@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Georgia Hospital System Scorecard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="top-nav">
+                <div class="logo">
+                    <span>WATCH</span>
+                    <span>Georgia Watch</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#">Rankings</a>
+                    <a href="#">Methodology</a>
+                    <a href="#">About Us</a>
+                </div>
+            </div>
+            <!-- This is the logo container you need to add (take this out) -->
+            <div class="logo-container">
+                <div class="GEORGIA WATCH logo2.png">
+                    <span>GEORGIA</span>
+                </div>
+            </div>
+            <div class="header-content">
+                <h1>GEORGIA WATCH</h1>
+                <p>Advocating for patients and protecting consumers since 2002</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="container main-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="accordion-section">
+				<button class="accordion active">Location Search</button>
+				<div class="panel" style="display:block;">
+				  <label>
+					Enter ZIP Code:
+					<input type="text" id="zipInput" placeholder="12345">
+				  </label>
+				  <br>
+				  <label>
+					Radius:
+					<select id="radiusSelect">
+					  <option value="5">5 miles</option>
+					  <option value="10">10 miles</option>
+					  <option value="15">15 miles</option>
+					  <option value="20">20 miles</option>
+					  <option value="25">25 miles</option>
+					  <option value="30">30 miles</option>
+					</select>
+				  </label>
+				</div>
+			  </div>
+
+			  <!-- Hospital Type -->
+			  <div class="accordion-section">
+				<button class="accordion">Hospital Type</button>
+				<div class="panel">
+				  <label><input type="checkbox" value="Urban"> Urban</label>
+				  <label><input type="checkbox" value="Rural"> Rural</label>
+				  <label><input type="checkbox" value="Non-profit"> Non-profit</label>
+				  <label><input type="checkbox" value="For Profit"> For Profit</label>
+				  <label><input type="checkbox" value="Church Affiliated"> Church Affiliated</label>
+				  <label><input type="checkbox" value="Academic Medical Center"> Academic Medical Center</label>
+				  <label><input type="checkbox" value="Safety Net"> Safety Net</label>
+				</div>
+			  </div>
+
+			  <!-- Hospital Services -->
+			  <div class="accordion-section">
+				<button class="accordion">Hospital Services</button>
+				<div class="panel">
+				  <label><input type="checkbox" value="Option 1"> Option 1</label>
+				  <label><input type="checkbox" value="Option 2"> Option 2</label>
+				</div>
+			  </div>
+
+			  <!-- Financial Transparency -->
+			  <div class="accordion-section">
+				<button class="accordion">Financial Transparency & Institutional Health</button>
+				<div class="panel">
+				  <label><input type="checkbox" value="Balance Growth"> Balance Growth</label>
+				  <label><input type="checkbox" value="Transparency"> Transparency</label>
+				  <label><input type="checkbox" value="Fiscal Health"> Fiscal Health</label>
+				  <label><input type="checkbox" value="Staffing"> Staffing</label>
+				</div>
+			  </div>
+
+			  <!-- Community Benefit Spending -->
+			  <div class="accordion-section">
+				<button class="accordion">Community Benefit Spending</button>
+				<div class="panel">
+				  <label><input type="checkbox" value="Tax Benefit"> Tax Benefit</label>
+				  <label><input type="checkbox" value="Quality of CBS"> Quality of CBS</label>
+				  <label><input type="checkbox" value="Strategic Use"> Strategic Use</label>
+				</div>
+			  </div>
+
+			  <!-- Healthcare Affordability -->
+			  <div class="accordion-section">
+				<button class="accordion">Healthcare Affordability & Billing</button>
+				<div class="panel">
+				  <label><input type="checkbox" value="Financial Burden"> Financial Burden</label>
+				  <label><input type="checkbox" value="Charity Care"> Charity Care</label>
+				  <label><input type="checkbox" value="Medical Debt"> Medical Debt</label>
+				</div>
+			  </div>
+
+			  <!-- Healthcare Access -->
+			  <div class="accordion-section">
+				<button class="accordion">Healthcare Access & Social Responsibility</button>
+				<div class="panel">
+				  <label><input type="checkbox" value="Range of Services"> Range of Services</label>
+				  <label><input type="checkbox" value="Demographic Alignment"> Demographic Alignment</label>
+				  <label><input type="checkbox" value="Workforce Training"> Workforce Training</label>
+				  <label><input type="checkbox" value="Pay Equity Ratio"> Pay Equity Ratio</label>
+				</div>
+			  </div>
+
+			  <!-- Action Buttons -->
+		  <div class="filter-actions">
+			<button id="applyFiltersBtn">Apply Filters</button>
+			<button id="resetFiltersBtn" type="reset">Reset</button>
+			<button id="downloadDataBtn">Download Data</button>
+		  </div>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="content-area">
+            <section class="search-section">
+                <div class="results-header">
+                    <div>
+                        <span id="resultsCount">Viewing 0 results</span>
+                    </div>
+                </div>
+
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Grade</th>
+                            <th width="70%">Hospital Name & Location</th>
+                            <th width="20%">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hospitalResults">
+                        <!-- Results will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="map-section">
+                <h2>HOSPITAL LOCATIONS</h2>
+                <div id="mainMap"></div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="#">Georgia Watch</a></li>
+                    <li><a href="#">Rankings</a></li>
+                    <li><a href="#">Methodology</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Donate</a></li>
+                    <li><a href="#">Legal/Privacy</a></li>
+                    <li><a href="#">Site Map</a></li>
+                </ul>
+                <div class="copyright">
+                    <p>Georgia Watch is a non-profit, nonpartisan 501(c)3 organization. © 2024 Georgia Watch. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

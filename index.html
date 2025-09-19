@@ -13,7 +13,7 @@
         <div class="container">
             <div class="top-nav">
                 <div class="logo">
-                    <span>WATCH</span>
+                    <img width="165.98" height="78" src="images/logo2.png" alt="Georgia Watch Logo" class="logo-img">
                     <span>Georgia Watch</span>
                 </div>
                 <div class="nav-links">
@@ -38,27 +38,26 @@
     <div class="container main-content">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="accordion-section">
-				<button class="accordion active">Location Search</button>
-				<div class="panel" style="display:block;">
-				  <label>
-					Enter ZIP Code:
-					<input type="text" id="zipInput" placeholder="12345">
-				  </label>
-				  <br>
-				  <label>
-					Radius:
-					<select id="radiusSelect">
-					  <option value="5">5 miles</option>
-					  <option value="10">10 miles</option>
-					  <option value="15">15 miles</option>
-					  <option value="20">20 miles</option>
-					  <option value="25">25 miles</option>
-					  <option value="30">30 miles</option>
-					</select>
-				  </label>
-				</div>
+            <div class="location-search">
+				<h3>Location Search</h3>
+				<label>
+				  Enter ZIP Code:
+				  <input type="text" id="zipInput" placeholder="12345">
+				</label>
+				<br>
+				<label>
+				  Radius:
+				  <select id="radiusSelect">
+					<option value="5">5 miles</option>
+					<option value="10">10 miles</option>
+					<option value="15">15 miles</option>
+					<option value="20">20 miles</option>
+					<option value="25">25 miles</option>
+					<option value="30">30 miles</option>
+				  </select>
+				</label>
 			  </div>
+
 
 			  <!-- Hospital Type -->
 			  <div class="accordion-section">
@@ -129,7 +128,7 @@
 		  <div class="filter-actions">
 			<button id="applyFiltersBtn">Apply Filters</button>
 			<button id="resetFiltersBtn" type="reset">Reset</button>
-			<button id="downloadDataBtn">Download Data</button>
+			<button id="downloadDataBtn" bgcolor="#f48810">Download Data</button>
 		  </div>
         </aside>
 

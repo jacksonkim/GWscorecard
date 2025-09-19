@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Roboto', Century Gothic, sans-serif;
+    font-family: "Century Gothic", CenturyGothic, "Rubik", sans-serif;
 }
 
 body {
@@ -184,9 +184,6 @@ header {
     width: 100%;
 }
 
-
-
-
 /* Sidebar styles */
 .sidebar {
   width: 260px;
@@ -195,8 +192,22 @@ header {
   border-right: 1px solid #ccc;
 }
 
+.location-search {
+  background: #eee;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.location-search h3 {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .accordion {
-  background: #ddd;
+  background: #6fb353;   /* sponsor green */
+  color: white;          /* white text for contrast */
   cursor: pointer;
   padding: 10px;
   width: 100%;
@@ -205,10 +216,25 @@ header {
   outline: none;
   margin-top: 5px;
   font-weight: bold;
+  position: relative;
+  font-family: "Century Gothic", CenturyGothic, "Rubik", sans-serif; /* ensure consistency */
 }
 
 .accordion.active {
-  background: #bbb;
+  background: #5a9445;   /* darker green when open (optional) */
+}
+
+.accordion::after {
+  content: "▼";
+  font-size: 0.8em;
+  position: absolute;
+  right: 10px;
+  transition: transform 0.2s ease;
+  color: white;   /* make arrow match text */
+}
+
+.accordion.active::after {
+  content: "▲";
 }
 
 .panel {
@@ -240,6 +266,19 @@ header {
 
 .filter-actions button:hover {
   background: #5a9445;
+}
+
+#resetFiltersBtn {
+  background: #ccc;      /* grey background */
+  color: #333;           /* darker text */
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#resetFiltersBtn:hover {
+  background: #999;      /* darker grey on hover */
 }
 
 /* Content area styles */
@@ -386,24 +425,6 @@ header {
 
 .details-section p {
     margin-bottom: 8px;
-}
-
-.metric-bars {
-    margin-top: 15px;
-}
-
-.metric-bar {
-    margin-bottom: 15px;
-}
-
-.metric-name {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
-}
-
-.metric-value {
-    font-weight: 500;
 }
 
 .bar-container {
@@ -584,6 +605,19 @@ footer {
 .metrics-list li.active {
     background-color: #0078c8;
     color: white;
+}
+
+#downloadDataBtn {
+  background: #f48810;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#downloadDataBtn:hover {
+  background: #d9740e; /* slightly darker shade for hover */
 }
 
 /* Mobile responsiveness */

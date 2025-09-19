@@ -82,36 +82,21 @@ header {
 }
 
 /* GEORGIA WATCH Logo - ADDED THIS SECTION */
-.logo-container {
-    position: absolute;
-    top: 20px;
-    right: 40px;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px 15px;
-    border-radius: 8px;
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .logo-img {
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 1.2;
-    color: white;
-    text-align: center;
+  height: 40px;   /* adjust size as needed */
+  width: auto;
 }
 
-.logo-img span:first-child {
-    font-size: 28px;
-    display: block;
-    color: #ff9900;
-}
-
-.logo-img span:last-child {
-    font-size: 14px;
-    display: block;
-    margin-top: 5px;
-    font-weight: 400;
-    opacity: 0.9;
+.logo-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
 }
 
 /* Main content and sidebar layout */

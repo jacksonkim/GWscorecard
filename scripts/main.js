@@ -88,57 +88,64 @@ function renderHospitals(data) {
     return;
   }
 
-  data.forEach(hospital => {
-    const row = document.createElement("tr");
+data.forEach(hospital => {
+  const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+  const gradeClass = `grade-${grade}`;
 
-    // === Grade Cell ===
-    const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
-    const gradeClass = `grade-${grade}`;
-    const gradeCell = document.createElement("td");
-    gradeCell.innerHTML = grade !== "N/A"
-      ? `<span class="grade-circle ${gradeClass}">${grade}</span>`
-      : "N/A";
-    row.appendChild(gradeCell);
+  // === Main Row ===
+  const row = document.createElement("tr");
+  row.classList.add("hospital-row");
 
-    // === Name / Location Cell ===
-    const nameCell = document.createElement("td");
-    nameCell.innerHTML = `
-      <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
-      ${hospital.City || ""}, ${hospital.State || ""}
-    `;
-    row.appendChild(nameCell);
+  const gradeCell = document.createElement("td");
+  gradeCell.innerHTML = grade !== "N/A"
+    ? `<span class="grade-circle ${gradeClass}">${grade}</span>`
+    : "N/A";
+  row.appendChild(gradeCell);
 
-    // === Details Cell ===
-    const detailsCell = document.createElement("td");
-    detailsCell.style.textAlign = "center";
+  const nameCell = document.createElement("td");
+  nameCell.innerHTML = `
+    <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
+    ${hospital.City || ""}, ${hospital.State || ""}
+  `;
+  row.appendChild(nameCell);
 
-    const detailsButton = document.createElement("button");
-    detailsButton.textContent = "View Details";
-    detailsButton.classList.add("view-detail");
+  const buttonCell = document.createElement("td");
+  buttonCell.style.textAlign = "center";
+  const detailsButton = document.createElement("button");
+  detailsButton.textContent = "View Details";
+  detailsButton.classList.add("view-detail");
+  buttonCell.appendChild(detailsButton);
+  row.appendChild(buttonCell);
 
-    const detailInfo = document.createElement("div");
-    detailInfo.classList.add("detail-info");
-    detailInfo.style.display = "none";
-    detailInfo.innerHTML = `
+  // === Detail Row ===
+  const detailRow = document.createElement("tr");
+  detailRow.classList.add("hospital-detail-row");
+  detailRow.style.display = "none";
+
+  const detailCell = document.createElement("td");
+  detailCell.colSpan = 3;
+  detailCell.innerHTML = `
+    <div class="detail-info">
       <p><strong>Outcome Grade:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
       <p><strong>Value Grade:</strong> ${hospital.TIER_2_GRADE_Value || "N/A"}</p>
       <p><strong>Civic Grade:</strong> ${hospital.TIER_2_GRADE_Civic || "N/A"}</p>
       <p><strong>Safety Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Saf || "N/A"}</p>
       <p><strong>Experience Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Exp || "N/A"}</p>
-    `;
+    </div>
+  `;
+  detailRow.appendChild(detailCell);
 
-    detailsButton.addEventListener("click", () => {
-      detailInfo.style.display = (detailInfo.style.display === "none" || detailInfo.style.display === "")
-        ? "block"
-        : "none";
-    });
-
-    detailsCell.appendChild(detailsButton);
-    detailsCell.appendChild(detailInfo);
-    row.appendChild(detailsCell);
-
-    resultsTable.appendChild(row);
+  // === Toggle Logic ===
+  detailsButton.addEventListener("click", () => {
+    detailRow.style.display = (detailRow.style.display === "none" || detailRow.style.display === "")
+      ? "table-row"
+      : "none";
   });
+
+  // === Append both rows ===
+  resultsTable.appendChild(row);
+  resultsTable.appendChild(detailRow);
+});
 }
 
 

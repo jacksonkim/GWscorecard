@@ -151,7 +151,7 @@ function toggleHospitalDetails(hospitalId, button) {
     return;
   }
 
-  const hospital = hospitalsData.find(h => h.RECORD_ID === hospitalId);
+  const hospital = hospitalData.find(h => h.RECORD_ID === hospitalId);
   if (!hospital) {
     console.error("Hospital not found:", hospitalId);
     return;
@@ -336,7 +336,7 @@ function showHospitalDetailPage(hospitalId) {
     document.querySelector('.main-content').style.display = 'none';
     document.querySelector('.map-section').style.display = 'none';
 
-    const hospital = hospitalsData.find(h => h.RECORD_ID == hospitalId);
+    const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
 
     if (!hospital) {
         window.location.href = window.location.pathname;

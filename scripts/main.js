@@ -316,3 +316,38 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
   // TODO: backend or SheetJS export
 });
+
+function showHospitalDetailPage(hospitalId) {
+    document.querySelector('.main-content').style.display = 'none';
+    document.querySelector('.map-section').style.display = 'none';
+
+    const hospital = hospitalsData.find(h => h.RECORD_ID == hospitalId);
+
+    if (!hospital) {
+        window.location.href = window.location.pathname;
+        return;
+    }
+
+    const detailContainer = document.createElement('div');
+    detailContainer.className = 'hospital-detail-container';
+
+    const gradeClass = `grade-${hospital.TIER_1_GRADE_Lown_Composite}`;
+
+    const lat = 32.6782 + (Math.random() - 0.5) * 2;
+    const lng = -83.2226 + (Math.random() - 0.5) * 2;
+
+    detailContainer.innerHTML = `
+        <div class="hospital-header">
+            <h2>${hospital.HOSPITAL_NAME}</h2>
+            <span class="hospital-grade ${gradeClass}">${hospital.TIER_1_GRADE_Lown_Composite}</span>
+        </div>
+        <p><strong>Location:</strong> ${hospital.CITY}, ${hospital.STATE}</p>
+        <p><strong>Type:</strong> ${hospital.HOSPITAL_TYPE}</p>
+        <p><strong>Ownership:</strong> ${hospital.OWNERSHIP}</p>
+        <p><strong>System Name:</strong> ${hospital.SYSTEM_NAME}</p>
+        <p><strong>Zip Code:</strong> ${hospital.ZIP_CODE}</p>
+        <button onclick="window.location.reload()">Back to Results</button>
+    `;
+
+    document.body.appendChild(detailContainer);
+}

@@ -242,11 +242,18 @@ header {
 .hospital-detail-row {
   background-color: #f9f9f9;
   transition: all 0.3s ease-in-out;
+  border-top: 1px solid #ddd;
 }
 
 .detail-info {
-  padding: 10px;
+  padding: 8px 15px 5px;
   font-size: 0.9em;
+  margin-top: -10px;
+  margin-bottom: -5px;
+}
+
+.hospital-detail-row td {
+  border-top: 3px solid #6fb353;
 }
 
 /* Sidebar styles */
@@ -405,36 +412,40 @@ header {
 
 /* Grade circles */
 .grade-circle {
-  display: inline-block;
-  width: 28px;
-  height: 28px;
-  line-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  text-align: center;
+  background-color: #ccc; /* fallback */
   font-weight: bold;
+  font-size: 16px;         
   color: white;
   font-family: "Century Gothic", "Rubik", sans-serif;
+  text-align: center;
+  line-height: 1;
 }
 
 /* Grade color classes */
 .grade-A {
-  background-color: #388e3c; /* dark green */
+  background-color: #6fb353; 
 }
 
 .grade-B {
-  background-color: #7cb342; /* yellow-green */
+  background-color: #a4cc95; 
 }
 
 .grade-C {
-  background-color: #f9a825; /* amber */
+  background-color: #f9a825; 
 }
 
 .grade-D {
-  background-color: #ef6c00; /* orange */
+  background-color: #f9a825; 
 }
 
 .grade-F {
-  background-color: #d32f2f; /* red */
+  background-color: #f48810; 
 }
 
 /* Hospital name link */

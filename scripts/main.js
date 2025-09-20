@@ -136,11 +136,11 @@ data.forEach(hospital => {
   detailRow.appendChild(detailCell);
 
   // === Toggle Logic ===
-  detailsButton.addEventListener("click", () => {
-    detailRow.style.display = (detailRow.style.display === "none" || detailRow.style.display === "")
-      ? "table-row"
-      : "none";
-  });
+	detailsButton.addEventListener("click", () => {
+	  const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
+	  detailRow.style.display = isHidden ? "table-row" : "none";
+	  detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
+	});
 
   // === Append both rows ===
   resultsTable.appendChild(row);

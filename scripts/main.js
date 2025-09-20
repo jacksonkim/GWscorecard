@@ -13,12 +13,11 @@ document.querySelectorAll(".accordion").forEach(btn => {
 // Data Storage
 // ===============================
 let hospitalData = [];
-const resultsContainer = document.getElementById("resultsContainer");
 
 // ===============================
 // Load JSON Data
 // ===============================
-fetch("./data/2025/2025_Lown_Index_GA.json")
+fetch("data/2025/2025_Lown_Index_GA.json")
   .then(res => res.json())
   .then(data => {
     hospitalData = data;
@@ -47,20 +46,36 @@ function showHospitalDetails(hospital, container) {
 }
 
 function renderHospitals(data) {
-  resultsContainer.innerHTML = "";
+  const resultsTable = document.getElementById("hospitalResults");
+  const resultsCount = document.getElementById("resultsCount");
+
+  // Clear old results
+  resultsTable.innerHTML = "";
+
+  // Update results count
+  resultsCount.textContent = `Viewing ${data.length} results`;
 
   if (!data.length) {
-    resultsContainer.innerHTML = "<p>No hospitals match the selected filters.</p>";
+    resultsTable.innerHTML = `<tr><td colspan="3">No hospitals match the selected filters.</td></tr>`;
     return;
   }
 
   data.forEach(hospital => {
-    const div = document.createElement("div");
-    div.classList.add("hospital-card");
-    showHospitalDetails(hospital, div);
-    resultsContainer.appendChild(div);
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${hospital.TIER_1_GRADE_Lown_Composite || "N/A"}</td>
+      <td>
+        <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
+        ${hospital.City || ""}, ${hospital.State || ""}
+      </td>
+      <td><a href="?id=${hospital.RECORD_ID}" class="details-button">View Details</a></td>
+    `;
+
+    resultsTable.appendChild(row);
   });
 }
+
 
 // ===============================
 // Apply Filters
@@ -102,4 +117,3 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
   // TODO: backend or SheetJS export
 });
-

@@ -57,7 +57,16 @@ function showHospitalDetails(hospital, container) {
       </div>
     </div>
     <div style="text-align: center; margin-top: 15px;">
-      <a href="?id=${hospital.RECORD_ID}" class="details-button">View Full Details Page</a>
+      const detailsButton = document.createElement("button");
+detailsButton.textContent = "View Details";
+detailsButton.classList.add("details-button");
+detailsButton.addEventListener("click", () => {
+  toggleHospitalDetails(hospital.RECORD_ID, detailsButton);
+});
+
+const detailsCell = document.createElement("td");
+detailsCell.appendChild(detailsButton);
+row.appendChild(detailsCell);
     </div>
   `;
 }
@@ -292,3 +301,4 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
   // TODO: backend or SheetJS export
 });
+

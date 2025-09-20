@@ -72,6 +72,7 @@ row.appendChild(detailsCell);
 }
 
 
+
 function renderHospitals(data) {
   const resultsTable = document.getElementById("hospitalResults");
   const resultsCount = document.getElementById("resultsCount");
@@ -90,19 +91,16 @@ function renderHospitals(data) {
   data.forEach(hospital => {
     const row = document.createElement("tr");
 
-    // Build grade bubble
+    // === Grade Cell ===
     const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
     const gradeClass = `grade-${grade}`;
-    const gradeHTML = grade !== "N/A"
+    const gradeCell = document.createElement("td");
+    gradeCell.innerHTML = grade !== "N/A"
       ? `<span class="grade-circle ${gradeClass}">${grade}</span>`
       : "N/A";
-
-    // First cell: grade
-    const gradeCell = document.createElement("td");
-    gradeCell.innerHTML = gradeHTML;
     row.appendChild(gradeCell);
 
-    // Second cell: hospital name/location
+    // === Name / Location Cell ===
     const nameCell = document.createElement("td");
     nameCell.innerHTML = `
       <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
@@ -110,23 +108,40 @@ function renderHospitals(data) {
     `;
     row.appendChild(nameCell);
 
-    // Third cell: details button
+    // === Details Cell ===
     const detailsCell = document.createElement("td");
     detailsCell.style.textAlign = "center";
 
     const detailsButton = document.createElement("button");
     detailsButton.textContent = "View Details";
-    detailsButton.classList.add("details-button");
+    detailsButton.classList.add("view-detail");
+
+    const detailInfo = document.createElement("div");
+    detailInfo.classList.add("detail-info");
+    detailInfo.style.display = "none";
+    detailInfo.innerHTML = `
+      <p><strong>Outcome Grade:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
+      <p><strong>Value Grade:</strong> ${hospital.TIER_2_GRADE_Value || "N/A"}</p>
+      <p><strong>Civic Grade:</strong> ${hospital.TIER_2_GRADE_Civic || "N/A"}</p>
+      <p><strong>Safety Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Saf || "N/A"}</p>
+      <p><strong>Experience Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Exp || "N/A"}</p>
+    `;
+
     detailsButton.addEventListener("click", () => {
-      toggleHospitalDetails(hospital.RECORD_ID, detailsButton);
+      detailInfo.style.display = (detailInfo.style.display === "none" || detailInfo.style.display === "")
+        ? "block"
+        : "none";
     });
 
     detailsCell.appendChild(detailsButton);
+    detailsCell.appendChild(detailInfo);
     row.appendChild(detailsCell);
 
     resultsTable.appendChild(row);
   });
 }
+
+
 
 
 function toggleHospitalDetails(hospitalId, button) {
@@ -351,3 +366,4 @@ function showHospitalDetailPage(hospitalId) {
 
     document.body.appendChild(detailContainer);
 }
+

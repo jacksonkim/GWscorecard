@@ -186,7 +186,7 @@ header {
 .view-toggle {
   background: #e7f5e5;
   padding: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   border: 2px solid #6fb353;
   border-radius: 8px;
   font-family: "Century Gothic", "Rubik", sans-serif;
@@ -200,6 +200,7 @@ header {
 .view-buttons {
   display: flex;
   gap: 10px;
+  margin-bottom: 15px;
   flex-wrap: wrap;
 }
 
@@ -221,6 +222,31 @@ header {
 
 .toggle-btn.active {
   background: #f48810;  /* Highlight selected option */
+}
+
+.view-detail {
+  background: #f48810;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.view-detail:hover {
+  background: #d9740e;
+}
+
+.hospital-detail-row {
+  background-color: #f9f9f9;
+  transition: all 0.3s ease-in-out;
+}
+
+.detail-info {
+  padding: 10px;
+  font-size: 0.9em;
 }
 
 /* Sidebar styles */
@@ -256,7 +282,7 @@ header {
   margin-top: 5px;
   font-weight: bold;
   position: relative;
-  font-family: "Century Gothic", CenturyGothic, "Rubik", sans-serif; /* ensure consistency */
+  font-family: "Century Gothic", CenturyGothic, "Rubik", sans-serif; 
 }
 
 .accordion.active {

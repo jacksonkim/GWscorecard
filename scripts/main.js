@@ -75,13 +75,6 @@ row.appendChild(detailsCell);
 function renderHospitals(data) {
   const resultsTable = document.getElementById("hospitalResults");
   const resultsCount = document.getElementById("resultsCount");
-  
-  const detailsButton = document.createElement("button");
-  detailsButton.textContent = "View Details";
-  detailsButton.classList.add("details-button");
-  detailsButton.addEventListener("click", () => {
-  toggleHospitalDetails(hospital.RECORD_ID, detailsButton);
-  });
 
   // Clear old results
   resultsTable.innerHTML = "";
@@ -104,39 +97,55 @@ function renderHospitals(data) {
       ? `<span class="grade-circle ${gradeClass}">${grade}</span>`
       : "N/A";
 
-    row.innerHTML = `
-      <td>${gradeHTML}</td>
-      <td>
-        <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
-        ${hospital.City || ""}, ${hospital.State || ""}
-      </td>
-      <td style="text-align: center;">
-        <button class="details-button" onclick="toggleHospitalDetails('${hospital.RECORD_ID}', this)">View Details</button>
-      </td>
+    // First cell: grade
+    const gradeCell = document.createElement("td");
+    gradeCell.innerHTML = gradeHTML;
+    row.appendChild(gradeCell);
+
+    // Second cell: hospital name/location
+    const nameCell = document.createElement("td");
+    nameCell.innerHTML = `
+      <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
+      ${hospital.City || ""}, ${hospital.State || ""}
     `;
+    row.appendChild(nameCell);
+
+    // Third cell: details button
+    const detailsCell = document.createElement("td");
+    detailsCell.style.textAlign = "center";
+
+    const detailsButton = document.createElement("button");
+    detailsButton.textContent = "View Details";
+    detailsButton.classList.add("details-button");
+    detailsButton.addEventListener("click", () => {
+      toggleHospitalDetails(hospital.RECORD_ID, detailsButton);
+    });
+
+    detailsCell.appendChild(detailsButton);
+    row.appendChild(detailsCell);
 
     resultsTable.appendChild(row);
   });
 }
 
+
 function toggleHospitalDetails(hospitalId, button) {
-  // Remove existing detail row if it's already open
   const existingRow = document.querySelector(`.details-row[data-id="${hospitalId}"]`);
   if (existingRow) {
-    existingRow.remove();
+    existingRow.remove(); // close if already open
     return;
   }
 
-  // Find the hospital data from the global hospitalsData array
   const hospital = hospitalsData.find(h => h.RECORD_ID === hospitalId);
-  if (!hospital) return;
+  if (!hospital) {
+    console.error("Hospital not found:", hospitalId);
+    return;
+  }
 
-  // Create the detail row element
   const detailsRow = document.createElement("tr");
   detailsRow.classList.add("details-row");
   detailsRow.setAttribute("data-id", hospitalId);
 
-  // Fill in detail preview content
   detailsRow.innerHTML = `
     <td colspan="3">
       <div class="hospital-details-dropdown show">
@@ -147,7 +156,6 @@ function toggleHospitalDetails(hospitalId, button) {
     </td>
   `;
 
-  // Insert it after the clicked row
   const currentRow = button.closest("tr");
   currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
 }
@@ -155,25 +163,32 @@ function toggleHospitalDetails(hospitalId, button) {
 
 function renderGrades(hospital) {
   const metrics = [
-    "TIER_1_GRADE_Lown_Composite",
-    "TIER_2_GRADE_Lown_PatientOutcomes",
-    "TIER_3_GRADE_Lown_CareResponsiveness",
-    "TIER_4_GRADE_Lown_Transparency"
+    { key: "TIER_1_GRADE_Lown_Composite", label: "Tier 1 Composite" },
+    { key: "TIER_2_GRADE_Outcome", label: "Tier 2 Outcome" },
+    { key: "TIER_2_GRADE_Value", label: "Tier 2 Value" },
+    { key: "TIER_2_GRADE_Civic", label: "Tier 2 Civic" },
+    { key: "TIER_3_GRADE_Outcome", label: "Tier 3 Outcome" },
+    { key: "TIER_3_GRADE_Pat_Saf", label: "Tier 3 Patient Safety" },
+    { key: "TIER_3_GRADE_Pat_Exp", label: "Tier 3 Patient Experience" },
+    { key: "TIER_3_GRADE_OU", label: "Tier 3 Overuse" },
+    { key: "TIER_3_GRADE_Cost_Eff", label: "Tier 3 Cost Efficiency" },
+    { key: "TIER_3_GRADE_Exec_Comp", label: "Tier 3 Exec Comp" },
+    { key: "TIER_3_GRADE_CB", label: "Tier 3 Community Benefit" },
+    { key: "TIER_3_GRADE_Inclusivity", label: "Tier 3 Inclusivity" }
   ];
 
-  return metrics.map(metric => {
-    const grade = hospital[metric] || "N/A";
-    const label = metric.replace("TIER_", "Tier ").replace(/_/g, " ");
+  return metrics.map(m => {
+    const grade = hospital[m.key] || "N/A";
     const gradeClass = `grade-${grade}`;
-
     return `
       <div class="details-section">
-        <h4>${label}</h4>
+        <h4>${m.label}</h4>
         <span class="grade-circle ${gradeClass}">${grade}</span>
       </div>
     `;
   }).join("");
 }
+
 
 
 const viewSystemsBtn = document.getElementById("viewSystemsBtn");
@@ -301,4 +316,3 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
   // TODO: backend or SheetJS export
 });
-

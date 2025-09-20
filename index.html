@@ -23,10 +23,7 @@
                 </div>
             </div>
             <!-- This is the logo container you need to add (take this out) -->
-            <div class="logo-container">
-                <div class="logo-img">
-                </div>
-            </div>
+            
             <div class="header-content">
                 <h1>GEORGIA WATCH</h1>
                 <p>Advocating for patients and protecting consumers since 2002</p>
@@ -37,6 +34,21 @@
     <div class="container main-content">
         <!-- Sidebar -->
         <aside class="sidebar">
+		
+			<div class="view-toggle">
+			  <h3>View Results By:</h3>
+			  <div class="view-buttons">
+				<button id="viewSystemsBtn" class="toggle-btn">Hospital Systems</button>
+				<button id="viewIndividualsBtn" class="toggle-btn">Individual Hospitals</button>
+			</div>
+			
+			<div id="individualOptions" style="display: none; margin-top: 10px;">
+			  <h4 style="margin-bottom: 8px;">Individual Hospital Type:</h4>
+			  <div class="view-buttons">
+				<button id="filterCriticalBtn" class="toggle-btn">Critical Access</button>
+				<button id="filterAcuteBtn" class="toggle-btn">Acute Care</button>
+			  </div>
+			</div>
             <div class="location-search">
 				<h3>Location Search</h3>
 				<label>
@@ -55,6 +67,7 @@
 					<option value="30">30 miles</option>
 				  </select>
 				</label>
+				<button id="applyLocationBtn">Apply Location</button>
 			  </div>
 
 
@@ -130,10 +143,17 @@
         <main class="content-area">
             <section class="search-section">
                 <div class="results-header">
-                    <div>
-                        <span id="resultsCount">Viewing 0 results</span>
-                    </div>
-                </div>
+				  <span id="resultsCount">Viewing 0 results</span>
+
+				  <label for="sortSelect" class="sort-select-label">
+					Sort by:
+					<select id="sortSelect">
+					  <option value="grade">Grade (High to Low)</option>
+					  <option value="distance">Distance (Closest First)</option>
+					  <option value="name">Hospital Name (A–Z)</option>
+					</select>
+				  </label>
+				</div>
 
                 <table class="results-table">
                     <thead>
@@ -176,6 +196,6 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="scripts/main.js"></script>
+    <script src="scripts/main_patched.js"></script>
 </body>
 </html>

@@ -17,7 +17,7 @@ let hospitalData = [];
 // ===============================
 // Load JSON Data
 // ===============================
-fetch("data/2025/2025_Lown_Index_GA.json")
+fetch("./data/2025/2025_Lown_Index_GA.json")
   .then(res => res.json())
   .then(data => {
     hospitalData = data;
@@ -117,3 +117,4 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
   // TODO: backend or SheetJS export
 });
+

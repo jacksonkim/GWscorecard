@@ -24,7 +24,7 @@ body {
 header {
     background: linear-gradient(#6fb353);
     color: white;
-    padding: 15px 0;
+    padding: 8px 0;
     position: relative; /* Added for logo positioning */
 }
 
@@ -32,7 +32,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 .logo {
@@ -68,12 +68,12 @@ header {
 
 .header-content {
     text-align: center;
-    padding: 20px 0;
+    padding: 8px 0;
 }
 
 .header-content h1 {
     font-size: 32px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .header-content p {
@@ -89,7 +89,7 @@ header {
 }
 
 .logo-img {
-  height: 40px;   /* adjust size as needed */
+  height: 80px;
   width: auto;
 }
 
@@ -167,6 +167,60 @@ header {
 #applyMetricsBtn {
     margin-top: 15px;
     width: 100%;
+}
+
+#applyLocationBtn {
+  margin-top: 10px;
+  background: #6fb353;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#applyLocationBtn:hover {
+  background: #5a9445;
+}
+
+.view-toggle {
+  background: #e7f5e5;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 2px solid #6fb353;
+  border-radius: 8px;
+  font-family: "Century Gothic", "Rubik", sans-serif;
+}
+
+.view-toggle h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.view-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toggle-btn {
+  flex: 1;
+  background: #6fb353;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: #5a9445;
+}
+
+.toggle-btn.active {
+  background: #f48810;  /* Highlight selected option */
 }
 
 /* Sidebar styles */
@@ -281,12 +335,20 @@ header {
 }
 
 .results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.sort-select-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Century Gothic", "Rubik", sans-serif;
+  font-size: 14px;
 }
 
 /* Results table */
@@ -317,38 +379,36 @@ header {
 
 /* Grade circles */
 .grade-circle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-weight: bold;
-    font-size: 20px;
-    color: white;
-    margin-right: 10px;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  font-family: "Century Gothic", "Rubik", sans-serif;
 }
 
+/* Grade color classes */
 .grade-A {
-    background-color: #2ecc71; /* Green */
+  background-color: #388e3c; /* dark green */
 }
 
 .grade-B {
-    background-color: #57d68d; /* Light Green */
+  background-color: #7cb342; /* yellow-green */
 }
 
 .grade-C {
-    background-color: #ffe135; /* Lemon */
-    color: #333;
+  background-color: #f9a825; /* amber */
 }
 
 .grade-D {
-    background-color: #ffd700; /* Yellow */
-    color: #333;
+  background-color: #ef6c00; /* orange */
 }
 
 .grade-F {
-    background-color: #e74c3c; /* Red */
+  background-color: #d32f2f; /* red */
 }
 
 /* Hospital name link */

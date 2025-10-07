@@ -37,101 +37,88 @@ function renderHospitals(data) {
     return;
   }
 
-data.forEach(hospital => {
-  // Convert letter grade to star rating
-	const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
-	const stars = convertGradeToStars(grade);
+  data.forEach(hospital => {
+    // Convert letter grade to star rating
+    const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+    const stars = convertGradeToStars(grade);
 
-  // === Main Row ===
-  const row = document.createElement("tr");
-  row.classList.add("hospital-row");
+    // === Main Row ===
+    const row = document.createElement("tr");
+    row.classList.add("hospital-row");
 
-  const gradeCell = document.createElement("td");
-	gradeCell.innerHTML = `
-	  <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
-		${renderStars(stars.value)}
-		<span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
-	  </div>
-	`;
-	row.appendChild(gradeCell);
+    const gradeCell = document.createElement("td");
+    gradeCell.innerHTML = `
+      <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
+        ${renderStars(stars.value)}
+        <span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
+      </div>
+    `;
+    row.appendChild(gradeCell);
 
-  const nameCell = document.createElement("td");
-	  nameCell.innerHTML = `
-	  <strong>
-		<a href="details.html?id=${hospital.RECORD_ID}" class="hospital-link">
-		  ${hospital.Name || "Unnamed Hospital"}
-		</a>
-	  </strong><br>
-	  ${hospital.City || ""}, ${hospital.State || ""}
-	`;
-  row.appendChild(nameCell);
+    const nameCell = document.createElement("td");
+    nameCell.innerHTML = `
+      <strong>
+        <a href="details.html?id=${hospital.RECORD_ID}" class="hospital-link">
+          ${hospital.Name || "Unnamed Hospital"}
+        </a>
+      </strong><br>
+      ${hospital.City || ""}, ${hospital.State || ""}
+    `;
+    row.appendChild(nameCell);
 
-	// Create container for both buttons
-	const buttonCell = document.createElement("td");
-	buttonCell.style.textAlign = "center";
-	buttonCell.style.display = "flex";
-	buttonCell.style.flexDirection = "column";
-	buttonCell.style.alignItems = "center";
-	buttonCell.style.gap = "6px";
+    // === Buttons ===
+    const buttonCell = document.createElement("td");
+    buttonCell.classList.add("details-buttons");
 
-	// First button – toggles inline details card
-	const detailsButton = document.createElement("button");
-	detailsButton.textContent = "View Details ▼";
-	detailsButton.classList.add("toggle-detail");
-	detailsButton.addEventListener("click", () => {
-	  const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
-	  detailRow.style.display = isHidden ? "table-row" : "none";
-	  detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
-	});
+    const detailsButton = document.createElement("button");
+    detailsButton.textContent = "View Details ▼";
+    detailsButton.classList.add("toggle-detail");
 
-	// Second button – opens full details page
-	const fullDetailsButton = document.createElement("button");
-	fullDetailsButton.textContent = "View Full Details";
-	fullDetailsButton.classList.add("view-full-detail");
-	fullDetailsButton.addEventListener("click", () => {
-	  if (hospital.RECORD_ID) {
-		window.location.href = `details.html?id=${hospital.RECORD_ID}`;
-	  } else {
-		showErrorPopup("Sorry, we couldn't find more details for this hospital.");
-	  }
-	});
+    const fullDetailsButton = document.createElement("button");
+    fullDetailsButton.textContent = "View Full Details";
+    fullDetailsButton.classList.add("view-full-detail");
+    fullDetailsButton.addEventListener("click", () => {
+      if (hospital.RECORD_ID) {
+        window.location.href = `details.html?id=${hospital.RECORD_ID}`;
+      } else {
+        showErrorPopup("Sorry, we couldn't find more details for this hospital.");
+      }
+    });
 
-	buttonCell.appendChild(detailsButton);
-	buttonCell.appendChild(fullDetailsButton);
-	row.appendChild(buttonCell);
+    buttonCell.appendChild(detailsButton);
+    buttonCell.appendChild(fullDetailsButton);
+    row.appendChild(buttonCell);
 
-  // === Detail Row ===
-  const detailRow = document.createElement("tr");
-  detailRow.classList.add("hospital-detail-row");
-  detailRow.style.display = "none";
+    // === Detail Row (collapsed preview) ===
+    const detailRow = document.createElement("tr");
+    detailRow.classList.add("hospital-detail-row");
+    detailRow.style.display = "none";
 
-  const detailCell = document.createElement("td");
-  detailCell.colSpan = 3;
-  detailCell.innerHTML = `
-    <div class="detail-info">
-      <p><strong>Outcome Grade:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
-      <p><strong>Value Grade:</strong> ${hospital.TIER_2_GRADE_Value || "N/A"}</p>
-      <p><strong>Civic Grade:</strong> ${hospital.TIER_2_GRADE_Civic || "N/A"}</p>
-      <p><strong>Safety Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Saf || "N/A"}</p>
-      <p><strong>Experience Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Exp || "N/A"}</p>
-    </div>
-  `;
-  detailRow.appendChild(detailCell);
+    const detailCell = document.createElement("td");
+    detailCell.colSpan = 3;
+    detailCell.innerHTML = `
+      <div class="detail-info">
+        <p><strong>Outcome Grade:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
+        <p><strong>Value Grade:</strong> ${hospital.TIER_2_GRADE_Value || "N/A"}</p>
+        <p><strong>Civic Grade:</strong> ${hospital.TIER_2_GRADE_Civic || "N/A"}</p>
+        <p><strong>Safety Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Saf || "N/A"}</p>
+        <p><strong>Experience Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Exp || "N/A"}</p>
+      </div>
+    `;
+    detailRow.appendChild(detailCell);
 
-  // === Toggle Logic ===
-	detailsButton.addEventListener("click", () => {
-	  const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
-	  detailRow.style.display = isHidden ? "table-row" : "none";
-	  detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
-	});
+    // === Toggle Logic (single listener) ===
+    detailsButton.addEventListener("click", () => {
+      const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
+      detailRow.style.display = isHidden ? "table-row" : "none";
+      detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
+    });
 
-  // === Append both rows ===
-  resultsTable.appendChild(row);
-  resultsTable.appendChild(detailRow);
-});
+    // === Append both rows ===
+    resultsTable.appendChild(row);
+    resultsTable.appendChild(detailRow);
+  });
 }
-
-
 
 
 function toggleHospitalDetails(hospitalId, button) {
@@ -504,6 +491,10 @@ function initHospitalMap(data) {
     // Reset to Georgia default if no markers
     map.setView([32.1656, -82.9001], 7);
   }
+  
+  setTimeout(() => {
+  map.invalidateSize();
+	}, 200);
 }
 
 // ===============================

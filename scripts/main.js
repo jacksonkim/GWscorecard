@@ -97,14 +97,24 @@ function renderHospitals(data) {
     const detailCell = document.createElement("td");
     detailCell.colSpan = 3;
     detailCell.innerHTML = `
-      <div class="detail-info">
-        <p><strong>Outcome Grade:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
-        <p><strong>Value Grade:</strong> ${hospital.TIER_2_GRADE_Value || "N/A"}</p>
-        <p><strong>Civic Grade:</strong> ${hospital.TIER_2_GRADE_Civic || "N/A"}</p>
-        <p><strong>Safety Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Saf || "N/A"}</p>
-        <p><strong>Experience Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Exp || "N/A"}</p>
-      </div>
-    `;
+	  <div class="detail-info">
+		<p><strong>Outcome:</strong>
+		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</span>
+		</p>
+		<p><strong>Value:</strong>
+		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</span>
+		</p>
+		<p><strong>Civic:</strong>
+		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</span>
+		</p>
+		<p><strong>Safety:</strong>
+		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</span>
+		</p>
+		<p><strong>Experience:</strong>
+		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</span>
+		</p>
+	  </div>
+	`;
     detailRow.appendChild(detailCell);
 
     // === Toggle Logic (single listener) ===
@@ -435,17 +445,32 @@ function emptyStarSVG() {
 let map; // Global map instance so we can reuse it
 let mapMarkers = []; // Store current markers to clear them later
 
+// ===============================
+// ZIP-Based Coordinate Approximation (for hospitals without lat/lon)
+// ===============================
+function getZipCoords(zip) {
+  const baseLat = 31.0;   // southern edge of Georgia
+  const baseLon = -85.5;  // western edge of Georgia
+  const zipNum = parseInt(String(zip).replace(/\D/g, "")) || 30000;
+
+  // Spread zip codes somewhat evenly across the state
+  const offsetLat = ((zipNum % 300) / 100) * 0.8; // 0–2.4° northward variation
+  const offsetLon = ((zipNum % 700) / 100) * 0.8; // 0–2.4° eastward variation
+
+  return [baseLat + offsetLat, baseLon + offsetLon];
+}
+
 function initHospitalMap(data) {
   const mapDiv = document.getElementById("mainMap");
   if (!mapDiv) return;
 
   // Initialize only once
-  if (!map) {
-    map = L.map("mainMap").setView([32.1656, -82.9001], 7);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
-  }
+	if (!map) {
+	  map = L.map("mainMap").setView([32.7, -83.4], 7); // centered around Georgia
+	  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+		attribution: "&copy; OpenStreetMap contributors"
+	  }).addTo(map);
+	}
 
   // Clear old markers
   mapMarkers.forEach(marker => map.removeLayer(marker));
@@ -454,18 +479,22 @@ function initHospitalMap(data) {
   // Add new markers
   data.forEach(hospital => {
     // Try all common latitude/longitude field names
-    const lat =
-      parseFloat(hospital.Latitude) ||
-      parseFloat(hospital.LAT) ||
-      parseFloat(hospital.lat) ||
-      parseFloat(hospital.latitude);
-    const lon =
-      parseFloat(hospital.Longitude) ||
-      parseFloat(hospital.LON) ||
-      parseFloat(hospital.lon) ||
-      parseFloat(hospital.longitude);
+	let lat =
+	  parseFloat(hospital.Latitude) ||
+	  parseFloat(hospital.LAT) ||
+	  parseFloat(hospital.lat) ||
+	  parseFloat(hospital.latitude);
+	let lon =
+	  parseFloat(hospital.Longitude) ||
+	  parseFloat(hospital.LON) ||
+	  parseFloat(hospital.lon) ||
+	  parseFloat(hospital.longitude);
 
-    if (!lat || !lon) return; // Skip entries missing coordinates
+	// If no coordinates, approximate from ZIP code
+	if ((!lat || !lon) && hospital.Zip) {
+	  [lat, lon] = getZipCoords(hospital.Zip);
+	}
+	if (!lat || !lon) return; // Skip entries missing coordinates
 
     const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
     const stars = convertGradeToStars(grade);

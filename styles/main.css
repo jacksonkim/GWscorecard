@@ -672,3 +672,28 @@ details[open] summary {
   border-radius: 0 0 8px 8px;
   line-height: 1.4;
 }
+.details-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-detail,
+.view-full-detail {
+  background: #f48810;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.2s ease;
+  width: 140px;
+  text-align: center;
+}
+
+.toggle-detail:hover,
+.view-full-detail:hover {
+  background: #d9740e;
+}

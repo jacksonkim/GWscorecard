@@ -22,48 +22,6 @@ fetch("./data/2025/2025_Lown_Index_GA.json")
 // ===============================
 // Render Hospitals
 // ===============================
-function showHospitalDetails(hospital, container) {
-  // Determine grade class for color coding
-  const gradeClass = `grade-${hospital.TIER_1_GRADE_Lown_Composite}`;
-
-  // Set hospital details
-  container.innerHTML = `
-    <div class="details-grid">
-      <div class="details-section">
-        <h4>Hospital Information</h4>
-        <p><strong>Grade:</strong> <span class="grade-circle ${gradeClass}">${hospital.TIER_1_GRADE_Lown_Composite || "N/A"}</span></p>
-        <p><strong>Size:</strong> ${hospital.Size || "N/A"}</p>
-        <p><strong>Type:</strong> ${hospital.TYPE_NonProfit ? 'Nonprofit' : 'For Profit'}</p>
-        <p><strong>Location:</strong> ${hospital.TYPE_urban ? 'Urban' : 'Rural'}</p>
-        <p><strong>County Income:</strong> ${hospital.county_income_shrt || 'N/A'}</p>
-      </div>
-
-      <div class="details-section">
-        <h4>Key Metrics</h4>
-        <p><strong>Outcome Grade:</strong> ${hospital.TIER_2_GRADE_Outcome || "N/A"}</p>
-        <p><strong>Value Grade:</strong> ${hospital.TIER_2_GRADE_Value || "N/A"}</p>
-        <p><strong>Civic Grade:</strong> ${hospital.TIER_2_GRADE_Civic || "N/A"}</p>
-        <p><strong>Patient Safety Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Saf || "N/A"}</p>
-        <p><strong>Patient Experience Grade:</strong> ${hospital.TIER_3_GRADE_Pat_Exp || "N/A"}</p>
-      </div>
-    </div>
-    <div style="text-align: center; margin-top: 15px;">
-      const detailsButton = document.createElement("button");
-detailsButton.textContent = "View Details";
-detailsButton.classList.add("details-button");
-detailsButton.addEventListener("click", () => {
-  toggleHospitalDetails(hospital.RECORD_ID, detailsButton);
-});
-
-const detailsCell = document.createElement("td");
-detailsCell.appendChild(detailsButton);
-row.appendChild(detailsCell);
-    </div>
-  `;
-}
-
-
-
 function renderHospitals(data) {
   const resultsTable = document.getElementById("hospitalResults");
   const resultsCount = document.getElementById("resultsCount");
@@ -98,19 +56,49 @@ data.forEach(hospital => {
 	row.appendChild(gradeCell);
 
   const nameCell = document.createElement("td");
-  nameCell.innerHTML = `
-    <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
-    ${hospital.City || ""}, ${hospital.State || ""}
-  `;
+	  nameCell.innerHTML = `
+	  <strong>
+		<a href="details.html?id=${hospital.RECORD_ID}" class="hospital-link">
+		  ${hospital.Name || "Unnamed Hospital"}
+		</a>
+	  </strong><br>
+	  ${hospital.City || ""}, ${hospital.State || ""}
+	`;
   row.appendChild(nameCell);
 
-  const buttonCell = document.createElement("td");
-  buttonCell.style.textAlign = "center";
-  const detailsButton = document.createElement("button");
-  detailsButton.textContent = "View Details ▼";
-  detailsButton.classList.add("view-detail");
-  buttonCell.appendChild(detailsButton);
-  row.appendChild(buttonCell);
+	// Create container for both buttons
+	const buttonCell = document.createElement("td");
+	buttonCell.style.textAlign = "center";
+	buttonCell.style.display = "flex";
+	buttonCell.style.flexDirection = "column";
+	buttonCell.style.alignItems = "center";
+	buttonCell.style.gap = "6px";
+
+	// First button – toggles inline details card
+	const detailsButton = document.createElement("button");
+	detailsButton.textContent = "View Details ▼";
+	detailsButton.classList.add("toggle-detail");
+	detailsButton.addEventListener("click", () => {
+	  const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
+	  detailRow.style.display = isHidden ? "table-row" : "none";
+	  detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
+	});
+
+	// Second button – opens full details page
+	const fullDetailsButton = document.createElement("button");
+	fullDetailsButton.textContent = "View Full Details";
+	fullDetailsButton.classList.add("view-full-detail");
+	fullDetailsButton.addEventListener("click", () => {
+	  if (hospital.RECORD_ID) {
+		window.location.href = `details.html?id=${hospital.RECORD_ID}`;
+	  } else {
+		showErrorPopup("Sorry, we couldn't find more details for this hospital.");
+	  }
+	});
+
+	buttonCell.appendChild(detailsButton);
+	buttonCell.appendChild(fullDetailsButton);
+	row.appendChild(buttonCell);
 
   // === Detail Row ===
   const detailRow = document.createElement("tr");
@@ -195,15 +183,19 @@ function renderGrades(hospital) {
   ];
 
   return metrics.map(m => {
-    const grade = hospital[m.key] || "N/A";
-    const gradeClass = `grade-${grade}`;
-    return `
-      <div class="details-section">
-        <h4>${m.label}</h4>
-        <span class="grade-circle ${gradeClass}">${grade}</span>
-      </div>
-    `;
-  }).join("");
+	  const grade = hospital[m.key] || "N/A";
+	  const stars = convertGradeToStars(grade);
+	  return `
+		<div class="details-section">
+		  <h4>${m.label}</h4>
+		  <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
+			${renderStars(stars.value)}
+			<span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
+		  </div>
+		</div>
+	  `;
+	}).join("");
+
 }
 
 
@@ -453,31 +445,82 @@ function emptyStarSVG() {
 // ===============================
 // Leaflet Map Integration
 // ===============================
+let map; // Global map instance so we can reuse it
+let mapMarkers = []; // Store current markers to clear them later
+
 function initHospitalMap(data) {
   const mapDiv = document.getElementById("mainMap");
   if (!mapDiv) return;
 
-  // Initialize map (centered roughly on Georgia)
-  const map = L.map("mainMap").setView([32.1656, -82.9001], 7);
+  // Initialize only once
+  if (!map) {
+    map = L.map("mainMap").setView([32.1656, -82.9001], 7);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+  }
 
-  // Add OpenStreetMap tiles
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
+  // Clear old markers
+  mapMarkers.forEach(marker => map.removeLayer(marker));
+  mapMarkers = [];
 
-  // Add markers
+  // Add new markers
   data.forEach(hospital => {
-    const lat = parseFloat(hospital.Latitude || hospital.LAT || hospital.lat);
-    const lon = parseFloat(hospital.Longitude || hospital.LON || hospital.lon);
+    // Try all common latitude/longitude field names
+    const lat =
+      parseFloat(hospital.Latitude) ||
+      parseFloat(hospital.LAT) ||
+      parseFloat(hospital.lat) ||
+      parseFloat(hospital.latitude);
+    const lon =
+      parseFloat(hospital.Longitude) ||
+      parseFloat(hospital.LON) ||
+      parseFloat(hospital.lon) ||
+      parseFloat(hospital.longitude);
 
-    if (!lat || !lon) return; // skip if no coordinates
+    if (!lat || !lon) return; // Skip entries missing coordinates
+
+    const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+    const stars = convertGradeToStars(grade);
 
     const popupHTML = `
       <strong>${hospital.HOSPITAL_NAME || hospital.Name}</strong><br>
       ${hospital.CITY || ""}, ${hospital.STATE || ""}<br>
-      <a href="details.html?id=${hospital.RECORD_ID}" target="_blank">View Details</a>
+      <div class="star-rating">${renderStars(stars.value)}</div>
+      <a href="details.html?id=${hospital.RECORD_ID}" target="_blank" class="view-full-detail">
+        View Full Details
+      </a>
     `;
 
-    L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
+    const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
+    mapMarkers.push(marker);
   });
+
+  // Adjust map to fit all visible markers
+  if (mapMarkers.length > 0) {
+    const group = L.featureGroup(mapMarkers);
+    map.fitBounds(group.getBounds().pad(0.2));
+  } else {
+    // Reset to Georgia default if no markers
+    map.setView([32.1656, -82.9001], 7);
+  }
+}
+
+// ===============================
+// Error Popup Utility
+// ===============================
+function showErrorPopup(message) {
+  const popup = document.createElement("div");
+  popup.className = "error-popup";
+  popup.innerHTML = `<p>${message}</p>`;
+  document.body.appendChild(popup);
+
+  // Animate fade-in
+  setTimeout(() => popup.classList.add("visible"), 10);
+
+  // Auto-remove after 4 seconds
+  setTimeout(() => {
+    popup.classList.remove("visible");
+    setTimeout(() => popup.remove(), 400);
+  }, 4000);
 }

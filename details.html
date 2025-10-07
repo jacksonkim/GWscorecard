@@ -5,12 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hospital Details | Georgia Watch</title>
 
-  <!-- Fonts & Styles -->
   <link rel="stylesheet" href="styles/main.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <!-- Meta -->
-  <meta name="description" content="Hospital Transparency Scorecard - Georgia Watch" />
 </head>
 <body>
   <!-- ===== Header ===== -->
@@ -29,57 +25,101 @@
     </div>
   </header>
 
-  <!-- ===== Main ===== -->
-  <main id="detailRoot" class="container hospital-detail-page">
-    <section class="hospital-header">
-      <div class="map-container">
-        <div id="leafletMap" class="map-placeholder" role="img" aria-label="Hospital location map"></div>
+  <!-- ===== HERO SECTION ===== -->
+  
+  <div class="detail-topbar">
+  <a href="index.html" class="btn back">← Back to Results</a>
+  <h1 id="hospitalNameTop">Hospital Name Loading…</h1>
+  </div>
+
+  <section class="detail-hero-wrap">
+    <div class="detail-hero">
+      <!-- Left: Map -->
+      <div class="hero-card">
+        <h3>Location</h3>
+        <div id="leafletMap"></div>
+        <a id="gmapsLink" class="gmaps-link" href="#" target="_blank">Open in Google Maps</a>
       </div>
 
-      <div class="hospital-info">
-        <h1 id="hospitalName">Loading...</h1>
-        <p id="hospitalAddress" class="muted">Address loading...</p>
-        <div class="star-rating" id="overallStars" aria-label="Overall rating stars"></div>
-        <p id="overallGradeText" class="overall-grade-text"></p>
+      <!-- Center: Hospital Info -->
+      <div class="hero-card">
+        <div class="address-block" id="hospitalAddress">
+			<h3>Address: </h3>
+		<p><span id="streetLine"></span></p>
+		<p><span id="cityStateZip"></span></p>
+	  </div>
+
+
+        <div class="overall-grade-wrap">
+			<h3>Overall Grade: </h3>
+          <div id="overallStars" class="star-rating"></div>
+          <p id="overallGradeText" class="overall-grade-text"></p>
+        </div>
+
+        <div class="info-grid">
+			<p><strong>County:</strong> <span id="hospitalCounty">—</span></p>
+			<p><strong>Size:</strong> <span id="hospitalSize">—</span></p>
+			<p><strong>Type:</strong> <span id="hospitalType">—</span></p>
+			<p><strong>Care Level:</strong> <span id="hospitalCareLevel">—</span></p>
+			<p><strong>System Affiliation:</strong> <span id="hospitalSystem">—</span></p>
+			<p><strong>Setting:</strong> <span id="hospitalUrbanRural">—</span></p>
+			<p><strong>Beds:</strong> <span id="hospitalBeds">—</span></p>
+		</div>
       </div>
 
-      <div class="services-section">
+      <!-- Right: Services -->
+      <div class="hero-card">
         <h3>Services Offered</h3>
-        <ul id="hospitalServices" class="services-grid">
-          <!-- dynamically loaded -->
-        </ul>
+        <ul id="hospitalServices" class="services-grid"></ul>
       </div>
-    </section>
-
-    <!-- ===== Key Metrics Accordions ===== -->
-    <section class="accordion-section">
-      <h2>Key Metrics</h2>
-
-      <details id="financialTransparency">
-        <summary>Financial Transparency & Institutional Health</summary>
-        <div class="metric-body"></div>
-      </details>
-
-      <details id="communityBenefit">
-        <summary>Community Benefit Spending</summary>
-        <div class="metric-body"></div>
-      </details>
-
-      <details id="affordabilityBilling">
-        <summary>Healthcare Affordability & Billing</summary>
-        <div class="metric-body"></div>
-      </details>
-
-      <details id="accessResponsibility">
-        <summary>Healthcare Access & Social Responsibility</summary>
-        <div class="metric-body"></div>
-      </details>
-    </section>
-
-    <!-- ===== Back Button ===== -->
-    <div class="back-button">
-      <a href="index.html" class="btn back">← Back to Results</a>
     </div>
+  </section>
+
+  <!-- ===== METRIC SECTIONS ===== -->
+  <main class="metrics-wrap" id="metricsRoot">
+
+    <section id="financialTransparency" class="metric-section">
+      <div class="metric-header">
+        <h2>Financial Transparency & Institutional Health</h2>
+        <div class="star-rating" id="financialTransparencyStars"></div>
+      </div>
+      <details class="submetric"><summary>Balance Growth</summary><p>How well the hospital manages financial stability while expanding responsibly.</p></details>
+      <details class="submetric"><summary>Transparency</summary><p>How openly the hospital shares financial data and policies with the public.</p></details>
+      <details class="submetric"><summary>Fiscal Health</summary><p>Evaluates liquidity, debt ratios, and overall financial health indicators.</p></details>
+      <details class="submetric"><summary>Staffing</summary><p>Assesses staff-to-patient ratios and investment in personnel stability.</p></details>
+    </section>
+
+    <section id="communityBenefit" class="metric-section">
+      <div class="metric-header">
+        <h2>Community Benefit Spending</h2>
+        <div class="star-rating" id="communityBenefitStars"></div>
+      </div>
+      <details class="submetric"><summary>Tax Benefit</summary><p>Compares nonprofit tax benefit value against community benefit spending.</p></details>
+      <details class="submetric"><summary>Quality of CBS</summary><p>Evaluates effectiveness of programs in meeting community health needs.</p></details>
+      <details class="submetric"><summary>Strategic Use</summary><p>Assesses whether funds are directed to long-term community improvement.</p></details>
+    </section>
+
+    <section id="affordabilityBilling" class="metric-section">
+      <div class="metric-header">
+        <h2>Healthcare Affordability & Billing</h2>
+        <div class="star-rating" id="affordabilityBillingStars"></div>
+      </div>
+      <details class="submetric"><summary>Financial Burden</summary><p>Assesses patient out-of-pocket expenses relative to income and coverage.</p></details>
+      <details class="submetric"><summary>Charity Care</summary><p>Measures how effectively the hospital provides free or reduced-cost care.</p></details>
+      <details class="submetric"><summary>Medical Debt</summary><p>Analyzes collection practices and how often patients accrue medical debt.</p></details>
+    </section>
+
+    <section id="accessResponsibility" class="metric-section">
+      <div class="metric-header">
+        <h2>Healthcare Access & Social Responsibility</h2>
+        <div class="star-rating" id="accessResponsibilityStars"></div>
+      </div>
+      <details class="submetric"><summary>Range of Services</summary><p>Assesses the breadth of essential services provided locally.</p></details>
+      <details class="submetric"><summary>Demographic Alignment</summary><p>Evaluates how well hospital demographics reflect the community it serves.</p></details>
+      <details class="submetric"><summary>Workforce Training</summary><p>Measures investment in training, certification, and education programs.</p></details>
+      <details class="submetric"><summary>Pay Equity Ratio</summary><p>Compares executive compensation to median employee pay for equity.</p></details>
+    </section>
+
   </main>
 
   <!-- ===== Footer ===== -->
@@ -97,7 +137,7 @@
     </div>
   </footer>
 
-  <!-- ===== Scripts ===== -->
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/details.js"></script>

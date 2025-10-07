@@ -1,15 +1,4 @@
 // ===============================
-// Accordion Toggle
-// ===============================
-document.querySelectorAll(".accordion").forEach(btn => {
-  btn.addEventListener("click", () => {
-    btn.classList.toggle("active");
-    const panel = btn.nextElementSibling;
-    panel.style.display = (panel.style.display === "block") ? "none" : "block";
-  });
-});
-
-// ===============================
 // Data Storage
 // ===============================
 let hospitalData = [];
@@ -25,6 +14,8 @@ fetch("./data/2025/2025_Lown_Index_GA.json")
 
     // Initial render
     renderHospitals(hospitalData);
+	initHospitalMap(hospitalData);
+
   })
   .catch(err => console.error("Error loading JSON:", err));
 
@@ -89,18 +80,22 @@ function renderHospitals(data) {
   }
 
 data.forEach(hospital => {
-  const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
-  const gradeClass = `grade-${grade}`;
+  // Convert letter grade to star rating
+	const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+	const stars = convertGradeToStars(grade);
 
   // === Main Row ===
   const row = document.createElement("tr");
   row.classList.add("hospital-row");
 
   const gradeCell = document.createElement("td");
-  gradeCell.innerHTML = grade !== "N/A"
-    ? `<span class="grade-circle ${gradeClass}">${grade}</span>`
-    : "N/A";
-  row.appendChild(gradeCell);
+	gradeCell.innerHTML = `
+	  <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
+		${renderStars(stars.value)}
+		<span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
+	  </div>
+	`;
+	row.appendChild(gradeCell);
 
   const nameCell = document.createElement("td");
   nameCell.innerHTML = `
@@ -112,7 +107,7 @@ data.forEach(hospital => {
   const buttonCell = document.createElement("td");
   buttonCell.style.textAlign = "center";
   const detailsButton = document.createElement("button");
-  detailsButton.textContent = "View Details";
+  detailsButton.textContent = "View Details ▼";
   detailsButton.classList.add("view-detail");
   buttonCell.appendChild(detailsButton);
   row.appendChild(buttonCell);
@@ -294,6 +289,18 @@ function sortAndRender(data) {
   } else if (sortValue === "name") {
     sorted.sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
   }
+    else if (sortValue === "size") {
+    const sizeOrder = ["Small", "Medium", "Large", "Extra Large"];
+
+    sorted.sort((a, b) => {
+      const sizeA = a.Size || "";
+      const sizeB = b.Size || "";
+      const indexA = sizeOrder.indexOf(sizeA) !== -1 ? sizeOrder.indexOf(sizeA) : 999;
+      const indexB = sizeOrder.indexOf(sizeB) !== -1 ? sizeOrder.indexOf(sizeB) : 999;
+      return indexA - indexB;
+    });
+  }
+
 
   renderHospitals(sorted);
 }
@@ -317,6 +324,8 @@ document.getElementById("applyFiltersBtn").addEventListener("click", () => {
   });
 
   renderHospitals(filtered);
+  initHospitalMap(filtered);
+
 });
 
 // ===============================
@@ -374,3 +383,101 @@ function showHospitalDetailPage(hospitalId) {
     document.body.appendChild(detailContainer);
 }
 
+// ===============================
+// Star Rating Utilities
+// ===============================
+function convertGradeToStars(grade) {
+  const gradeMap = {
+    "A+": 5,
+    "A": 5,
+    "A-": 4.5,
+    "B+": 4.5,
+    "B": 4,
+    "B-": 3.5,
+    "C+": 3.5,
+    "C": 3,
+    "C-": 2.5,
+    "D+": 2.5,
+    "D": 2,
+    "D-": 1.5,
+    "F": 1,
+  };
+  const value = gradeMap[grade.trim()] || 0;
+  return { value };
+}
+
+function renderStars(value) {
+  let html = "";
+  for (let i = 1; i <= 5; i++) {
+    if (value >= i) {
+      html += fullStarSVG();
+    } else if (value >= i - 0.5) {
+      html += halfStarSVG();
+    } else {
+      html += emptyStarSVG();
+    }
+  }
+  return html;
+}
+
+function fullStarSVG() {
+  return `
+    <svg class="star full" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+    </svg>
+  `;
+}
+
+function halfStarSVG() {
+  return `
+    <svg class="star half" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <linearGradient id="halfGradient" x1="0" x2="1">
+          <stop offset="50%" stop-color="#f48810" />
+          <stop offset="50%" stop-color="#a4cc95" />
+        </linearGradient>
+      </defs>
+      <path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+    </svg>
+  `;
+}
+
+function emptyStarSVG() {
+  return `
+    <svg class="star empty" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+    </svg>
+  `;
+}
+
+// ===============================
+// Leaflet Map Integration
+// ===============================
+function initHospitalMap(data) {
+  const mapDiv = document.getElementById("mainMap");
+  if (!mapDiv) return;
+
+  // Initialize map (centered roughly on Georgia)
+  const map = L.map("mainMap").setView([32.1656, -82.9001], 7);
+
+  // Add OpenStreetMap tiles
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  // Add markers
+  data.forEach(hospital => {
+    const lat = parseFloat(hospital.Latitude || hospital.LAT || hospital.lat);
+    const lon = parseFloat(hospital.Longitude || hospital.LON || hospital.lon);
+
+    if (!lat || !lon) return; // skip if no coordinates
+
+    const popupHTML = `
+      <strong>${hospital.HOSPITAL_NAME || hospital.Name}</strong><br>
+      ${hospital.CITY || ""}, ${hospital.STATE || ""}<br>
+      <a href="details.html?id=${hospital.RECORD_ID}" target="_blank">View Details</a>
+    `;
+
+    L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
+  });
+}

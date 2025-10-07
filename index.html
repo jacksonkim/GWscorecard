@@ -13,13 +13,13 @@
         <div class="container">
             <div class="top-nav">
                 <div class="logo">
-					<img src="images/logo2.png" width="auto" height="80" />
+					<img src="images/logo2White.png" width="auto" height="80" />
                     <span>Georgia Watch</span>
                 </div>
                 <div class="nav-links">
-                    <a href="#">Rankings</a>
-                    <a href="#">Methodology</a>
-                    <a href="#">About Us</a>
+                    <a href="rankings.html">Rankings</a>
+                    <a href="methodology.html">Methodology</a>
+                    <a href="https://georgiawatch.org/about/">About Us</a>
                 </div>
             </div>
             
@@ -33,14 +33,14 @@
     <div class="container main-content">
         <!-- Sidebar -->
         <aside class="sidebar">
-		
-			<div class="view-toggle">
-			  <h3>View Results By:</h3>
-			  <div class="view-buttons">
-				<button id="viewSystemsBtn" class="toggle-btn">Hospital Systems</button>
-				<button id="viewIndividualsBtn" class="toggle-btn">Individual Hospitals</button>
+
+		  <!-- View Toggle -->
+		  <div class="view-toggle">
+			<h3>View Results By:</h3>
+			<div class="view-buttons">
+			  <button id="viewSystemsBtn" class="toggle-btn">Hospital Systems</button>
+			  <button id="viewIndividualsBtn" class="toggle-btn">Individual Hospitals</button>
 			</div>
-			
 			<div id="individualOptions" style="display: none; margin-top: 10px;">
 			  <h4 style="margin-bottom: 8px;">Individual Hospital Type:</h4>
 			  <div class="view-buttons">
@@ -48,96 +48,63 @@
 				<button id="filterAcuteBtn" class="toggle-btn">Acute Care</button>
 			  </div>
 			</div>
-            <div class="location-search">
-				<h3>Location Search</h3>
-				<label>
-				  Enter ZIP Code:
-				  <input type="text" id="zipInput" placeholder="12345">
-				</label>
-				<br>
-				<label>
-				  Radius:
-				  <select id="radiusSelect">
-					<option value="5">5 miles</option>
-					<option value="10">10 miles</option>
-					<option value="15">15 miles</option>
-					<option value="20">20 miles</option>
-					<option value="25">25 miles</option>
-					<option value="30">30 miles</option>
-				  </select>
-				</label>
-				<button id="applyLocationBtn">Apply Location</button>
-			  </div>
+		  </div>
 
+		  <!-- Location Search -->
+		  <div class="location-search">
+			<h3>Location Search</h3>
+			<label>
+			  Enter ZIP Code:
+			  <input type="text" id="zipInput" placeholder="12345">
+			</label>
+			<br>
+			<label>
+			  Radius:
+			  <select id="radiusSelect">
+				<option value="5">5 miles</option>
+				<option value="10">10 miles</option>
+				<option value="15">15 miles</option>
+				<option value="20">20 miles</option>
+				<option value="25">25 miles</option>
+				<option value="30">30 miles</option>
+			  </select>
+			</label>
+			<button id="applyLocationBtn">Apply Location</button>
+		  </div>
 
-			  <!-- Hospital Type -->
-			  <div class="accordion-section">
-				  <h3>Refine by Type:</h3>
-				<button class="accordion">Hospital Type</button>
-				<div class="panel">
-				  <label><input type="checkbox" value="Urban"> Urban</label>
-				  <label><input type="checkbox" value="Rural"> Rural</label>
-				  <label><input type="checkbox" value="Non-profit"> Non-profit</label>
-				  <label><input type="checkbox" value="For Profit"> For Profit</label>
-				  <label><input type="checkbox" value="Church Affiliated"> Church Affiliated</label>
-				  <label><input type="checkbox" value="Academic Medical Center"> Academic Medical Center</label>
-				  <label><input type="checkbox" value="Safety Net"> Safety Net</label>
-				</div>
-			  </div>
+		  <!-- Hospital Type -->
+		  <details open>
+			<summary>Hospital Type</summary>
+			<div class="filter-group">
+			  <label><input type="checkbox" value="Urban"> Urban</label>
+			  <label><input type="checkbox" value="Rural"> Rural</label>
+			  <label><input type="checkbox" value="Non-profit"> Non-profit</label>
+			  <label><input type="checkbox" value="For Profit"> For Profit</label>
+			  <label><input type="checkbox" value="Church Affiliated"> Church Affiliated</label>
+			  <label><input type="checkbox" value="Academic Medical Center"> Academic Medical Center</label>
+			  <label><input type="checkbox" value="Safety Net"> Safety Net</label>
+			</div>
+		  </details>
 
-			  <div class="metrics">
-				<h3>Refine by Metrics:</h3>
-			  </div>
-			  
-			  <!-- Financial Transparency -->
-			  <div class="accordion-section">
-				<button class="accordion">Financial Transparency & Institutional Health</button>
-				<div class="panel">
-				  <label><input type="checkbox" value="Balance Growth"> Balance Growth</label>
-				  <label><input type="checkbox" value="Transparency"> Transparency</label>
-				  <label><input type="checkbox" value="Fiscal Health"> Fiscal Health</label>
-				  <label><input type="checkbox" value="Staffing"> Staffing</label>
-				</div>
-			  </div>
+		  <!-- Key Metric Categories -->
+		  <details>
+			<summary>Refine by Metrics</summary>
+			<div class="filter-group">
+			  <label><input type="checkbox" value="Financial Transparency and Institutional Health"> Financial Transparency & Institutional Health</label>
+			  <label><input type="checkbox" value="Community Benefit Spending"> Community Benefit Spending</label>
+			  <label><input type="checkbox" value="Healthcare Affordability and Billing"> Healthcare Affordability & Billing</label>
+			  <label><input type="checkbox" value="Healthcare Access and Social Responsibility"> Healthcare Access & Social Responsibility</label>
+			</div>
+		  </details>
 
-			  <!-- Community Benefit Spending -->
-			  <div class="accordion-section">
-				<button class="accordion">Community Benefit Spending</button>
-				<div class="panel">
-				  <label><input type="checkbox" value="Tax Benefit"> Tax Benefit</label>
-				  <label><input type="checkbox" value="Quality of CBS"> Quality of CBS</label>
-				  <label><input type="checkbox" value="Strategic Use"> Strategic Use</label>
-				</div>
-			  </div>
-
-			  <!-- Healthcare Affordability -->
-			  <div class="accordion-section">
-				<button class="accordion">Healthcare Affordability & Billing</button>
-				<div class="panel">
-				  <label><input type="checkbox" value="Financial Burden"> Financial Burden</label>
-				  <label><input type="checkbox" value="Charity Care"> Charity Care</label>
-				  <label><input type="checkbox" value="Medical Debt"> Medical Debt</label>
-				</div>
-			  </div>
-
-			  <!-- Healthcare Access -->
-			  <div class="accordion-section">
-				<button class="accordion">Healthcare Access & Social Responsibility</button>
-				<div class="panel">
-				  <label><input type="checkbox" value="Range of Services"> Range of Services</label>
-				  <label><input type="checkbox" value="Demographic Alignment"> Demographic Alignment</label>
-				  <label><input type="checkbox" value="Workforce Training"> Workforce Training</label>
-				  <label><input type="checkbox" value="Pay Equity Ratio"> Pay Equity Ratio</label>
-				</div>
-			  </div>
-
-			  <!-- Action Buttons -->
+		  <!-- Action Buttons -->
 		  <div class="filter-actions">
 			<button id="applyFiltersBtn">Apply Filters</button>
 			<button id="resetFiltersBtn" type="reset">Reset</button>
 			<button id="downloadDataBtn" bgcolor="#f48810">Download Data</button>
 		  </div>
-        </aside>
+
+		</aside>
 
         <!-- Main content area -->
         <main class="content-area">
@@ -151,6 +118,7 @@
 					  <option value="grade">Grade (High to Low)</option>
 					  <option value="distance">Distance (Closest First)</option>
 					  <option value="name">Hospital Name (A–Z)</option>
+					  <option value="size">Bed Size (Small → Extra Large)</option>
 					</select>
 				  </label>
 				</div>
@@ -158,7 +126,7 @@
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th width="10%">Grade</th>
+                            <th width="10%">Score</th>
                             <th width="70%">Hospital Name & Location</th>
                             <th width="20%">Details</th>
                         </tr>
@@ -168,6 +136,10 @@
                     </tbody>
                 </table>
             </section>
+			
+			<!-- Detail page mount point -->
+			<div id="detailRoot" style="display:none;"></div>
+
 
             <section class="map-section">
                 <h2>HOSPITAL LOCATIONS</h2>
@@ -198,6 +170,4 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="scripts/main.js"></script>
 </body>
-
 </html>
-

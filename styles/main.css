@@ -277,49 +277,6 @@ header {
   font-weight: bold;
 }
 
-.accordion {
-  background: #6fb353;   /* sponsor green */
-  color: white;          /* white text for contrast */
-  cursor: pointer;
-  padding: 10px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  outline: none;
-  margin-top: 5px;
-  font-weight: bold;
-  position: relative;
-  font-family: "Century Gothic", CenturyGothic, "Rubik", sans-serif; 
-}
-
-.accordion.active {
-  background: #5a9445;   /* darker green when open (optional) */
-}
-
-.accordion::after {
-  content: "▼";
-  font-size: 0.8em;
-  position: absolute;
-  right: 10px;
-  transition: transform 0.2s ease;
-  color: white;   /* make arrow match text */
-}
-
-.accordion.active::after {
-  content: "▲";
-}
-
-.panel {
-  display: none;
-  padding: 10px 15px;
-  background: #eee;
-}
-
-.panel label {
-  display: block;
-  margin: 5px 0;
-}
-
 .filter-actions {
   margin-top: 20px;
   display: flex;
@@ -408,44 +365,6 @@ header {
 .results-table tr {
     background-color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Grade circles */
-.grade-circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background-color: #ccc; /* fallback */
-  font-weight: bold;
-  font-size: 16px;         
-  color: white;
-  font-family: "Century Gothic", "Rubik", sans-serif;
-  text-align: center;
-  line-height: 1;
-}
-
-/* Grade color classes */
-.grade-A {
-  background-color: #6fb353; 
-}
-
-.grade-B {
-  background-color: #a4cc95; 
-}
-
-.grade-C {
-  background-color: #f9a825; 
-}
-
-.grade-D {
-  background-color: #f9a825; 
-}
-
-.grade-F {
-  background-color: #f48810; 
 }
 
 /* Hospital name link */
@@ -540,11 +459,13 @@ header {
 }
 
 #mainMap {
-    height: 400px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 400px;
+  background: #f3f3f3;
+  border-radius: 6px;
+  margin-top: 10px;
 }
+
 
 /* Footer */
 footer {
@@ -659,35 +580,37 @@ footer {
 }
 
 /* Metrics section in sidebar */
-.metrics-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+details {
+  background: #6fb353;
+  color: white;
+  border-radius: 6px;
+  margin-top: 10px;
+  padding: 0;
+  overflow: hidden;
 }
 
-.metrics-list {
-    list-style-type: none;
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px;
+  font-family: "Century Gothic", "Rubik", sans-serif;
 }
 
-.metrics-list li {
-    background-color: #f0f8ff;
-    padding: 10px 15px;
-    border-radius: 20px;
-    font-weight: 500;
-    color: #0078c8;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 10px;
+summary:hover {
+  background: #5a9445;
 }
 
-.metrics-list li:hover {
-    background-color: #d8eaff;
+.filter-group {
+  background: #eee;
+  color: #333;
+  padding: 10px 15px;
 }
 
-.metrics-list li.active {
-    background-color: #0078c8;
-    color: white;
+.filter-group label {
+  display: block;
+  margin: 5px 0;
 }
+
 
 #downloadDataBtn {
   background: #f48810;
@@ -701,6 +624,68 @@ footer {
 #downloadDataBtn:hover {
   background: #d9740e; /* slightly darker shade for hover */
 }
+
+/* Map Placeholder */
+.map-placeholder {
+  width: 100%;
+  height: 300px;
+  background-color: #f3f3f3;
+  border-radius: 6px;
+}
+
+/* Info Grid */
+.hospital-info {
+  padding: 10px 0;
+}
+.muted { color: #666; }
+
+/* Services Grid */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  list-style: disc;
+  margin-left: 20px;
+}
+
+/* Accordions */
+details {
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px;
+  background: #6fb353;
+  color: white;
+  border-radius: 6px 6px 0 0;
+}
+details[open] summary {
+  background: #5aa345;
+}
+.metric-body {
+  background: white;
+  padding: 10px 15px;
+}
+
+/* Back button */
+.btn.back {
+  display: inline-block;
+  background: #6fb353;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+.btn.back:hover {
+  background: #5aa345;
+}
+
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
@@ -772,3 +757,100 @@ footer {
         margin: 15px 0;
     }
 }
+
+/* ===============================
+   Star Rating Styles
+=============================== */
+.star-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.star {
+  width: 22px;
+  height: 22px;
+  fill: #a4cc95; /* light green for empty */
+}
+
+.star.full {
+  fill: #f48810; /* orange for full stars */
+}
+
+.star.half {
+  fill: url(#halfGradient);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* ===== Methodology Page ===== */
+.methodology-page {
+  padding: 2rem 0;
+  line-height: 1.6;
+}
+
+.methodology-page h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.methodology-page h2 {
+  margin-top: 2rem;
+  color: #6fb353;
+  font-size: 1.5rem;
+}
+
+.methodology-page .lead {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 2rem;
+}
+
+.category-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.category-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.category-card h3 {
+  color: #f48810;
+  margin-bottom: 0.5rem;
+}
+
+.methodology-faq details {
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-top: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.methodology-faq summary {
+  font-weight: bold;
+  cursor: pointer;
+  color: #6fb353;
+}
+
+.methodology-faq details[open] summary {
+  color: #f48810;
+}
+

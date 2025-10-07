@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Details | Georgia Watch</title>
+
+  <!-- Fonts & Styles -->
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Meta -->
+  <meta name="description" content="Hospital Transparency Scorecard - Georgia Watch" />
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header>
+    <div class="container top-nav">
+      <div class="logo">
+        <img src="images/logo2White.png" height="80" alt="Georgia Watch logo" />
+        <span>Georgia Watch</span>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">Rankings</a>
+        <a href="methodology.html">Methodology</a>
+        <a href="https://georgiawatch.org/about/">About Us</a>
+        <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== Main ===== -->
+  <main id="detailRoot" class="container hospital-detail-page">
+    <section class="hospital-header">
+      <div class="map-container">
+        <div id="leafletMap" class="map-placeholder" role="img" aria-label="Hospital location map"></div>
+      </div>
+
+      <div class="hospital-info">
+        <h1 id="hospitalName">Loading...</h1>
+        <p id="hospitalAddress" class="muted">Address loading...</p>
+        <div class="star-rating" id="overallStars" aria-label="Overall rating stars"></div>
+        <p id="overallGradeText" class="overall-grade-text"></p>
+      </div>
+
+      <div class="services-section">
+        <h3>Services Offered</h3>
+        <ul id="hospitalServices" class="services-grid">
+          <!-- dynamically loaded -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Key Metrics Accordions ===== -->
+    <section class="accordion-section">
+      <h2>Key Metrics</h2>
+
+      <details id="financialTransparency">
+        <summary>Financial Transparency & Institutional Health</summary>
+        <div class="metric-body"></div>
+      </details>
+
+      <details id="communityBenefit">
+        <summary>Community Benefit Spending</summary>
+        <div class="metric-body"></div>
+      </details>
+
+      <details id="affordabilityBilling">
+        <summary>Healthcare Affordability & Billing</summary>
+        <div class="metric-body"></div>
+      </details>
+
+      <details id="accessResponsibility">
+        <summary>Healthcare Access & Social Responsibility</summary>
+        <div class="metric-body"></div>
+      </details>
+    </section>
+
+    <!-- ===== Back Button ===== -->
+    <div class="back-button">
+      <a href="index.html" class="btn back">← Back to Results</a>
+    </div>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer>
+    <div class="container footer-content">
+      <ul class="footer-links">
+        <li><a href="#">Georgia Watch</a></li>
+        <li><a href="#">Rankings</a></li>
+        <li><a href="#">Methodology</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Donate</a></li>
+        <li><a href="#">Legal/Privacy</a></li>
+      </ul>
+      <p>© 2024 Georgia Watch. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Scripts ===== -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/details.js"></script>
+</body>
+</html>

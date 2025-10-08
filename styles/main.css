@@ -102,13 +102,6 @@ header {
   align-items: flex-start;
 }
 
-.map-column {
-  position: sticky;
-  top: 10px;
-  align-self: start;
-  height: calc(100vh - 120px);
-}
-
 .map-section {
   height: 100%;
   padding: 0;
@@ -141,6 +134,39 @@ header {
   align-self: start;
   height: auto;
   overflow: visible;
+}
+
+/* ===============================
+   Map Column — scrolls naturally
+=============================== */
+.map-column {
+  position: sticky;
+  height: auto;
+  align-self: start;
+}
+
+.map-section {
+  position: sticky;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.map-section h2 {
+  background-color: #6fb353;
+  color: #fff;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+}
+
+#mainMap {
+  width: 100%;
+  height: 500px; /* fixed visible height */
+  display: block;
 }
 
 /* ===============================
@@ -522,43 +548,40 @@ footer {
 =============================== */
 .detail-topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 4vw 0;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 0;
 }
 
-.detail-topbar h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #333;
-}
-
-/* ===== Back to Results Button ===== */
-.btn.back {
-  display: inline-block;
-  background: #6fb353;         /* Georgia Watch green */
+.detail-topbar .btn.back {
+  background-color: #f48810;
   color: #fff;
-  border: none;
-  padding: 10px 18px;
+  padding: 6px 12px;
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-  transition: background 0.2s ease, transform 0.1s ease;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
 }
 
-.btn.back:hover {
-  background: #5aa345;         /* darker green on hover */
-  transform: translateY(-1px);
+.detail-topbar .btn.back:hover {
+  background-color: #d97706;
 }
 
-.btn.back:active {
-  transform: translateY(0);
+.detail-topbar h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  color: #333;
+}
+
+.detail-topbar .spacer {
+  width: 110px; /* roughly the same width as the back button */
 }
 
 .detail-hero-wrap {
@@ -579,7 +602,6 @@ footer {
   gap: 16px;
   align-items: stretch;
 }
-
 
 .hero-card {
   background: #ffffff;
@@ -615,13 +637,44 @@ footer {
   text-align: center;
 }
 
+/* =========================================
+   SERVICES GRID STYLING
+========================================= */
+
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 12px;
-  list-style: disc inside;
-  padding-left: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
+
+.services-grid li {
+  background-color: #f9faf9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.services-grid li::before {
+  content: "✔";
+  color: #6fb353; /* your green */
+  font-weight: bold;
+  font-size: 0.85em;
+}
+
+.services-grid li:hover {
+  background-color: #f4fff7;
+}
+
 
 /* ===== Metrics ===== */
 .metrics-wrap {
@@ -900,13 +953,6 @@ footer {
   align-self: stretch;
   height: auto;
   overflow: visible;
-}
-
-/* Map scrolls with the page */
-.index-page .map-column {
-  position: relative;
-  align-self: stretch;
-  height: auto;
 }
 
 /* Visual alignment between columns */

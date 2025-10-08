@@ -38,11 +38,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       val === 1 || val === "1" || val === "Y" || val === "Yes" || val === "TRUE";
 
     // ===== Hospital Name =====
-    const name = h["Hospital Name"] || "Unnamed Hospital";
-    const nameTop = document.getElementById("hospitalNameTop");
-    const nameCenter = document.getElementById("hospitalName");
-    if (nameTop) nameTop.textContent = name;
-    if (nameCenter) nameCenter.textContent = name;
+	const hospitalName = h.Name || "Unnamed Hospital";
+	const nameEl = document.getElementById("hospitalName");
+	if (nameEl) nameEl.textContent = hospitalName;
+
 
     // ===== Address =====
     document.getElementById("streetLine").textContent = safe(h["Address"]);
@@ -50,20 +49,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       [h["City"], h["State"], h["ZIP Code"]].filter(Boolean).join(", ");
 
     // ===== Hospital Info =====
-    const info = {
-      hospitalCounty: safe(h["County"]),
-      hospitalSize: safe(h["Bed Size"]),
-      hospitalCareLevel: safe(h["Hospital Type"]),
-      hospitalUrbanRural: safe(h["Urban/Rural"]),
-      hospitalSystem: safe(h["Health System"] || "Independent"),
-      hospitalType: safe(h["Ownership"]),
-      hospitalBeds: safe(h["Bed Size"])
-    };
+    document.getElementById("hospitalName").textContent = h.Name || "Unnamed Hospital";
+	document.getElementById("streetLine").textContent = h.Address || "—";
+	document.getElementById("cityStateZip").textContent =
+	  [h.City, h.State, h.Zip].filter(Boolean).join(", ");
 
-    for (const [id, val] of Object.entries(info)) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = val;
-    }
+	const infoMap = {
+	  hospitalCounty: h.County || "—",
+	  hospitalSize: h.Size || "—",
+	  hospitalType: h.Ownership || "—",
+	  hospitalCareLevel: h.Type || "—",
+	  hospitalSystem: h.System_Affiliation || "Independent",
+	  hospitalUrbanRural: h["Urban/Rural"] || "—",
+	  hospitalBeds: h.Beds || "—"
+	};
+
+	for (const [id, val] of Object.entries(infoMap)) {
+	  const el = document.getElementById(id);
+	  if (el) el.textContent = val;
+	}
+
 
     // ===== Binary attribute flags (display only if TRUE) =====
     const attributes = [];

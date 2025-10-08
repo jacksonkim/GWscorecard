@@ -980,6 +980,11 @@ footer {
   font-size: 0.95em;
 }
 
+.hospital-title {
+  text-align: center;
+  margin: 20px 0 10px;
+}
+
 
 @media (max-width: 992px) {
   .detail-hero {

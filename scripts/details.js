@@ -24,31 +24,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         .filter(Boolean)
         .join(", ");
 
-		// NEW FIELDS (add these right here)
+		// === Hospital Info Fix (matches Lown JSON fields) ===
 		document.getElementById("hospitalCounty").textContent =
-		  h.COUNTY || h.County || "—";
+		  h.COUNTY_NAME || "—";
 
 		document.getElementById("hospitalSize").textContent =
-		  h.SIZE || h.Hospital_Size || "—";
+		  h.BED_SIZE || "—";
 
 		document.getElementById("hospitalCareLevel").textContent =
-		  h.CRITICAL_ACCESS === "Y"
-			? "Critical Access"
-			: h.CARE_LEVEL || h.Type_of_Care || "Acute Care";
+		  h.HOSPITAL_TYPE || "—"; // acute, critical access, etc.
 
 		document.getElementById("hospitalUrbanRural").textContent =
-		  h.URBAN_RURAL || h.Urban_Rural || "—";
+		  h.URBAN_RURAL_DESIGNATION || "—";
 
 		document.getElementById("hospitalSystem").textContent =
-		  h.SYSTEM_NAME && h.SYSTEM_NAME !== "Independent"
-			? h.SYSTEM_NAME
-			: "Independent";
+		  h.HEALTH_SYSTEM || "Independent";
 
 		document.getElementById("hospitalType").textContent =
-		  h.HOSPITAL_TYPE || h.Type || "—";
+		  h.OWNERSHIP || "—"; // nonprofit, government, etc.
 
 		document.getElementById("hospitalBeds").textContent =
-		  h.BEDS || h.Bed_Range || "—";
+		  h.BED_SIZE || "—";
 
     // === Services ===
     const list = document.getElementById("hospitalServices");

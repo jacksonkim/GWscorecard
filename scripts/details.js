@@ -16,14 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = await res.json();
 
     // Match flexible key names (handles spaces and case)
-    const h = data.find(x =>
-      String(
-        x["Record ID"] ||
-        x["RECORD ID"] ||
-        x["RECORD_ID"] ||
-        x["id"]
-      ) === String(hospitalId)
-    );
+    const h = data.find(x => String(x.RECORD_ID) === String(hospitalId));
 
     if (!h) {
       console.error("Hospital not found for ID:", hospitalId);
@@ -44,9 +37,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     // ===== Address =====
-    document.getElementById("streetLine").textContent = safe(h["Address"]);
-    document.getElementById("cityStateZip").textContent =
-      [h["City"], h["State"], h["ZIP Code"]].filter(Boolean).join(", ");
+    const streetEl = document.getElementById("streetLine");
+    if (streetEl) streetEl.textContent = h.Address || "—";
+
+    const cityStateZipEl = document.getElementById("cityStateZip");
+    if (cityStateZipEl)
+      cityStateZipEl.textContent = [h.City, h.State, h.Zip].filter(Boolean).join(", ");
 
     // ===== Hospital Info =====
     document.getElementById("hospitalName").textContent = h.Name || "Unnamed Hospital";
@@ -68,7 +64,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	  const el = document.getElementById(id);
 	  if (el) el.textContent = val;
 	}
-
 
     // ===== Binary attribute flags (display only if TRUE) =====
     const attributes = [];

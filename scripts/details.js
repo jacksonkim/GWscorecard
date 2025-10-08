@@ -44,39 +44,87 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (cityStateZipEl)
       cityStateZipEl.textContent = [h.City, h.State, h.Zip].filter(Boolean).join(", ");
 
-    // ===== Hospital Info =====
-    document.getElementById("hospitalName").textContent = h.Name || "Unnamed Hospital";
-	document.getElementById("streetLine").textContent = h.Address || "—";
-	document.getElementById("cityStateZip").textContent =
-	  [h.City, h.State, h.Zip].filter(Boolean).join(", ");
-
+	// ===== Hospital Info =====
 	const infoMap = {
+	  // ===== County =====
 	  hospitalCounty: h.County || "—",
-	  hospitalSize: h.Size || "—",
-	  hospitalType: h.Ownership || "—",
-	  hospitalCareLevel: h.Type || "—",
-	  hospitalSystem: h.System_Affiliation || "Independent",
-	  hospitalUrbanRural: h["Urban/Rural"] || "—",
-	  hospitalBeds: h.Beds || "—"
+
+	  // ===== Bed Size / Hospital Size =====
+	  hospitalSize: (() => {
+		const sizeMap = {
+		  xs: "Extra Small",
+		  s: "Small",
+		  m: "Medium",
+		  l: "Large",
+		  xl: "Extra Large"
+		};
+		const sizeKey = String(h.Size || "").toLowerCase().trim();
+		return sizeMap[sizeKey] || "—";
+	  })(),
+
+	  // ===== Hospital Type =====
+	  hospitalType: (() => {
+		const types = [];
+
+		if (isTrue(h.TYPE_HospTyp_ACH)) types.push("Acute Care Hospital");
+		if (isTrue(h.TYPE_HospTyp_CAH)) types.push("Critical Access Hospital");
+		if (isTrue(h.TYPE_AMC)) types.push("Academic Medical Center");
+
+		if (isTrue(h.TYPE_ForProfit)) types.push("For-Profit");
+		if (isTrue(h.TYPE_NonProfit)) types.push("Nonprofit");
+		if (isTrue(h.TYPE_chrch_affl_f)) types.push("Faith-Affiliated");
+
+		if (isTrue(h.TYPE_isSafetyNet)) types.push("Safety Net Hospital");
+
+		return types.length ? types.join(", ") : "—";
+	  })(),
+
+	  // ===== Care Level =====
+	  hospitalCareLevel: (() => {
+		if (isTrue(h.TYPE_HospTyp_CAH)) return "Critical Access";
+		if (isTrue(h.TYPE_HospTyp_ACH)) return "Acute Care";
+		if (isTrue(h.TYPE_AMC)) return "Academic / Teaching";
+		return "—";
+	  })(),
+
+	  // ===== System Affiliation =====
+	  hospitalSystem: isTrue(h.HOSPITAL_SYSTEM)
+		? "Part of a Health System"
+		: "Independent",
+
+	  // ===== Setting (Urban vs Rural) =====
+	  hospitalUrbanRural: (() => {
+		if (isTrue(h.TYPE_urban)) return "Urban";
+		if (isTrue(h.TYPE_rural)) return "Rural";
+		return "—";
+	  })(),
+
+	  // ===== Bed Count =====
+	  hospitalBeds: "—" // dataset doesn’t contain numeric beds; size used instead
 	};
 
+	// Apply infoMap values to page
 	for (const [id, val] of Object.entries(infoMap)) {
 	  const el = document.getElementById(id);
 	  if (el) el.textContent = val;
 	}
 
-    // ===== Binary attribute flags (display only if TRUE) =====
-    const attributes = [];
-    if (isTrue(h["Teaching"])) attributes.push("Teaching Hospital");
-    if (isTrue(h["Critical Access"])) attributes.push("Critical Access Hospital");
-    if (isTrue(h["Safety Net"])) attributes.push("Safety Net Hospital");
-    if (isTrue(h["Academic"])) attributes.push("Academic Medical Center");
-    if (attributes.length > 0) {
-      const wrap = document.getElementById("hospitalAddress");
-      const list = document.createElement("p");
-      list.textContent = attributes.join(" • ");
-      wrap.appendChild(list);
-    }
+	// ===== Attribute Summary (optional) =====
+	const attributes = [];
+
+	if (isTrue(h.TYPE_AMC)) attributes.push("Academic Medical Center");
+	if (isTrue(h.TYPE_isSafetyNet)) attributes.push("Safety Net Hospital");
+	if (isTrue(h.TYPE_ForProfit)) attributes.push("For-Profit");
+	if (isTrue(h.TYPE_NonProfit)) attributes.push("Nonprofit");
+	if (isTrue(h.TYPE_chrch_affl_f)) attributes.push("Faith-Affiliated");
+
+	if (attributes.length > 0) {
+	  const wrap = document.getElementById("hospitalAddress");
+	  const list = document.createElement("p");
+	  list.classList.add("hospital-attributes");
+	  list.textContent = attributes.join(" • ");
+	  wrap.appendChild(list);
+	}
 
     // ===== Services =====
 	const list = document.getElementById("hospitalServices");
@@ -168,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       let lon = parseFloat(h["Longitude"]);
 
       if (!lat || !lon) {
-        const coords = getZipCoords(h["ZIP Code"]);
+        const coords = getZipCoords(h.Zip);
         lat = coords[0];
         lon = coords[1];
       }
@@ -262,4 +310,3 @@ function getZipCoords(zip) {
   const coords = lookup[String(zip)] || [32.5, -83.5];
   return coords;
 }
-

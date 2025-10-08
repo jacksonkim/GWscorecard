@@ -48,9 +48,8 @@ function renderHospitals(data) {
 
     const gradeCell = document.createElement("td");
     gradeCell.innerHTML = `
-      <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
+      <div class="star-rating" aria-label="${stars.value} out of 5 stars">
         ${renderStars(stars.value)}
-        <span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
       </div>
     `;
     row.appendChild(gradeCell);
@@ -98,21 +97,11 @@ function renderHospitals(data) {
     detailCell.colSpan = 3;
     detailCell.innerHTML = `
 	  <div class="detail-info">
-		<p><strong>Outcome:</strong>
-		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</span>
-		</p>
-		<p><strong>Value:</strong>
-		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</span>
-		</p>
-		<p><strong>Civic:</strong>
-		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</span>
-		</p>
-		<p><strong>Safety:</strong>
-		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</span>
-		</p>
-		<p><strong>Experience:</strong>
-		  <span class="star-rating">${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</span>
-		</p>
+		<p class="inline-stars"><strong>Outcome:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</p>
+		<p class="inline-stars"><strong>Value:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</p>
+		<p class="inline-stars"><strong>Civic:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</p>
+		<p class="inline-stars"><strong>Safety:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</p>
+		<p class="inline-stars"><strong>Experience:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</p>
 	  </div>
 	`;
     detailRow.appendChild(detailCell);

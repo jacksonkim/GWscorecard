@@ -109,23 +109,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	  if (el) el.textContent = val;
 	}
 
-	// ===== Attribute Summary (optional) =====
-	const attributes = [];
-
-	if (isTrue(h.TYPE_AMC)) attributes.push("Academic Medical Center");
-	if (isTrue(h.TYPE_isSafetyNet)) attributes.push("Safety Net Hospital");
-	if (isTrue(h.TYPE_ForProfit)) attributes.push("For-Profit");
-	if (isTrue(h.TYPE_NonProfit)) attributes.push("Nonprofit");
-	if (isTrue(h.TYPE_chrch_affl_f)) attributes.push("Faith-Affiliated");
-
-	if (attributes.length > 0) {
-	  const wrap = document.getElementById("hospitalAddress");
-	  const list = document.createElement("p");
-	  list.classList.add("hospital-attributes");
-	  list.textContent = attributes.join(" • ");
-	  wrap.appendChild(list);
-	}
-
     // ===== Services =====
 	const list = document.getElementById("hospitalServices");
 	list.innerHTML = "";
@@ -163,7 +146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	list.innerHTML = services.map(s => `<li>${s}</li>`).join("");
 
     // ===== Overall Grade =====
-    const overallGrade = h["TIER 1 GRADE Lown Composite"] || "N/A";
+    const overallGrade = h["TIER_1_GRADE_Lown_Composite"] || "N/A";
     const starWrap = document.getElementById("overallStars");
     if (starWrap)
       starWrap.innerHTML = renderStars(
@@ -310,3 +293,4 @@ function getZipCoords(zip) {
   const coords = lookup[String(zip)] || [32.5, -83.5];
   return coords;
 }
+

@@ -1,6 +1,6 @@
 // =======================================
 //  Georgia Watch Details Page Script
-//  Updated for Lown 2025 dataset structure
+//  Finalized for Lown 2025 JSON structure
 // =======================================
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch("./data/2025/2025_Lown_Index_GA.json");
     const data = await res.json();
 
-    // Match flexible key names (handles spaces and case)
+    // Match using flexible field names
     const h = data.find(x =>
       String(
         x["Record ID"] ||
@@ -31,23 +31,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ===== Helper functions =====
-    const safe = val =>
-      val && val !== "NULL" && val !== "—" ? val : "—";
-
-    const isTrue = val =>
-      val === 1 || val === "1" || val === "Y" || val === "Yes" || val === "TRUE";
+    const safe = val => (val && val !== "NULL" ? val : "—");
+    const isTrue = val => val === 1 || val === "1" || val === "Y" || val === "Yes" || val === "TRUE";
 
     // ===== Hospital Name =====
     const name = h["Hospital Name"] || "Unnamed Hospital";
-    const nameTop = document.getElementById("hospitalNameTop");
-    const nameCenter = document.getElementById("hospitalName");
-    if (nameTop) nameTop.textContent = name;
-    if (nameCenter) nameCenter.textContent = name;
+    document.getElementById("hospitalNameTop").textContent = name;
+    const centerName = document.getElementById("hospitalName");
+    if (centerName) centerName.textContent = name;
 
     // ===== Address =====
-    document.getElementById("streetLine").textContent = safe(h["Address"]);
-    document.getElementById("cityStateZip").textContent =
-      [h["City"], h["State"], h["ZIP Code"]].filter(Boolean).join(", ");
+    const addr = safe(h["Address"]);
+    const city = safe(h["City"]);
+    const state = safe(h["State"]);
+    const zip = safe(h["ZIP Code"]);
+    document.getElementById("streetLine").textContent = addr;
+    document.getElementById("cityStateZip").textContent = [city, state, zip].filter(Boolean).join(", ");
 
     // ===== Hospital Info =====
     const info = {
@@ -65,48 +64,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (el) el.textContent = val;
     }
 
-    // ===== Binary attribute flags (display only if TRUE) =====
-    const attributes = [];
-    if (isTrue(h["Teaching"])) attributes.push("Teaching Hospital");
-    if (isTrue(h["Critical Access"])) attributes.push("Critical Access Hospital");
-    if (isTrue(h["Safety Net"])) attributes.push("Safety Net Hospital");
-    if (isTrue(h["Academic"])) attributes.push("Academic Medical Center");
-    if (attributes.length > 0) {
-      const wrap = document.getElementById("hospitalAddress");
-      const list = document.createElement("p");
-      list.textContent = attributes.join(" • ");
-      wrap.appendChild(list);
-    }
-
-    // ===== Services =====
-    const list = document.getElementById("hospitalServices");
-    list.innerHTML = "";
-    let services = [];
-
-    if (typeof h["Services"] === "string") {
-      services = h["Services"].split(",").map(s => s.trim());
-    }
-
-    if (!services.length) {
-      services = [
-        "Behavioral Health",
-        "Cardiology",
-        "Emergency Care",
-        "Imaging & Radiology",
-        "Maternity & Neonatal ICU",
-        "Oncology",
-        "Orthopedics",
-        "Outpatient Surgery",
-        "Pediatric Services",
-        "Pharmacy",
-        "Physical Therapy",
-        "Rehabilitation"
-      ];
-    }
-    list.innerHTML = services.map(s => `<li>${s}</li>`).join("");
-
     // ===== Overall Grade =====
-    const overallGrade = h["TIER 1 GRADE Lown Composite"] || "N/A";
+    const overallGrade = safe(h["TIER 1 GRADE Lown Composite"]);
     const starWrap = document.getElementById("overallStars");
     if (starWrap)
       starWrap.innerHTML = renderStars(
@@ -114,16 +73,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         overallGrade
       );
 
-    // Hide redundant text
+    // Hide redundant grade text
     const gradeText = document.getElementById("overallGradeText");
     if (gradeText) gradeText.textContent = "";
 
     // ===== Category-level stars =====
     const starMap = {
-      financialTransparencyStars: h["TIER 2 GRADE Value"] || "F",
-      communityBenefitStars: h["TIER 3 GRADE CB"] || "F",
-      affordabilityBillingStars: h["TIER 3 GRADE Cost Eff"] || "F",
-      accessResponsibilityStars: h["TIER 3 GRADE Inclusivity"] || "F"
+      financialTransparencyStars: h["TIER 2 GRADE Value"],
+      communityBenefitStars: h["TIER 3 GRADE CB"],
+      affordabilityBillingStars: h["TIER 3 GRADE Cost Eff"],
+      accessResponsibilityStars: h["TIER 3 GRADE Inclusivity"]
     };
 
     for (const [id, grade] of Object.entries(starMap)) {
@@ -142,7 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       let lon = parseFloat(h["Longitude"]);
 
       if (!lat || !lon) {
-        const coords = getZipCoords(h["ZIP Code"]);
+        const coords = getZipCoords(zip);
         lat = coords[0];
         lon = coords[1];
       }

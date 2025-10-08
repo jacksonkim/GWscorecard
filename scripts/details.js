@@ -1,6 +1,6 @@
 // =======================================
 //  Georgia Watch Details Page Script
-//  Synced to Lown 2025 JSON (underscored keys)
+//  Updated for Lown 2025 dataset structure
 // =======================================
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -15,69 +15,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch("./data/2025/2025_Lown_Index_GA.json");
     const data = await res.json();
 
-    // Match by RECORD_ID (integer in this dataset)
-    const h = data.find(x => String(x.RECORD_ID) === String(hospitalId));
+    // Match flexible key names (handles spaces and case)
+    const h = data.find(x =>
+      String(
+        x["Record ID"] ||
+        x["RECORD ID"] ||
+        x["RECORD_ID"] ||
+        x["id"]
+      ) === String(hospitalId)
+    );
+
     if (!h) {
       console.error("Hospital not found for ID:", hospitalId);
       return;
     }
 
-    // ===== Helpers =====
-    const safe = v => (v !== null && v !== undefined && v !== "NULL" && v !== "" ? v : "—");
-    const isTrue = v => v === 1 || v === "1" || v === "Y" || v === "Yes" || v === true;
+    // ===== Helper functions =====
+    const safe = val =>
+      val && val !== "NULL" && val !== "—" ? val : "—";
+
+    const isTrue = val =>
+      val === 1 || val === "1" || val === "Y" || val === "Yes" || val === "TRUE";
 
     // ===== Hospital Name =====
-    const name = h.Name || "Unnamed Hospital";
+    const name = h["Hospital Name"] || "Unnamed Hospital";
     const nameTop = document.getElementById("hospitalNameTop");
     const nameCenter = document.getElementById("hospitalName");
     if (nameTop) nameTop.textContent = name;
     if (nameCenter) nameCenter.textContent = name;
 
-    // ===== Address (includes ZIP) =====
-    const addr = safe(h.Address);
-    const city = safe(h.City);
-    const state = safe(h.State);
-    const zip = safe(h.Zip);
-    const streetLineEl = document.getElementById("streetLine");
-    const cityStateZipEl = document.getElementById("cityStateZip");
-    if (streetLineEl) streetLineEl.textContent = addr;
-    if (cityStateZipEl) cityStateZipEl.textContent = [city, state, zip].filter(Boolean).join(", ");
+    // ===== Address =====
+    document.getElementById("streetLine").textContent = safe(h["Address"]);
+    document.getElementById("cityStateZip").textContent =
+      [h["City"], h["State"], h["ZIP Code"]].filter(Boolean).join(", ");
 
-    // ===== Hospital Info (matching available fields) =====
-    // County: not present in this JSON -> "—"
-    // Size: map 's','m','l' to Small/Medium/Large when present
-    const sizeMap = { s: "Small", m: "Medium", l: "Large" };
-    const prettySize = h.Size && sizeMap[String(h.Size).toLowerCase()] ? sizeMap[String(h.Size).toLowerCase()] : (h.Size || "—");
-
-    // Ownership Type from flags
-    let ownership = "—";
-    if (isTrue(h.TYPE_NonProfit)) ownership = "Nonprofit";
-    else if (isTrue(h.TYPE_ForProfit)) ownership = "For-Profit";
-
-    // Care Level from flags
-    let careLevel = "—";
-    if (isTrue(h.TYPE_HospTyp_CAH)) careLevel = "Critical Access";
-    else if (isTrue(h.TYPE_HospTyp_ACH)) careLevel = "Acute Care";
-
-    // Urban/Rural setting from flags
-    let setting = "—";
-    if (isTrue(h.TYPE_urban)) setting = "Urban";
-    else if (isTrue(h.TYPE_rural)) setting = "Rural";
-
-    // System Affiliation from HOSPITAL_SYSTEM
-    let systemAff = "Independent";
-    if (String(h.HOSPITAL_SYSTEM).toUpperCase() === "Y") {
-      systemAff = h.SYSTEM_ID ? `Affiliated (System ID: ${h.SYSTEM_ID})` : "Affiliated";
-    }
-
+    // ===== Hospital Info =====
     const info = {
-      hospitalCounty: "—",            // not in this file
-      hospitalSize: prettySize,       // from Size (s/m/l)
-      hospitalType: ownership,        // Nonprofit / For-Profit
-      hospitalCareLevel: careLevel,   // Acute Care / Critical Access
-      hospitalSystem: systemAff,      // Independent or Affiliated
-      hospitalUrbanRural: setting,    // Urban / Rural
-      hospitalBeds: "—"               // not in this file
+      hospitalCounty: safe(h["County"]),
+      hospitalSize: safe(h["Bed Size"]),
+      hospitalCareLevel: safe(h["Hospital Type"]),
+      hospitalUrbanRural: safe(h["Urban/Rural"]),
+      hospitalSystem: safe(h["Health System"] || "Independent"),
+      hospitalType: safe(h["Ownership"]),
+      hospitalBeds: safe(h["Bed Size"])
     };
 
     for (const [id, val] of Object.entries(info)) {
@@ -85,50 +65,110 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (el) el.textContent = val;
     }
 
-    // ===== Attribute badges (only show true ones) =====
-    const attrs = [];
-    if (isTrue(h.TYPE_AMC)) attrs.push("Academic Medical Center");
-    if (isTrue(h.TYPE_isSafetyNet)) attrs.push("Safety Net Hospital");
-    if (isTrue(h.TYPE_chrch_affl_f)) attrs.push("Church-Affiliated");
-    if (attrs.length) {
+    // ===== Binary attribute flags (display only if TRUE) =====
+    const attributes = [];
+    if (isTrue(h["Teaching"])) attributes.push("Teaching Hospital");
+    if (isTrue(h["Critical Access"])) attributes.push("Critical Access Hospital");
+    if (isTrue(h["Safety Net"])) attributes.push("Safety Net Hospital");
+    if (isTrue(h["Academic"])) attributes.push("Academic Medical Center");
+    if (attributes.length > 0) {
       const wrap = document.getElementById("hospitalAddress");
-      if (wrap) {
-        const p = document.createElement("p");
-        p.className = "attr-badges";
-        p.textContent = attrs.join(" • ");
-        wrap.appendChild(p);
-      }
+      const list = document.createElement("p");
+      list.textContent = attributes.join(" • ");
+      wrap.appendChild(list);
     }
 
-    // ===== Overall Grade (underscored key names) =====
-    const overallGrade = h.TIER_1_GRADE_Lown_Composite || "N/A";
+    // ===== Services =====
+	const list = document.getElementById("hospitalServices");
+	list.innerHTML = "";
+
+	// Default fallback list if dataset has no service info
+	let services = [
+	  "Behavioral Health",
+	  "Cardiology",
+	  "Emergency Care",
+	  "Imaging & Radiology",
+	  "Maternity & Neonatal ICU",
+	  "Oncology",
+	  "Orthopedics",
+	  "Outpatient Surgery",
+	  "Pediatric Services",
+	  "Pharmacy",
+	  "Physical Therapy",
+	  "Rehabilitation"
+	];
+
+	// Check for multiple possible keys
+	const rawServices =
+	  h["SERVICES"] ||
+	  h["Services"] ||
+	  h["Services Offered"] ||
+	  h["Service List"];
+
+	if (typeof rawServices === "string" && rawServices.trim() && rawServices.toUpperCase() !== "NULL") {
+	  const parsed = rawServices.split(",").map(s => s.trim()).filter(Boolean);
+	  if (parsed.length) services = parsed;
+	} else if (Array.isArray(rawServices) && rawServices.length) {
+	  services = rawServices.map(s => s.trim()).filter(Boolean);
+	}
+
+	list.innerHTML = services.map(s => `<li>${s}</li>`).join("");
+
+    // ===== Overall Grade =====
+    const overallGrade = h["TIER 1 GRADE Lown Composite"] || "N/A";
     const starWrap = document.getElementById("overallStars");
     if (starWrap)
-      starWrap.innerHTML = renderStars(convertGradeToStars(overallGrade).value, overallGrade);
+      starWrap.innerHTML = renderStars(
+        convertGradeToStars(overallGrade).value,
+        overallGrade
+      );
+
+    // Hide redundant text
     const gradeText = document.getElementById("overallGradeText");
     if (gradeText) gradeText.textContent = "";
 
-    // ===== Category stars (underscored keys) =====
-    const starMap = {
-      financialTransparencyStars: h.TIER_2_GRADE_Value || "F",
-      communityBenefitStars: h.TIER_3_GRADE_CB || "F",
-      affordabilityBillingStars: h.TIER_3_GRADE_Cost_Eff || "F",
-      accessResponsibilityStars: h.TIER_3_GRADE_Inclusivity || "F"
-    };
-    for (const [id, grade] of Object.entries(starMap)) {
-      const el = document.getElementById(id);
-      if (el)
-        el.innerHTML = renderStars(convertGradeToStars(grade).value, grade);
-    }
+    // ===== Category-level stars =====
+	const categoryMap = {
+	  financialTransparencyStars: [
+		"TIER 2 GRADE Value",
+		"TIER_2_GRADE_Value",
+		"TIER 1 GRADE Lown Composite"
+	  ],
+	  communityBenefitStars: [
+		"TIER 3 GRADE CB",
+		"TIER_3_GRADE_CB"
+	  ],
+	  affordabilityBillingStars: [
+		"TIER 3 GRADE Cost Eff",
+		"TIER_3_GRADE_Cost_Eff"
+	  ],
+	  accessResponsibilityStars: [
+		"TIER 3 GRADE Inclusivity",
+		"TIER_3_GRADE_Inclusivity"
+	  ]
+	};
 
-    // ===== Map (fallback to ZIP centroid) =====
+	for (const [id, fields] of Object.entries(categoryMap)) {
+	  let grade = "N/A";
+	  for (const key of fields) {
+		if (h[key] && h[key] !== "NULL" && h[key] !== "—") {
+		  grade = h[key];
+		  break;
+		}
+	  }
+	  const el = document.getElementById(id);
+	  if (el) el.innerHTML = renderStars(convertGradeToStars(grade).value, grade);
+	}
+
+
+    // ===== Map =====
     const mapDiv = document.getElementById("leafletMap");
     if (mapDiv) {
-      let lat = parseFloat(h.Latitude || h.LAT);
-      let lon = parseFloat(h.Longitude || h.LON);
+      let lat = parseFloat(h["Latitude"]);
+      let lon = parseFloat(h["Longitude"]);
 
       if (!lat || !lon) {
-        const coords = getZipCoords(zip);
+        const coords = getZipCoords(h["ZIP Code"]);
         lat = coords[0];
         lon = coords[1];
       }
@@ -140,10 +180,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       L.marker([lat, lon]).addTo(map).bindPopup(name);
 
-      const gmapsLink = document.getElementById("gmapsLink");
-      if (gmapsLink) {
-        gmapsLink.href = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-      }
+      document.getElementById("gmapsLink").href =
+        `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
     }
   } catch (err) {
     console.error("Error loading hospital details:", err);
@@ -151,37 +189,77 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ====== STAR UTILITIES ======
-function convertGradeToStars(grade) {
-  const map = { A: 5, B: 4, C: 3, D: 2, F: 1 };
-  const upper = String(grade).trim().toUpperCase();
-  return { value: map[upper] || 0 };
-}
+	function convertGradeToStars(grade) {
+	  const gradeMap = {
+		"A+": 5, "A": 5, "A-": 4.5,
+		"B+": 4.5, "B": 4, "B-": 3.5,
+		"C+": 3.5, "C": 3, "C-": 2.5,
+		"D+": 2.5, "D": 2, "D-": 1.5,
+		"F": 1
+	  };
+	  const g = String(grade).trim().toUpperCase();
+	  return { value: gradeMap[g] || 0 };
+	}
 
-function renderStars(count, grade = "") {
-  const maxStars = 5;
-  const color =
-    ["A", "B"].includes(grade) ? "#6fb353" :
-    grade === "C" ? "#a4cc95" :
-    ["D", "F"].includes(grade) ? "#f48810" :
-    "#ccc";
+	function renderStars(value, grade = "") {
+	  let html = `<div class="star-rating" aria-label="${grade} (${value} of 5 stars)">`;
+	  for (let i = 1; i <= 5; i++) {
+		if (value >= i) html += fullStarSVG();
+		else if (value >= i - 0.5) html += halfStarSVG();
+		else html += emptyStarSVG();
+	  }
+	  html += `</div>`;
+	  return html;
+	}
 
-  let html = `<div class="star-rating" aria-label="Rating: ${count} out of ${maxStars} stars">`;
-  for (let i = 1; i <= maxStars; i++) {
-    html += `
-      <svg xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="20" height="20"
-        fill="${i <= count ? color : '#ddd'}"
-        style="margin-right: 2px">
-        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-      </svg>`;
-  }
-  html += `</div>`;
-  return html;
-}
+	function fullStarSVG() {
+	  return `<svg class="star full" viewBox="0 0 24 24" width="20" height="20">
+		<path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+	  </svg>`;
+	}
+
+	function halfStarSVG() {
+	  return `<svg class="star half" viewBox="0 0 24 24" width="20" height="20">
+		<defs><linearGradient id="halfGradient" x1="0" x2="1">
+		  <stop offset="50%" stop-color="#f48810"/><stop offset="50%" stop-color="#a4cc95"/>
+		</linearGradient></defs>
+		<path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+	  </svg>`;
+	}
+
+	function emptyStarSVG() {
+	  return `<svg class="star empty" viewBox="0 0 24 24" width="20" height="20">
+		<path fill="#ddd" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+	  </svg>`;
+	}
 
 // ====== ZIPCODE FALLBACK FUNCTION ======
 function getZipCoords(zip) {
-  // Placeholder: center of Georgia until we wire a ZIP-to-lat/lon table
-  return [32.5, -83.5];
+  // Basic GA ZIP-to-lat/lon lookup (approximate centers)
+  const lookup = {
+    "30303": [33.7525, -84.3915], // Atlanta
+    "30720": [34.7698, -84.9719], // Dalton
+    "31201": [32.8306, -83.6513], // Macon
+    "31901": [32.464, -84.9877],  // Columbus
+    "31401": [32.0809, -81.0912], // Savannah
+    "31520": [31.1499, -81.4915], // Brunswick
+    "31701": [31.5795, -84.1557], // Albany
+    "39817": [30.9043, -84.5762], // Bainbridge
+    "30601": [33.959, -83.3767],  // Athens
+    "30161": [34.2546, -85.1647], // Rome
+    "30501": [34.2963, -83.8255], // Gainesville
+    "39840": [31.3141, -84.6191], // Dawson
+    "30040": [34.2282, -84.1596], // Cumming
+    "30809": [33.5515, -82.0903], // Evans/Augusta area
+    "31794": [31.4505, -83.5085], // Tifton
+    "30263": [33.3768, -84.8038], // Newnan
+    "31021": [32.5404, -82.9056], // Dublin
+    "30114": [34.196, -84.5049],  // Canton
+    "30240": [33.036, -85.0318],  // LaGrange
+    "31525": [31.2609, -81.5163], // Glynn County
+  };
+
+  const coords = lookup[String(zip)] || [32.5, -83.5];
+  return coords;
 }
+

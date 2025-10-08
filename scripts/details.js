@@ -1,19 +1,34 @@
 // =======================================
 //  Georgia Watch Details Page Script
 //  Updated for Lown 2025 dataset structure
-//  Author: Chatty for Kim 💪
 // =======================================
 
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const hospitalId = params.get("id");
-  if (!hospitalId) return;
+  if (!hospitalId) {
+    console.warn("No ?id= parameter found in URL.");
+    return;
+  }
 
   try {
     const res = await fetch("./data/2025/2025_Lown_Index_GA.json");
     const data = await res.json();
-    const h = data.find(x => String(x.RECORD_ID) === String(hospitalId));
-    if (!h) return;
+
+    // Match flexible key names (handles spaces and case)
+    const h = data.find(x =>
+      String(
+        x["Record ID"] ||
+        x["RECORD ID"] ||
+        x["RECORD_ID"] ||
+        x["id"]
+      ) === String(hospitalId)
+    );
+
+    if (!h) {
+      console.error("Hospital not found for ID:", hospitalId);
+      return;
+    }
 
     // ===== Helper functions =====
     const safe = val =>
@@ -22,47 +37,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     const isTrue = val =>
       val === 1 || val === "1" || val === "Y" || val === "Yes" || val === "TRUE";
 
-    const getVal = (...keys) =>
-      keys.map(k => h[k]).find(v => v && v !== "NULL" && v !== "—") || "—";
-
     // ===== Hospital Name =====
-    const name = h.HOSPITAL_NAME || h.Name || "Unnamed Hospital";
+    const name = h["Hospital Name"] || "Unnamed Hospital";
     const nameTop = document.getElementById("hospitalNameTop");
     const nameCenter = document.getElementById("hospitalName");
     if (nameTop) nameTop.textContent = name;
     if (nameCenter) nameCenter.textContent = name;
 
     // ===== Address =====
-    document.getElementById("streetLine").textContent = safe(h.ADDRESS);
+    document.getElementById("streetLine").textContent = safe(h["Address"]);
     document.getElementById("cityStateZip").textContent =
-      [h.CITY, h.STATE, h.ZIP_CODE].filter(Boolean).join(", ");
+      [h["City"], h["State"], h["ZIP Code"]].filter(Boolean).join(", ");
 
     // ===== Hospital Info =====
     const info = {
-      hospitalCounty: getVal("COUNTY_NAME", "COUNTY"),
-      hospitalSize: getVal("BED_SIZE", "SIZE", "Hospital_Size"),
-      hospitalCareLevel: getVal("HOSPITAL_TYPE", "CARE_LEVEL", "Type_of_Care"),
-      hospitalUrbanRural: isTrue(h.Urban)
-        ? "Urban"
-        : isTrue(h.Rural)
-        ? "Rural"
-        : h.URBAN_RURAL_DESIGNATION || "—",
-      hospitalSystem: getVal("HEALTH_SYSTEM", "SYSTEM_NAME", "System_Affiliation") || "Independent",
-      hospitalType: getVal("OWNERSHIP", "Type"),
-      hospitalBeds: getVal("BED_SIZE", "BEDS", "Bed_Range")
+      hospitalCounty: safe(h["County"]),
+      hospitalSize: safe(h["Bed Size"]),
+      hospitalCareLevel: safe(h["Hospital Type"]),
+      hospitalUrbanRural: safe(h["Urban/Rural"]),
+      hospitalSystem: safe(h["Health System"] || "Independent"),
+      hospitalType: safe(h["Ownership"]),
+      hospitalBeds: safe(h["Bed Size"])
     };
 
     for (const [id, val] of Object.entries(info)) {
       const el = document.getElementById(id);
-      if (el) el.textContent = safe(val);
+      if (el) el.textContent = val;
     }
 
     // ===== Binary attribute flags (display only if TRUE) =====
     const attributes = [];
-    if (isTrue(h.Teaching)) attributes.push("Teaching Hospital");
-    if (isTrue(h.CriticalAccess)) attributes.push("Critical Access Hospital");
-    if (isTrue(h.SafetyNet)) attributes.push("Safety Net Hospital");
-    if (isTrue(h.Academic)) attributes.push("Academic Medical Center");
+    if (isTrue(h["Teaching"])) attributes.push("Teaching Hospital");
+    if (isTrue(h["Critical Access"])) attributes.push("Critical Access Hospital");
+    if (isTrue(h["Safety Net"])) attributes.push("Safety Net Hospital");
+    if (isTrue(h["Academic"])) attributes.push("Academic Medical Center");
     if (attributes.length > 0) {
       const wrap = document.getElementById("hospitalAddress");
       const list = document.createElement("p");
@@ -75,10 +83,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     list.innerHTML = "";
     let services = [];
 
-    if (typeof h.SERVICES === "string") {
-      services = h.SERVICES.split(",").map(s => s.trim());
-    } else if (Array.isArray(h.Services)) {
-      services = h.Services.map(s => s.trim());
+    if (typeof h["Services"] === "string") {
+      services = h["Services"].split(",").map(s => s.trim());
     }
 
     if (!services.length) {
@@ -100,33 +106,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     list.innerHTML = services.map(s => `<li>${s}</li>`).join("");
 
     // ===== Overall Grade =====
-    const overallGrade = h.TIER_1_GRADE_Lown_Composite || "N/A";
+    const overallGrade = h["TIER 1 GRADE Lown Composite"] || "N/A";
     const starWrap = document.getElementById("overallStars");
-    if (starWrap) starWrap.innerHTML = renderStars(convertGradeToStars(overallGrade).value);
-    // Hide redundant grade text
+    if (starWrap)
+      starWrap.innerHTML = renderStars(
+        convertGradeToStars(overallGrade).value,
+        overallGrade
+      );
+
+    // Hide redundant text
     const gradeText = document.getElementById("overallGradeText");
     if (gradeText) gradeText.textContent = "";
 
     // ===== Category-level stars =====
     const starMap = {
-      financialTransparencyStars: h.TIER_2_GRADE_Value || "F",
-      communityBenefitStars: h.TIER_3_GRADE_CB || "F",
-      affordabilityBillingStars: h.TIER_3_GRADE_Cost_Eff || "F",
-      accessResponsibilityStars: h.TIER_3_GRADE_Inclusivity || "F"
+      financialTransparencyStars: h["TIER 2 GRADE Value"] || "F",
+      communityBenefitStars: h["TIER 3 GRADE CB"] || "F",
+      affordabilityBillingStars: h["TIER 3 GRADE Cost Eff"] || "F",
+      accessResponsibilityStars: h["TIER 3 GRADE Inclusivity"] || "F"
     };
+
     for (const [id, grade] of Object.entries(starMap)) {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = renderStars(convertGradeToStars(grade).value);
+      if (el)
+        el.innerHTML = renderStars(
+          convertGradeToStars(grade).value,
+          grade
+        );
     }
 
     // ===== Map =====
     const mapDiv = document.getElementById("leafletMap");
     if (mapDiv) {
-      let lat = parseFloat(h.Latitude || h.LAT);
-      let lon = parseFloat(h.Longitude || h.LON);
+      let lat = parseFloat(h["Latitude"]);
+      let lon = parseFloat(h["Longitude"]);
 
       if (!lat || !lon) {
-        const coords = getZipCoords(h.ZIP_CODE || h.Zip);
+        const coords = getZipCoords(h["ZIP Code"]);
         lat = coords[0];
         lon = coords[1];
       }
@@ -146,24 +162,37 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ====== STAR UTILITY FUNCTIONS ======
+// ====== STAR UTILITIES ======
 function convertGradeToStars(grade) {
-  // Convert letter grades A–F to star counts
   const map = { A: 5, B: 4, C: 3, D: 2, F: 1 };
   const upper = String(grade).trim().toUpperCase();
   return { value: map[upper] || 0 };
 }
 
-function renderStars(count) {
-  const fullStar = "★";
-  const emptyStar = "☆";
-  return `<span class="stars">${fullStar.repeat(count)}${emptyStar.repeat(
-    5 - count
-  )}</span>`;
+function renderStars(count, grade = "") {
+  const maxStars = 5;
+  const color =
+    ["A", "B"].includes(grade) ? "#6fb353" :
+    grade === "C" ? "#a4cc95" :
+    ["D", "F"].includes(grade) ? "#f48810" :
+    "#ccc";
+
+  let html = `<div class="star-rating" aria-label="Rating: ${count} out of ${maxStars} stars">`;
+  for (let i = 1; i <= maxStars; i++) {
+    html += `
+      <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="20" height="20"
+        fill="${i <= count ? color : '#ddd'}"
+        style="margin-right: 2px">
+        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </svg>`;
+  }
+  html += `</div>`;
+  return html;
 }
 
 // ====== ZIPCODE FALLBACK FUNCTION ======
 function getZipCoords(zip) {
-  // fallback approximate coords (center of Georgia)
   return [32.5, -83.5];
 }

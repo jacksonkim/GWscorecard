@@ -2,6 +2,7 @@
 // Data Storage
 // ===============================
 let hospitalData = [];
+let filteredHospitalData = [];
 
 // ===============================
 // Load JSON Data
@@ -10,12 +11,12 @@ fetch("./data/2025/2025_Lown_Index_GA.json")
   .then(res => res.json())
   .then(data => {
     hospitalData = data;
+    filteredHospitalData = [...hospitalData];
     console.log("Hospital data loaded:", hospitalData.length, "records");
 
     // Initial render
     renderHospitals(hospitalData);
-	initHospitalMap(hospitalData);
-
+    initHospitalMap(hospitalData);
   })
   .catch(err => console.error("Error loading JSON:", err));
 
@@ -96,14 +97,14 @@ function renderHospitals(data) {
     const detailCell = document.createElement("td");
     detailCell.colSpan = 3;
     detailCell.innerHTML = `
-	  <div class="detail-info">
-		<p class="inline-stars"><strong>Outcome:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</p>
-		<p class="inline-stars"><strong>Value:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</p>
-		<p class="inline-stars"><strong>Civic:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</p>
-		<p class="inline-stars"><strong>Safety:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</p>
-		<p class="inline-stars"><strong>Experience:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</p>
-	  </div>
-	`;
+      <div class="detail-info">
+        <p class="inline-stars"><strong>Outcome:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</p>
+        <p class="inline-stars"><strong>Value:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</p>
+        <p class="inline-stars"><strong>Civic:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</p>
+        <p class="inline-stars"><strong>Safety:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</p>
+        <p class="inline-stars"><strong>Experience:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</p>
+      </div>
+    `;
     detailRow.appendChild(detailCell);
 
     // === Toggle Logic (single listener) ===
@@ -119,73 +120,9 @@ function renderHospitals(data) {
   });
 }
 
-
-function toggleHospitalDetails(hospitalId, button) {
-  const existingRow = document.querySelector(`.details-row[data-id="${hospitalId}"]`);
-  if (existingRow) {
-    existingRow.remove(); // close if already open
-    return;
-  }
-
-  const hospital = hospitalData.find(h => h.RECORD_ID === hospitalId);
-  if (!hospital) {
-    console.error("Hospital not found:", hospitalId);
-    return;
-  }
-
-  const detailsRow = document.createElement("tr");
-  detailsRow.classList.add("details-row");
-  detailsRow.setAttribute("data-id", hospitalId);
-
-  detailsRow.innerHTML = `
-    <td colspan="3">
-      <div class="hospital-details-dropdown show">
-        <div class="details-grid">
-          ${renderGrades(hospital)}
-        </div>
-      </div>
-    </td>
-  `;
-
-  const currentRow = button.closest("tr");
-  currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
-}
-
-
-function renderGrades(hospital) {
-  const metrics = [
-    { key: "TIER_1_GRADE_Lown_Composite", label: "Tier 1 Composite" },
-    { key: "TIER_2_GRADE_Outcome", label: "Tier 2 Outcome" },
-    { key: "TIER_2_GRADE_Value", label: "Tier 2 Value" },
-    { key: "TIER_2_GRADE_Civic", label: "Tier 2 Civic" },
-    { key: "TIER_3_GRADE_Outcome", label: "Tier 3 Outcome" },
-    { key: "TIER_3_GRADE_Pat_Saf", label: "Tier 3 Patient Safety" },
-    { key: "TIER_3_GRADE_Pat_Exp", label: "Tier 3 Patient Experience" },
-    { key: "TIER_3_GRADE_OU", label: "Tier 3 Overuse" },
-    { key: "TIER_3_GRADE_Cost_Eff", label: "Tier 3 Cost Efficiency" },
-    { key: "TIER_3_GRADE_Exec_Comp", label: "Tier 3 Exec Comp" },
-    { key: "TIER_3_GRADE_CB", label: "Tier 3 Community Benefit" },
-    { key: "TIER_3_GRADE_Inclusivity", label: "Tier 3 Inclusivity" }
-  ];
-
-  return metrics.map(m => {
-	  const grade = hospital[m.key] || "N/A";
-	  const stars = convertGradeToStars(grade);
-	  return `
-		<div class="details-section">
-		  <h4>${m.label}</h4>
-		  <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
-			${renderStars(stars.value)}
-			<span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
-		  </div>
-		</div>
-	  `;
-	}).join("");
-
-}
-
-
-
+// ===============================
+// View Toggle and Filter Buttons
+// ===============================
 const viewSystemsBtn = document.getElementById("viewSystemsBtn");
 const viewIndividualsBtn = document.getElementById("viewIndividualsBtn");
 const individualOptions = document.getElementById("individualOptions");
@@ -201,25 +138,21 @@ function deactivateHospitalTypeButtons() {
 // Critical Access toggle
 filterCriticalBtn.addEventListener("click", () => {
   const isActive = filterCriticalBtn.classList.contains("active");
-
   deactivateHospitalTypeButtons();
   if (!isActive) {
     filterCriticalBtn.classList.add("active");
   }
-
-  console.log("Hospital type selected:", getSelectedHospitalType());
+  applyAllFilters();
 });
 
 // Acute Care toggle
 filterAcuteBtn.addEventListener("click", () => {
   const isActive = filterAcuteBtn.classList.contains("active");
-
   deactivateHospitalTypeButtons();
   if (!isActive) {
     filterAcuteBtn.classList.add("active");
   }
-
-  console.log("Hospital type selected:", getSelectedHospitalType());
+  applyAllFilters();
 });
 
 // Helper function to get current selection
@@ -233,77 +166,119 @@ viewSystemsBtn.addEventListener("click", () => {
   viewSystemsBtn.classList.add("active");
   viewIndividualsBtn.classList.remove("active");
   individualOptions.style.display = "none";
-
-  console.log("View set to: Hospital Systems");
-  // TODO: Implement system-level rendering
-  renderHospitals(hospitalData); // placeholder
+  applyAllFilters();
 });
 
 viewIndividualsBtn.addEventListener("click", () => {
   viewIndividualsBtn.classList.add("active");
   viewSystemsBtn.classList.remove("active");
   individualOptions.style.display = "block";
-
-  console.log("View set to: Individual Hospitals");
-  // TODO: Implement individual rendering with critical/acute filtering
-  renderHospitals(hospitalData); // placeholder
+  applyAllFilters();
 });
 
+// ===============================
+// Main Filter Function
+// ===============================
+function applyAllFilters() {
+  let filtered = [...hospitalData];
+
+  // Apply hospital type filters
+  const selectedHospitalType = getSelectedHospitalType();
+  if (selectedHospitalType === 'Critical Access') {
+    filtered = filtered.filter(hospital => hospital.TYPE_HospTyp_CAH === 1);
+  } else if (selectedHospitalType === 'Acute Care') {
+    filtered = filtered.filter(hospital => hospital.TYPE_HospTyp_ACH === 1);
+  }
+
+  // Apply checkbox filters
+  const checked = [...document.querySelectorAll("input[type='checkbox']:checked")].map(cb => cb.value);
+  if (checked.length > 0) {
+    filtered = filtered.filter(hospital => {
+      return checked.every(val => {
+        switch(val) {
+          case 'Urban': return hospital.TYPE_urban === 1;
+          case 'Rural': return hospital.TYPE_rural === 1;
+          case 'Non-profit': return hospital.TYPE_NonProfit === 1;
+          case 'For Profit': return hospital.TYPE_ForProfit === 1;
+          case 'Church Affiliated': return hospital.TYPE_chrch_affl_f === 1;
+          case 'Academic Medical Center': return hospital.TYPE_AMC === 1;
+          case 'Safety Net': return hospital.TYPE_isSafetyNet === 1;
+          default: return JSON.stringify(hospital).toLowerCase().includes(val.toLowerCase());
+        }
+      });
+    });
+  }
+
+  // Apply location filter
+  const zip = document.getElementById("zipInput").value.trim();
+  const radius = document.getElementById("radiusSelect").value;
+  if (zip && /^\d{5}$/.test(zip)) {
+    const coords = getZipCoords(zip);
+    filtered = filtered.filter(hospital => {
+      let lat = parseFloat(hospital.Latitude) || getZipCoords(hospital.Zip)[0];
+      let lon = parseFloat(hospital.Longitude) || getZipCoords(hospital.Zip)[1];
+      const distance = calculateDistance(coords[0], coords[1], lat, lon);
+      return distance <= parseInt(radius);
+    });
+  }
+
+  filteredHospitalData = filtered;
+  
+  // Apply sorting and render
+  sortAndRender(filteredHospitalData);
+  updateMapMarkers(filteredHospitalData);
+}
+
+// ===============================
+// Distance Calculation
+// ===============================
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 3959; // Earth's radius in miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// ===============================
+// Sorting Function
+// ===============================
 function sortAndRender(data) {
   const sortValue = document.getElementById("sortSelect").value;
-
   let sorted = [...data];
 
   if (sortValue === "grade") {
     sorted.sort((a, b) => {
-      const gradeA = a.TIER_1_GRADE_Lown_Composite || "F";
-      const gradeB = b.TIER_1_GRADE_Lown_Composite || "F";
-      return gradeA.localeCompare(gradeB); // or reverse it if needed
+      const gradeOrder = {"A+": 12, "A": 11, "A-": 10, "B+": 9, "B": 8, "B-": 7, "C+": 6, "C": 5, "C-": 4, "D+": 3, "D": 2, "D-": 1, "F": 0, "N/A": -1};
+      const gradeA = a.TIER_1_GRADE_Lown_Composite || "N/A";
+      const gradeB = b.TIER_1_GRADE_Lown_Composite || "N/A";
+      return gradeOrder[gradeB] - gradeOrder[gradeA]; // High to low
     });
   } else if (sortValue === "distance") {
-    sorted.sort((a, b) => {
-      return (a.distance || 99999) - (b.distance || 99999); // assumes `.distance` was set by ZIP logic
-    });
+    // Distance sorting handled in applyAllFilters
   } else if (sortValue === "name") {
     sorted.sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
-  }
-    else if (sortValue === "size") {
-    const sizeOrder = ["Small", "Medium", "Large", "Extra Large"];
-
+  } else if (sortValue === "size") {
+    const sizeOrder = {"xs": 1, "s": 2, "m": 3, "l": 4, "xl": 5};
     sorted.sort((a, b) => {
-      const sizeA = a.Size || "";
-      const sizeB = b.Size || "";
-      const indexA = sizeOrder.indexOf(sizeA) !== -1 ? sizeOrder.indexOf(sizeA) : 999;
-      const indexB = sizeOrder.indexOf(sizeB) !== -1 ? sizeOrder.indexOf(sizeB) : 999;
-      return indexA - indexB;
+      const sizeA = sizeOrder[a.Size] || 0;
+      const sizeB = sizeOrder[b.Size] || 0;
+      return sizeA - sizeB; // Small to large
     });
   }
-
 
   renderHospitals(sorted);
 }
 
 // ===============================
-// Apply Filters
+// Apply Filters Button
 // ===============================
 document.getElementById("applyFiltersBtn").addEventListener("click", () => {
-  const zip = document.getElementById("zipInput").value.trim();
-  const radius = document.getElementById("radiusSelect").value;
-  const checked = [...document.querySelectorAll("input[type='checkbox']:checked")].map(cb => cb.value);
-
-  console.log("ZIP:", zip, "Radius:", radius);
-  console.log("Selected Filters:", checked);
-
-  // TODO: Real filtering logic (hook into fields in JSON)
-  let filtered = hospitalData.filter(h => {
-    return checked.every(val =>
-      JSON.stringify(h).toLowerCase().includes(val.toLowerCase())
-    );
-  });
-
-  renderHospitals(filtered);
-  initHospitalMap(filtered);
-
+  applyAllFilters();
 });
 
 // ===============================
@@ -313,52 +288,148 @@ document.getElementById("resetFiltersBtn").addEventListener("click", () => {
   document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
   document.getElementById("zipInput").value = "";
   document.getElementById("radiusSelect").selectedIndex = 0;
-  console.log("Filters reset");
-
+  
+  // Reset view buttons
+  deactivateHospitalTypeButtons();
+  viewIndividualsBtn.click();
+  
+  // Reset to all data
+  filteredHospitalData = [...hospitalData];
   renderHospitals(hospitalData);
+  updateMapMarkers(hospitalData);
 });
 
 // ===============================
-// Download Data (Stub)
+// Sort Event Listener
+// ===============================
+document.getElementById("sortSelect").addEventListener("change", () => {
+  sortAndRender(filteredHospitalData);
+});
+
+// ===============================
+// Download Data
 // ===============================
 document.getElementById("downloadDataBtn").addEventListener("click", () => {
   console.log("Download triggered");
   // TODO: backend or SheetJS export
 });
 
-function showHospitalDetailPage(hospitalId) {
-    document.querySelector('.main-content').style.display = 'none';
-    document.querySelector('.map-section').style.display = 'none';
+// ===============================
+// Map Functions - FIXED VERSION
+// ===============================
+let map;
+let mapMarkers = [];
 
-    const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
+function initHospitalMap(data) {
+  const mapDiv = document.getElementById("mainMap");
+  if (!mapDiv) {
+    console.error("Map container not found!");
+    return;
+  }
 
-    if (!hospital) {
-        window.location.href = window.location.pathname;
-        return;
+  // Initialize map only once
+  if (!map) {
+    console.log("Initializing map...");
+    map = L.map("mainMap").setView([32.7, -83.4], 7);
+    
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+      maxZoom: 18
+    }).addTo(map);
+    
+    console.log("Map initialized successfully");
+  }
+
+  updateMapMarkers(data);
+}
+
+function updateMapMarkers(data) {
+  console.log("Updating map markers with", data.length, "hospitals");
+  
+  // Clear old markers
+  mapMarkers.forEach(marker => map.removeLayer(marker));
+  mapMarkers = [];
+
+  if (data.length === 0) {
+    console.log("No data to display on map");
+    return;
+  }
+
+  // Add new markers
+  data.forEach(hospital => {
+    let lat = parseFloat(hospital.Latitude);
+    let lon = parseFloat(hospital.Longitude);
+
+    // If no coordinates, approximate from ZIP code
+    if ((!lat || !lon) && hospital.Zip) {
+      [lat, lon] = getZipCoords(hospital.Zip);
     }
 
-    const detailContainer = document.createElement('div');
-    detailContainer.className = 'hospital-detail-container';
+    if (!lat || !lon) {
+      console.warn("No coordinates for hospital:", hospital.Name);
+      return;
+    }
 
-    const gradeClass = `grade-${hospital.TIER_1_GRADE_Lown_Composite}`;
+    const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
+    const stars = convertGradeToStars(grade);
 
-    const lat = 32.6782 + (Math.random() - 0.5) * 2;
-    const lng = -83.2226 + (Math.random() - 0.5) * 2;
-
-    detailContainer.innerHTML = `
-        <div class="hospital-header">
-            <h2>${hospital.HOSPITAL_NAME}</h2>
-            <span class="hospital-grade ${gradeClass}">${hospital.TIER_1_GRADE_Lown_Composite}</span>
-        </div>
-        <p><strong>Location:</strong> ${hospital.CITY}, ${hospital.STATE}</p>
-        <p><strong>Type:</strong> ${hospital.HOSPITAL_TYPE}</p>
-        <p><strong>Ownership:</strong> ${hospital.OWNERSHIP}</p>
-        <p><strong>System Name:</strong> ${hospital.SYSTEM_NAME}</p>
-        <p><strong>Zip Code:</strong> ${hospital.ZIP_CODE}</p>
-        <button onclick="window.location.reload()">Back to Results</button>
+    const popupHTML = `
+      <div class="map-popup">
+        <strong>${hospital.Name || "Unnamed Hospital"}</strong><br>
+        ${hospital.City || ""}, ${hospital.State || ""}<br>
+        <div class="star-rating">${renderStars(stars.value)}</div>
+        <a href="details.html?id=${hospital.RECORD_ID}" class="view-full-detail">
+          View Full Details
+        </a>
+      </div>
     `;
 
-    document.body.appendChild(detailContainer);
+    const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
+    mapMarkers.push(marker);
+  });
+
+  console.log("Added", mapMarkers.length, "markers to map");
+
+  // Adjust map to fit all visible markers
+  if (mapMarkers.length > 0) {
+    const group = L.featureGroup(mapMarkers);
+    map.fitBounds(group.getBounds().pad(0.2));
+    console.log("Map bounds adjusted to fit markers");
+  }
+
+  // Ensure map is properly sized
+  setTimeout(() => {
+    map.invalidateSize();
+    console.log("Map size invalidated");
+  }, 100);
+}
+
+// ===============================
+// ZIP-Based Coordinate Approximation
+// ===============================
+function getZipCoords(zip) {
+  const lookup = {
+    "30303": [33.7525, -84.3915], // Atlanta
+    "30606": [33.9597, -83.3764], // Athens
+    "31404": [32.0760, -81.0886], // Savannah
+    "31533": [31.5185, -82.8499], // Douglas
+    "30553": [34.3434, -83.8003], // Lavonia
+    "30720": [34.7698, -84.9719], // Dalton
+    "31201": [32.8306, -83.6513], // Macon
+    "31901": [32.464, -84.9877], // Columbus
+    "31401": [32.0809, -81.0912], // Savannah
+    "31701": [31.5795, -84.1557], // Albany
+    "39817": [30.9043, -84.5762], // Bainbridge
+    "30161": [34.2546, -85.1647], // Rome
+    "30501": [34.2963, -83.8255], // Gainesville
+    "30117": [33.5801, -85.0767], // Carrollton
+    "31093": [32.6184, -83.6272], // Warner Robins
+    "31405": [32.0316, -81.1028], // Savannah
+    "31021": [32.5563, -82.8947], // Dublin
+    "31792": [30.8365, -83.9787]  // Thomasville
+  };
+  const coords = lookup[String(zip)] || [32.5, -83.5]; // Default to central Georgia
+  return coords;
 }
 
 // ===============================
@@ -366,18 +437,10 @@ function showHospitalDetailPage(hospitalId) {
 // ===============================
 function convertGradeToStars(grade) {
   const gradeMap = {
-    "A+": 5,
-    "A": 5,
-    "A-": 4.5,
-    "B+": 4.5,
-    "B": 4,
-    "B-": 3.5,
-    "C+": 3.5,
-    "C": 3,
-    "C-": 2.5,
-    "D+": 2.5,
-    "D": 2,
-    "D-": 1.5,
+    "A+": 5, "A": 5, "A-": 4.5,
+    "B+": 4.5, "B": 4, "B-": 3.5,
+    "C+": 3.5, "C": 3, "C-": 2.5,
+    "D+": 2.5, "D": 2, "D-": 1.5,
     "F": 1,
   };
   const value = gradeMap[grade.trim()] || 0;
@@ -429,93 +492,6 @@ function emptyStarSVG() {
 }
 
 // ===============================
-// Leaflet Map Integration
-// ===============================
-let map; // Global map instance so we can reuse it
-let mapMarkers = []; // Store current markers to clear them later
-
-// ===============================
-// ZIP-Based Coordinate Approximation (for hospitals without lat/lon)
-// ===============================
-function getZipCoords(zip) {
-  const baseLat = 31.0;   // southern edge of Georgia
-  const baseLon = -85.5;  // western edge of Georgia
-  const zipNum = parseInt(String(zip).replace(/\D/g, "")) || 30000;
-
-  // Spread zip codes somewhat evenly across the state
-  const offsetLat = ((zipNum % 300) / 100) * 0.8; // 0–2.4° northward variation
-  const offsetLon = ((zipNum % 700) / 100) * 0.8; // 0–2.4° eastward variation
-
-  return [baseLat + offsetLat, baseLon + offsetLon];
-}
-
-function initHospitalMap(data) {
-  const mapDiv = document.getElementById("mainMap");
-  if (!mapDiv) return;
-
-  // Initialize only once
-	if (!map) {
-	  map = L.map("mainMap").setView([32.7, -83.4], 7); // centered around Georgia
-	  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-		attribution: "&copy; OpenStreetMap contributors"
-	  }).addTo(map);
-	}
-
-  // Clear old markers
-  mapMarkers.forEach(marker => map.removeLayer(marker));
-  mapMarkers = [];
-
-  // Add new markers
-  data.forEach(hospital => {
-    // Try all common latitude/longitude field names
-	let lat =
-	  parseFloat(hospital.Latitude) ||
-	  parseFloat(hospital.LAT) ||
-	  parseFloat(hospital.lat) ||
-	  parseFloat(hospital.latitude);
-	let lon =
-	  parseFloat(hospital.Longitude) ||
-	  parseFloat(hospital.LON) ||
-	  parseFloat(hospital.lon) ||
-	  parseFloat(hospital.longitude);
-
-	// If no coordinates, approximate from ZIP code
-	if ((!lat || !lon) && hospital.Zip) {
-	  [lat, lon] = getZipCoords(hospital.Zip);
-	}
-	if (!lat || !lon) return; // Skip entries missing coordinates
-
-    const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
-    const stars = convertGradeToStars(grade);
-
-    const popupHTML = `
-      <strong>${hospital.HOSPITAL_NAME || hospital.Name}</strong><br>
-      ${hospital.CITY || ""}, ${hospital.STATE || ""}<br>
-      <div class="star-rating">${renderStars(stars.value)}</div>
-      <a href="details.html?id=${hospital.RECORD_ID}" target="_blank" class="view-full-detail">
-        View Full Details
-      </a>
-    `;
-
-    const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
-    mapMarkers.push(marker);
-  });
-
-  // Adjust map to fit all visible markers
-  if (mapMarkers.length > 0) {
-    const group = L.featureGroup(mapMarkers);
-    map.fitBounds(group.getBounds().pad(0.2));
-  } else {
-    // Reset to Georgia default if no markers
-    map.setView([32.1656, -82.9001], 7);
-  }
-  
-  setTimeout(() => {
-  map.invalidateSize();
-	}, 200);
-}
-
-// ===============================
 // Error Popup Utility
 // ===============================
 function showErrorPopup(message) {
@@ -524,10 +500,8 @@ function showErrorPopup(message) {
   popup.innerHTML = `<p>${message}</p>`;
   document.body.appendChild(popup);
 
-  // Animate fade-in
   setTimeout(() => popup.classList.add("visible"), 10);
 
-  // Auto-remove after 4 seconds
   setTimeout(() => {
     popup.classList.remove("visible");
     setTimeout(() => popup.remove(), 400);

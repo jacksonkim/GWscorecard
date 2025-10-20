@@ -165,14 +165,21 @@ function getSelectedHospitalType() {
 viewSystemsBtn.addEventListener("click", () => {
   viewSystemsBtn.classList.add("active");
   viewIndividualsBtn.classList.remove("active");
-  individualOptions.style.display = "none";
+  individualOptions.style.display = "none"; // NOTE: Hides individual hospital type options
   applyAllFilters();
 });
 
 viewIndividualsBtn.addEventListener("click", () => {
   viewIndividualsBtn.classList.add("active");
   viewSystemsBtn.classList.remove("active");
-  individualOptions.style.display = "block";
+  individualOptions.style.display = "block"; // NOTE: Shows individual hospital type options
+  applyAllFilters();
+});
+
+// ===============================
+// Apply Location Button - NOTE: ADDED THIS MISSING EVENT LISTENER
+// ===============================
+document.getElementById("applyLocationBtn").addEventListener("click", () => {
   applyAllFilters();
 });
 
@@ -282,16 +289,16 @@ document.getElementById("applyFiltersBtn").addEventListener("click", () => {
 });
 
 // ===============================
-// Reset Filters
+// Reset Filters - NOTE: REMOVED viewIndividualsBtn.click() to prevent auto-showing dropdown
 // ===============================
 document.getElementById("resetFiltersBtn").addEventListener("click", () => {
   document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
   document.getElementById("zipInput").value = "";
   document.getElementById("radiusSelect").selectedIndex = 0;
   
-  // Reset view buttons
+  // Reset view buttons - NOTE: Only deactivates type buttons, doesn't change view mode
   deactivateHospitalTypeButtons();
-  viewIndividualsBtn.click();
+  // NOTE: Removed viewIndividualsBtn.click() - reset now keeps current view mode
   
   // Reset to all data
   filteredHospitalData = [...hospitalData];
@@ -315,7 +322,7 @@ document.getElementById("downloadDataBtn").addEventListener("click", () => {
 });
 
 // ===============================
-// Map Functions - FIXED VERSION
+// Map Functions
 // ===============================
 let map;
 let mapMarkers = [];

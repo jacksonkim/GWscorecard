@@ -101,7 +101,7 @@
 		<div class="filter-actions">
 		  <button id="applyFiltersBtn">Apply Filters</button>
 		  <button id="resetFiltersBtn" type="reset">Reset</button>
-		  <button id="downloadDataBtn">Download Data</button>
+		  <button id="downloadDataBtn" class="btn btn-download">Download Data</button>
 		</div>
 	  </aside>
 
@@ -119,14 +119,16 @@
 				<option value="size">Bed Size (Small → Extra Large)</option>
 			  </select>
 			</label>
+			<button id="openCompare" class="btn-compare" disabled>Compare (0)</button>
 		  </div>
 
 		  <table class="results-table">
 			<thead>
 			  <tr>
 				<th width="10%">Score</th>
-				<th width="70%">Hospital Name & Location</th>
+				<th width="64%">Hospital Name & Location</th>
 				<th width="20%">Details</th>
+				<th width="6%">Compare</th>
 			  </tr>
 			</thead>
 			<tbody id="hospitalResults">

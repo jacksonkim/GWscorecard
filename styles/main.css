@@ -418,6 +418,16 @@ header {
   }
 }
 
+.btn-compare{
+	border:1px solid #a4cc95;
+	border-radius:999px;
+	padding:6px 12px;
+	background:#fff
+}
+.btn-compare[disabled]{opacity:.5;
+	cursor:not-allowed
+}
+
 /* ===============================
    Detail Rows (Expandable)
 =============================== */
@@ -752,12 +762,29 @@ footer {
   line-height: 1.4;
 }
 
+#downloadDataBtn {
+  background-color: #f48810; /* Georgia Watch orange */
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#downloadDataBtn:hover {
+  background-color: #d9740e; /* darker orange hover */
+}
+
+
 /* ===============================
    Methodology Page Styles
 =============================== */
 
 .methodology-hero {
-  background: linear-gradient(135deg, #6fb353, #5aa345);
+  background: linear-gradient(135deg, #6fb353, #a4cc95);
   color: #fff;
   text-align: center;
   padding: 60px 20px;
@@ -858,7 +885,7 @@ footer {
 
 .btn-download {
   display: inline-block;
-  background: #6fb353;
+  background: #f48810;
   color: #fff;
   padding: 12px 24px;
   border-radius: 6px;
@@ -868,7 +895,7 @@ footer {
 }
 
 .btn-download:hover {
-  background: #5aa345;
+  background: #d9740e;
 }
 
 .btn-download[aria-disabled="true"] {

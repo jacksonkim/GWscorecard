@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compare Hospitals | Georgia Watch</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/comparison.css" />
+</head>
+<body class="compare-page">
+  <!-- Header (copied from details.html so brand/layout match) -->
+  <header>
+    <div class="container top-nav">
+      <div class="logo">
+        <img src="images/logo2White.png" height="80" alt="Georgia Watch logo" />
+        <span>Georgia Watch</span>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html">Rankings</a>
+        <a href="methodology.html">Methodology</a>
+        <a href="https://georgiawatch.org/about/">About Us</a>
+        <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="detail-topbar">
+    <a href="index.html" class="btn back">← Back to Results</a>
+    <h1>Compare Hospitals</h1>
+    <span id="compareCount" class="muted"></span>
+  </div>
+
+  <main class="page-content">
+    <div class="container">
+      <div class="card" role="region" aria-labelledby="title">
+        <div class="header">
+          <div class="title" id="title">Selected Hospitals</div>
+          <button id="resetBtn" class="pill" aria-label="Reset all filters">Reset</button>
+        </div>
+
+        <div class="filters" aria-label="Filters">
+          <div>
+            <label for="county">County</label>
+            <select id="county" multiple size="4" aria-label="Filter by county"></select>
+          </div>
+          <div>
+            <label for="ownership">Ownership</label>
+            <select id="ownership" multiple size="4" aria-label="Filter by ownership"></select>
+          </div>
+          <div>
+            <label for="teach">Teaching Hospital</label>
+            <div class="row">
+              <label><input type="checkbox" id="teachYes"> Yes</label>
+              <label><input type="checkbox" id="teachNo"> No</label>
+            </div>
+          </div>
+          <div>
+            <label for="minStars">Minimum Overall Stars: <span id="minStarsVal">1</span></label>
+            <input id="minStars" type="range" min="1" max="5" value="1">
+          </div>
+        </div>
+
+        <div class="toolbar" id="activeFilters" aria-live="polite"></div>
+
+        <div class="table-wrap" role="table" aria-label="Comparison table">
+          <table id="table">
+            <thead>
+              <tr>
+                <th class="sticky-col">Hospital</th>
+                <th>Overall</th>
+                <th>Safety</th>
+                <th>Experience</th>
+                <th>Equity</th>
+                <th>Affordability</th>
+                <th>Outcomes</th>
+                <th>Ownership</th>
+                <th>Teaching</th>
+                <th>Beds</th>
+                <th>Compare</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="cards" id="cards" aria-label="Mobile comparison list"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <ul class="footer-links">
+        <li><a href="#">Georgia Watch</a></li>
+        <li><a href="index.html">Rankings</a></li>
+        <li><a href="methodology.html">Methodology</a></li>
+        <li><a href="https://georgiawatch.org/about/">About Us</a></li>
+        <li><a href="https://georgiawatch.org/support-us/donate/">Donate</a></li>
+        <li><a href="#">Legal/Privacy</a></li>
+      </ul>
+      <p>© 2024 Georgia Watch. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="scripts/comparison.js"></script>
+</body>
+</html>

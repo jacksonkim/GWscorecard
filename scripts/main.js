@@ -595,9 +595,11 @@ document.getElementById('hospitalResults').addEventListener('click', (e) => {
   if (!id) return;
 
   const willSelect = btn.getAttribute('aria-pressed') === 'false';
+
   if (willSelect) {
-    if (compareSet.size >= 4) {  // keeping your 4-max rule
-      // brief visual bounce: do nothing and exit
+    if (compareSet.size >= 3) {
+      // bounce
+      btn.blur();
       return;
     }
     compareSet.add(id);
@@ -608,6 +610,7 @@ document.getElementById('hospitalResults').addEventListener('click', (e) => {
     btn.setAttribute('aria-pressed', 'false');
     btn.title = 'Select for comparison';
   }
+
   saveCompare();
   updateCompareBtn();
 });

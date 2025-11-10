@@ -1162,3 +1162,19 @@ footer {
 /* Section label styling (left column) */
 .compare-page .section{ font-weight:800; color:#0f172a; }
 .compare-page .subtle{ color:#64748b; font-weight:600; }
+
+/* Compare page: hide legacy UI */
+.compare-page .header,
+.compare-page .filters,
+.compare-page .table-wrap,
+.compare-page #cards { display: none; }
+
+/* Compare page star chips */
+.compare-page .stars{ display:inline-flex; gap:2px; }
+.compare-page .star{
+  width:18px; height:18px; display:inline-block;
+  background:#a4cc95; /* empty star color */
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+          mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+}
+.compare-page .star.filled{ background:#f48810; }

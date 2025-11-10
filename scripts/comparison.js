@@ -1,193 +1,145 @@
-// Load selected IDs from URL ?ids=... or localStorage (set by index page)
-const params = new URLSearchParams(location.search);
-const urlIds = (params.get('ids') || '').split(',').filter(Boolean);
-const storedIds = JSON.parse(localStorage.getItem('gw_compare_ids') || '[]');
-const selectedIds = new Set(urlIds.length ? urlIds : storedIds);
+// Desktop column comparison view (2–3 hospitals)
+(async function(){
+  // IDs from URL or localStorage
+  const params = new URLSearchParams(location.search);
+  const urlIds = (params.get('ids') || '').split(',').map(s=>s.trim()).filter(Boolean);
+  const storedIds = JSON.parse(localStorage.getItem('gw_compare_ids') || '[]');
+  const ids = urlIds.length ? urlIds : storedIds;
 
-// Elements
-const tbody = document.getElementById('tbody');
-const cards = document.getElementById('cards');
-const countySel = document.getElementById('county');
-const ownerSel  = document.getElementById('ownership');
-const teachYes  = document.getElementById('teachYes');
-const teachNo   = document.getElementById('teachNo');
-const minStars  = document.getElementById('minStars');
-const minStarsVal = document.getElementById('minStarsVal');
-const activeBar = document.getElementById('activeFilters');
-const resetBtn  = document.getElementById('resetBtn');
-const compareCount = document.getElementById('compareCount');
+  const container = document.querySelector('.page-content .container .card');
+  if (!container){ return; }
 
-let data = [];                 // normalized rows for UI
-const compared = new Set();    // live compare set in this page
-let sortKey = 'overall_stars';
-let sortDir = 'desc';
+  // build grid mount
+  const grid = document.createElement('div');
+  grid.className = 'cmp-grid';
+  container.appendChild(grid);
 
-// --- Helpers (self-contained, no dependency on details.js) ---
-function convertGradeToStars(grade) {
-  const g = String(grade ?? '').trim().toUpperCase();
-  const map = {"A+":5,"A":5,"A-":4.5,"B+":4.5,"B":4,"B-":3.5,"C+":3.5,"C":3,"C-":2.5,"D+":2.5,"D":2,"D-":1.5,"F":1};
-  return { value: map[g] || 0 };
-}
-function starEl(n){
-  const wrap=document.createElement('span'); wrap.className='stars';
-  for(let i=1;i<=5;i++){ const s=document.createElement('span'); s.className='star'+(i<=n?' filled':''); wrap.appendChild(s); }
-  return wrap;
-}
-const by = (key, dir='asc') => (a,b)=>{
-  const va=a[key], vb=b[key];
-  if(va===vb) return a.name.localeCompare(b.name);
-  if(typeof va==='number' && typeof vb==='number') return dir==='asc'? va-vb : vb-va;
-  return dir==='asc'? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
-};
-function uniqueVals(rows,key){ return [...new Set(rows.map(r=>r[key]))].filter(Boolean).sort(); }
+  if (ids.length < 2 || ids.length > 3){
+    grid.textContent = 'Please select 2 or 3 hospitals from the results page.';
+    return;
+  }
 
-// --- Load data from your dataset, normalize, and filter to selection ---
-(async function init(){
+  // load data
   const res = await fetch('./data/2025/2025_Lown_Index_GA.json');
   const raw = await res.json();
 
-  // normalize a subset of fields you use in index/details
-  let rows = raw.map(h => {
-    const id = String(h.RECORD_ID ?? h.Id ?? h.id ?? '');
-    const name = h.Name || h.HOSPITAL_NAME || 'Unnamed Hospital';
-    const county = h.County || '';
-    const ownership = (h.TYPE_ForProfit ? 'For-profit'
-                      : h.TYPE_NonProfit ? 'Nonprofit'
-                      : h.TYPE_Government ? 'Government' : '');
-    const teaching = (h.TYPE_AMC === 1 || String(h.TYPE_AMC).toUpperCase()==='Y'); // rough signal
-    const beds = ''; // not in dataset; leave blank
-    const overallGrade = h['TIER_1_GRADE_Lown_Composite'] || 'N/A';
-    const safetyGrade  = h['TIER_3_GRADE_Pat_Saf'] || 'N/A';
-    const expGrade     = h['TIER_3_GRADE_Pat_Exp'] || 'N/A';
-    const equityGrade  = h['TIER_3_GRADE_Inclusivity'] || 'N/A';
-    const valueGrade   = h['TIER_2_GRADE_Value'] || 'N/A';
-    const outcomes     = h['TIER_2_GRADE_Outcome'] || h['TIER_2_GRADE_Outcomes'] || 'N/A';
-
-    return {
-      id, name, county,
-      ownership: ownership || '—',
-      teaching_hospital: !!teaching,
-      beds: beds || '—',
-      overall_stars: convertGradeToStars(overallGrade).value,
-      patient_safety: convertGradeToStars(safetyGrade).value,
-      patient_experience: convertGradeToStars(expGrade).value,
-      equity: convertGradeToStars(equityGrade).value,
-      affordability: convertGradeToStars(valueGrade).value,
-      outcomes: convertGradeToStars(outcomes).value
-    };
-  });
-
-  if (selectedIds.size) rows = rows.filter(r => selectedIds.has(r.id));
-  data = rows;
-
-  // seed compare set from selection
-  (selectedIds.size ? selectedIds : new Set(rows.map(r=>r.id))).forEach(id=> compared.add(id));
-
-  // bootstrap UI
-  fillSelect(countySel, uniqueVals(data,'county'));
-  fillSelect(ownerSel, uniqueVals(data,'ownership'));
-  [minStars, teachYes, teachNo, countySel, ownerSel].forEach(el=> el.addEventListener('input', render));
-  if (resetBtn) resetBtn.addEventListener('click', resetAll);
-
-  if (compareCount) compareCount.textContent = `Comparing ${compared.size} hospital(s)`;
-  render();
-})();
-
-function fillSelect(sel, vals){ sel.innerHTML=''; vals.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); }); }
-function getFilters(){
-  const counties=[...countySel.selectedOptions].map(o=>o.value);
-  const owners=[...ownerSel.selectedOptions].map(o=>o.value);
-  const teach = teachYes.checked && !teachNo.checked ? true : (!teachYes.checked && teachNo.checked ? false : null);
-  const min = Number(minStars.value);
-  minStarsVal.textContent = String(min);
-  return { county:counties, ownership:owners, teaching:teach, minOverall:min };
-}
-function clearFilter(key){
-  if(key==='county') countySel.selectedIndex=-1;
-  if(key==='ownership') ownerSel.selectedIndex=-1;
-  if(key==='teaching'){ teachYes.checked=false; teachNo.checked=false; }
-  if(key==='minOverall') minStars.value=1;
-}
-function activeFiltersUI(filters){
-  activeBar.innerHTML='';
-  Object.entries(filters).forEach(([k,v])=>{
-    if(v==null) return; if(Array.isArray(v)&&v.length===0) return;
-    const pill=document.createElement('span'); pill.className='pill'; pill.textContent=`${k}: ${Array.isArray(v)?v.join(', '):v}`;
-    const x=document.createElement('button'); x.textContent='✕'; x.onclick=()=>{ clearFilter(k); render(); };
-    pill.appendChild(x); activeBar.appendChild(pill);
-  });
-  if(compared.size>0){
-    const c=document.createElement('span'); c.className='pill'; c.textContent=`Comparing ${compared.size}`;
-    const x=document.createElement('button'); x.textContent='✕'; x.onclick=()=>{ compared.clear(); render(); };
-    c.appendChild(x); activeBar.appendChild(c);
+  // map by RECORD_ID (your site uses this ID) 
+  // and normalize common fields we need
+  const byId = new Map(raw.map(h => [String(h.RECORD_ID), h]));
+  const chosen = ids.map(id => byId.get(String(id))).filter(Boolean);
+  if (chosen.length !== ids.length){
+    grid.textContent = 'One or more selected hospitals were not found.';
+    return;
   }
-}
-function applyFilters(rows){
-  const f=getFilters(); activeFiltersUI(f);
-  return rows.filter(r=>{
-    if(f.county.length && !f.county.includes(r.county)) return false;
-    if(f.ownership.length && !f.ownership.includes(r.ownership)) return false;
-    if(f.teaching!==null && r.teaching_hospital!==f.teaching) return false;
-    if((r.overall_stars||0) < f.minOverall) return false;
-    return true;
+
+  grid.style.setProperty('--cols', String(chosen.length));
+
+  // helpers
+  const g2s = (g) => {
+    const map = {"A+":5,"A":5,"A-":4.5,"B+":4.5,"B":4,"B-":3.5,"C+":3.5,"C":3,"C-":2.5,"D+":2.5,"D":2,"D-":1.5,"F":1};
+    const v = map[String(g||'').toUpperCase()] || 0;
+    return v;
+  };
+  const stars = (n) => {
+    const wrap = document.createElement('span'); wrap.className='stars';
+    for(let i=1;i<=5;i++){ const s=document.createElement('span'); s.className='star'+(i<=n?' filled':''); wrap.appendChild(s); }
+    return wrap;
+  };
+  const text = (s)=> document.createTextNode(String(s ?? '—'));
+  const cell = (child, cls='')=>{ const c=document.createElement('div'); c.className='cmp-cell ' + cls; if (child) c.appendChild(child); return c; };
+  const label = (txt)=> cell(text(txt), 'cmp-cell--label');
+
+  // header row (hospital info cards)
+  const head = document.createElement('div'); head.className='cmp-row cmp-row--head';
+  head.appendChild(label('Hospital Name')); 
+  chosen.forEach((h, idx)=>{
+    head.appendChild(cell(hcard(h), idx>0 ? 'cmp-col-split' : ''));
   });
-}
-function render(){
-  let rows = applyFilters(data.slice());
-  rows.sort(by(sortKey, sortDir));
-  rows.sort((a,b)=> Number(compared.has(b.id)) - Number(compared.has(a.id)));
+  grid.appendChild(head);
 
-  // table
-  tbody.innerHTML='';
-  rows.forEach(r=>{
-    const tr=document.createElement('tr');
-    if(compared.has(r.id)) tr.classList.add('compare-row');
+  // row builder for a simple metric (grade → stars)
+  const metricRow = (labelText, getter) => {
+    const row = document.createElement('div'); row.className = 'cmp-row';
+    row.appendChild(label(labelText));
+    chosen.forEach((h, idx)=>{
+      const v = getter(h);
+      row.appendChild(cell(stars(g2s(v)), idx>0 ? 'cmp-col-split' : ''));
+    });
+    grid.appendChild(row);
+  };
 
-    const th=document.createElement('th'); th.scope='row'; th.className='sticky-col'; th.textContent=r.name; tr.appendChild(th);
-    const add=(el)=>{ const td=document.createElement('td'); if(el instanceof HTMLElement) td.appendChild(el); else td.textContent=el; tr.appendChild(td); };
+  // sections (as in your Figma)
+  metricRow('Overall Grade', h => h['TIER_1_GRADE_Lown_Composite']);
+  section('Financial Transparency and Institutional Health', [
+    ['Balance Growth',          h => h['TIER_3_GRADE_Exec_Comp']],
+    ['Transparency',            h => h['TIER_3_GRADE_OU']],
+    ['Fiscal Health',           h => h['TIER_2_GRADE_Value']],
+    ['Staffing',                h => h['TIER_2_GRADE_Outcome']]
+  ]);
+  section('Community Benefit Spending', [
+    ['Tax Benefit',             h => h['TIER_3_GRADE_CB']],
+    ['Quality of CBS',          h => h['TIER_3_GRADE_CB']],
+    ['Strategic Use',           h => h['TIER_3_GRADE_Civic']]
+  ]);
+  section('Healthcare Affordability and Billing', [
+    ['Financial Burden',        h => h['TIER_3_GRADE_Cost_Eff']],
+    ['Charity Care',            h => h['TIER_3_GRADE_Civic']],
+    ['Medical Debt',            h => h['TIER_3_GRADE_Cost_Eff']]
+  ]);
+  section('Healthcare Access and Social Responsibility', [
+    ['Range of Services',       h => h['TIER_3_GRADE_Pat_Exp']],
+    ['Demographic Alignment',   h => h['TIER_3_GRADE_Inclusivity']],
+    ['Workforce Training',      h => h['TIER_3_GRADE_Pat_Saf']],
+    ['Pay Equity Ratio',        h => h['TIER_3_GRADE_Exec_Comp']]
+  ]);
 
-    add(starEl(r.overall_stars));
-    add(starEl(r.patient_safety));
-    add(starEl(r.patient_experience));
-    add(starEl(r.equity));
-    add(starEl(r.affordability));
-    add(starEl(r.outcomes));
-    add(r.ownership);
-    add(r.teaching_hospital ? 'Yes':'No');
-    add(String(r.beds));
+  // ------- helpers used above -------
 
-    const td=document.createElement('td');
-    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=compared.has(r.id);
-    cb.onchange=()=>{ if(cb.checked){ if(compared.size>=4){ cb.checked=false; alert('You can compare up to 4 hospitals.'); return; } compared.add(r.id);} else compared.delete(r.id); render(); };
-    td.appendChild(cb); tr.appendChild(td);
+  function section(title, items){
+    // section title row (bold label, subtle in cells)
+    const titleRow = document.createElement('div'); titleRow.className='cmp-row';
+    titleRow.appendChild(label(title));
+    chosen.forEach((_, idx)=>{
+      titleRow.appendChild(cell(el('span','subtle', '')), idx>0 ? 'cmp-col-split' : '');
+    });
+    grid.appendChild(titleRow);
 
-    tbody.appendChild(tr);
-  });
+    // item rows
+    items.forEach(([lbl, getter]) => metricRow(lbl, getter));
+  }
 
-  // mobile cards
-  cards.innerHTML='';
-  rows.forEach(r=>{
-    const el=document.createElement('div'); el.className='card-item';
-    el.innerHTML=`
-      <h3>${r.name}</h3>
-      <div class="mrow"><span>Overall</span><span>${'★'.repeat(r.overall_stars)}${'☆'.repeat(5-r.overall_stars)}</span></div>
-      <div class="mrow"><span>Safety</span><span>${'★'.repeat(r.patient_safety)}${'☆'.repeat(5-r.patient_safety)}</span></div>
-      <div class="mrow"><span>Experience</span><span>${'★'.repeat(r.patient_experience)}${'☆'.repeat(5-r.patient_experience)}</span></div>
-      <div class="mrow"><span>Equity</span><span>${'★'.repeat(r.equity)}${'☆'.repeat(5-r.equity)}</span></div>
-      <div class="mrow"><span>Affordability</span><span>${'★'.repeat(r.affordability)}${'☆'.repeat(5-r.affordability)}</span></div>
-      <div class="mrow"><span>Outcomes</span><span>${'★'.repeat(r.outcomes)}${'☆'.repeat(5-r.outcomes)}</span></div>
-      <div class="mrow"><span>Ownership</span><span>${r.ownership}</span></div>
-      <div class="mrow"><span>Teaching</span><span>${r.teaching_hospital?'Yes':'No'}</span></div>
-      <div class="mrow"><span>Beds</span><span>${r.beds}</span></div>
-      <div class="mrow"><label><input type="checkbox" ${compared.has(r.id)?'checked':''}/> Compare</label></div>`;
-    el.querySelector('input[type="checkbox"]').onchange=(e)=>{
-      if(e.target.checked){ if(compared.size>=4){ e.target.checked=false; alert('You can compare up to 4 hospitals.'); return; } compared.add(r.id); }
-      else compared.delete(r.id);
-      render();
-    };
-    cards.appendChild(el);
-  });
-}
-function resetAll(){
-  countySel.selectedIndex=-1; ownerSel.selectedIndex=-1; teachYes.checked=false; teachNo.checked=false; minStars.value=1; compared.clear(); sortKey='overall_stars'; sortDir='desc'; render();
-}
+  function hcard(h){
+    const wrap = document.createElement('div'); wrap.className='hcard';
+    const name = el('div','hcard__name', h.Name || 'Unnamed Hospital');
+    const meta = el('div','hcard__meta', [h.City, h.State].filter(Boolean).join(', ') || '—');
+    const info = document.createElement('div'); info.className='hinfo';
+
+    // five bullet lines like your Figma
+    info.appendChild(infoRow('Beds:', '—')); // dataset lacks exact beds
+    info.appendChild(infoRow(h.TYPE_rural ? 'Rural' : 'Urban', ''));
+    info.appendChild(infoRow('Critical Access:', truthy(h.TYPE_HospTyp_CAH) ? 'Yes' : 'No'));
+    info.appendChild(infoRow('System:', truthy(h.HOSPITAL_SYSTEM) ? 'Yes' : 'No'));
+    info.appendChild(infoRow('County:', h.County || '—'));
+
+    wrap.appendChild(name);
+    wrap.appendChild(meta);
+    wrap.appendChild(info);
+    return wrap;
+  }
+
+  function infoRow(label, value){
+    const row = document.createElement('div'); row.className='hinfo__row';
+    const dot = document.createElement('span'); dot.className='hinfo__dot';
+    const txt = document.createElement('span'); txt.textContent = [label, value].filter(Boolean).join(' ').trim();
+    row.appendChild(dot); row.appendChild(txt);
+    return row;
+  }
+
+  function truthy(v){ return v===1 || v==='1' || v==='Y' || v==='Yes' || v===true; }
+  function el(tag, cls, content){
+    const n = document.createElement(tag); if (cls) n.className = cls;
+    if (typeof content === 'string') n.textContent = content;
+    else if (Array.isArray(content)) n.textContent = content.join(' ');
+    return n;
+  }
+})();

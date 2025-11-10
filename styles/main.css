@@ -428,6 +428,22 @@ header {
 	cursor:not-allowed
 }
 
+/* Magnifying-glass compare toggle (desktop) */
+.cmp-toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border:1px solid #d1d5db; border-radius:10px;
+  background:#fff; cursor:pointer;
+  transition:box-shadow .15s, transform .05s, border-color .15s;
+}
+.cmp-toggle:hover{ box-shadow:0 1px 6px rgba(0,0,0,.08); }
+.cmp-toggle:active{ transform:translateY(1px); }
+.cmp-toggle[aria-pressed="true"]{ border-color:#6fb353; background:#f6fff7; }
+
+.cmp-icon{ display:none; fill:#374151; }
+.cmp-toggle[aria-pressed="false"] .cmp-icon--off{ display:block; }
+.cmp-toggle[aria-pressed="true"]  .cmp-icon--on { display:block; fill:#6fb353; }
+
+
 /* ===============================
    Detail Rows (Expandable)
 =============================== */
@@ -1072,3 +1088,77 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+/************  Compare Page (Desktop)  ************/
+.compare-page .table-wrap { display: none; }  /* hide old table if present */
+.compare-page .cards { display: none; }       /* hide mobile for now */
+
+.compare-page .cmp-grid{
+  border:1px solid #d9e7d2;           /* soft green divider */
+  border-radius:14px;
+  overflow:auto;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.compare-page .cmp-row{
+  display:grid;
+  grid-template-columns: 260px repeat(var(--cols, 3), 1fr);
+  min-height:48px;
+  border-bottom:1px solid #d9e7d2;
+}
+.compare-page .cmp-row:last-child{ border-bottom:0; }
+
+.compare-page .cmp-cell{
+  padding:14px 16px;
+  border-right:1px solid #d9e7d2;
+  background:#e7f5e5;                 /* pale green background like your Figma */
+}
+.compare-page .cmp-cell:last-child{ border-right:0; }
+
+/* sticky left label column */
+.compare-page .cmp-cell--label{
+  position:sticky; left:0; z-index:3;
+  background:#fff;
+  font-weight:700;
+  color:#0f172a;
+}
+
+/* sticky header row */
+.compare-page .cmp-row--head .cmp-cell{
+  position:sticky; top:0; z-index:4;
+  background:#fff;
+}
+
+/* subtle column split for visual separation of hospital columns */
+.compare-page .cmp-col-split{ box-shadow: inset 1px 0 0 #d9e7d2; }
+
+/* Hospital info card in header */
+.compare-page .hcard{
+  background:#fff;
+  border:1px solid #cfe3c8;
+  border-radius:10px;
+  padding:10px 12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+.compare-page .hcard__name{ font-weight:800; margin-bottom:4px; }
+.compare-page .hcard__meta{ font-size:.9rem; color:#475569; margin-bottom:6px; }
+.compare-page .hinfo{ display:grid; gap:6px; }
+.compare-page .hinfo__row{ display:flex; gap:8px; align-items:center; font-size:.95rem; }
+.compare-page .hinfo__dot{
+  width:8px; height:8px; border-radius:999px; background:#f48810; flex:none;
+}
+
+/* Stars (grade → stars) */
+.compare-page .stars{ display:inline-flex; gap:2px; }
+.compare-page .star{
+  width:18px; height:18px; display:inline-block;
+  background:#a4cc95; /* empty star color */
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+          mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+}
+.compare-page .star.filled{ background:#f48810; }
+
+/* Section label styling (left column) */
+.compare-page .section{ font-weight:800; color:#0f172a; }
+.compare-page .subtle{ color:#64748b; font-weight:600; }

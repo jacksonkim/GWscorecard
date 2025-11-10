@@ -94,10 +94,27 @@ function renderHospitals(data) {
     row.appendChild(buttonCell);
 
 	const cmpCell = document.createElement("td");
-	cmpCell.innerHTML = `<input type="checkbox" class="cmp" aria-label="Compare ${hospital.Name || 'hospital'}">`;
-	const cmpBox = cmpCell.querySelector('input.cmp');
-	if (hid && compareSet.has(hid)) cmpBox.checked = true;
+	cmpCell.innerHTML = `
+	  <button
+		class="cmp-toggle js-compare-toggle"
+		type="button"
+		aria-pressed="${compareSet.has(hid) ? 'true' : 'false'}"
+		data-id="${hid}"
+		title="${compareSet.has(hid) ? 'Selected for comparison' : 'Select for comparison'}"
+	  >
+		<!-- Outline = unselected -->
+		<svg class="cmp-icon cmp-icon--off" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+		  <path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2C6.6 2 3 5.6 3 10s3.6 8 8 8a7.96 7.96 0 0 0 4.9-1.7l4.6 4.6 1.4-1.4-4.6-4.6A7.96 7.96 0 0 0 19 10c0-4.4-3.6-8-8-8z"/>
+		</svg>
+
+		<!-- Filled = selected -->
+		<svg class="cmp-icon cmp-icon--on" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+		  <path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 1 0 10.5 17a6.47 6.47 0 0 0 3.23-.87l.27.28v.79L21 22.49 22.49 21 15.5 14zM10.5 15C7.5 15 5 12.5 5 9.5S7.5 4 10.5 4 16 6.5 16 9.5 13.5 15 10.5 15z"/>
+		</svg>
+	  </button>
+	`;
 	row.appendChild(cmpCell);
+
 	
     // === Detail Row (collapsed preview) ===
     const detailRow = document.createElement("tr");
@@ -569,22 +586,27 @@ if (openCompareBtn){
   });
 }
 
+// Delegate clicks for the magnifying-glass toggle
+document.getElementById('hospitalResults').addEventListener('click', (e) => {
+  const btn = e.target.closest('.js-compare-toggle');
+  if (!btn) return;
 
-document.getElementById('hospitalResults').addEventListener('change', (e)=>{
-  if(!e.target.classList.contains('cmp')) return;
-  const tr = e.target.closest('tr');
-  const hid = String(tr?.dataset?.id || '');
-  if(!hid) return;
+  const id = String(btn.dataset.id || '');
+  if (!id) return;
 
-  if(e.target.checked){
-    if(compareSet.size >= 4){
-      e.target.checked = false;
-      alert('You can compare up to 4 hospitals.');
+  const willSelect = btn.getAttribute('aria-pressed') === 'false';
+  if (willSelect) {
+    if (compareSet.size >= 4) {  // keeping your 4-max rule
+      // brief visual bounce: do nothing and exit
       return;
     }
-    compareSet.add(hid);
+    compareSet.add(id);
+    btn.setAttribute('aria-pressed', 'true');
+    btn.title = 'Selected for comparison';
   } else {
-    compareSet.delete(hid);
+    compareSet.delete(id);
+    btn.setAttribute('aria-pressed', 'false');
+    btn.title = 'Select for comparison';
   }
   saveCompare();
   updateCompareBtn();

@@ -52,6 +52,18 @@
     const map = { "A+":5, A:5, "A-":4.5, "B+":4.5, B:4, "B-":3.5, "C+":3.5, C:3, "C-":2.5, "D+":2.5, D:2, "D-":1.5, F:1 };
     return map[String(g || '').toUpperCase()] ?? 0;
   };
+  
+  // Round to nearest 0.5 (so we keep half-stars)
+	function roundToHalf(x){ return Math.round(x * 2) / 2; }
+
+	// Average a list of metric getters for one hospital -> stars (0..5, .5 steps)
+	function averageStars(getters, hospital){
+	  const vals = getters
+		.map(get => gradeToStars(get(hospital)))      // letter grade -> numeric stars
+		.filter(n => Number.isFinite(n) && n > 0);    // ignore missing/invalid (0 treated as “no data”)
+	  if (!vals.length) return 0;                      // no data → empty stars
+	  return roundToHalf(vals.reduce((a,b)=>a+b, 0) / vals.length);
+	}
 
   // simple inline-SVG stars; no external CSS required
   function starSVG(fill) {
@@ -103,14 +115,22 @@
     grid.appendChild(row);
   };
 
-  // section builder (title row + metric rows)
-  const section = (title, items) => {
-    const row = document.createElement('div'); row.className = 'cmp-row';
-    row.appendChild(labelCell(title));
-    chosen.forEach((_, i) => row.appendChild(cell('', i>0 ? 'cmp-col-split' : '')));
-    grid.appendChild(row);
-    items.forEach(([lbl, keyGetter]) => metricRow(lbl, keyGetter));
-  };
+  // section builder (overall-average row + individual metric rows)
+	const section = (title, items) => {
+	  // Overall average row for this category
+	  const getters = items.map(([_, get]) => get);
+	  const overall = document.createElement('div');
+	  overall.className = 'cmp-row';
+	  overall.appendChild(labelCell(title));
+	  chosen.forEach((h, i) => {
+		const n = averageStars(getters, h);
+		overall.appendChild(cell(renderStars(n), i > 0 ? 'cmp-col-split' : ''));
+	  });
+	  grid.appendChild(overall);
+
+	  // Individual metric rows
+	  items.forEach(([lbl, keyGetter]) => metricRow(lbl, keyGetter));
+	};
 
   // ---- rows (keys verified against your JSON) ----
   metricRow('Overall Grade', h => h['TIER_1_GRADE_Lown_Composite']);

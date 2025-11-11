@@ -1186,7 +1186,7 @@ footer {
 @media (max-width: 768px) {
   /* Hide your desktop layout */
   .compare-table,
-  .compare-grid {
+  .cmp-grid {
     display: none !important;
   }
 
@@ -1260,4 +1260,40 @@ footer {
   .stars {
     color: #00a3af;
   }
+}
+
+/* Floating Compare button (desktop + mobile) */
+#openCompare {
+  position: fixed;
+  right: calc(24px + env(safe-area-inset-right));
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 1000;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: #ffffff;
+  border: 2px solid #6fb353;          /* adjust to your theme */
+  color: #333;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover / focus states for desktop users */
+#openCompare:hover:not([disabled]),
+#openCompare:focus-visible {
+  background: #6fb353;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Disabled look but still tappable for consistency */
+#openCompare[disabled] {
+  opacity: 0.6;
+  pointer-events: auto;
+  cursor: not-allowed;
+}
+
+/* Ensure content doesn't get hidden behind the floating button */
+body {
+  padding-bottom: 90px; /* increases space at bottom for scroll comfort */
 }

@@ -1180,3 +1180,84 @@ footer {
 .compare-page .star.filled{ background:#f48810; }
 .compare-page .cmp-row:first-child .cmp-cell--label,
 .compare-page .cmp-row .cmp-cell--label { font-weight: 700; }
+
+
+/* === MOBILE-ONLY COMPARISON LAYOUT === */
+@media (max-width: 768px) {
+  /* Hide your desktop layout */
+  .compare-table,
+  .compare-grid {
+    display: none !important;
+  }
+
+  /* Show the mobile layout */
+  .compare-category {
+    display: block;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1rem;
+  }
+
+  .category-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #e9eff3;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .category-body {
+    background: #fff;
+    padding: 0.75rem 1rem;
+  }
+
+  .metric-title {
+    font-weight: 600;
+    color: #555;
+    margin: 0.5rem 0;
+  }
+
+  .hospital-scores,
+  .hospital-stars {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 1rem 0;
+  }
+
+  .hospital-scores li,
+  .hospital-stars li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .hospital-name {
+    font-weight: 500;
+  }
+
+  .hospital-grade {
+    background: #007c89;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    line-height: 2rem;
+  }
+
+  .metric-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+  }
+
+  .stars {
+    color: #00a3af;
+  }
+}

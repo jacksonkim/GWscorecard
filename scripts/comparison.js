@@ -1,3 +1,95 @@
+function renderMobileComparison(hospitals) {
+  const container = document.getElementById('cards');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Reuse the same getters you used in desktop "section(...)" blocks
+  const categories = [
+    {
+      title: 'Financial Transparency and Institutional Health',
+      getters: [
+        h => h['TIER_3_GRADE_Exec_Comp'],
+        h => h['TIER_3_GRADE_OU'],
+        h => h['TIER_2_GRADE_Value'],
+        h => h['TIER_2_GRADE_Outcome'],
+      ],
+    },
+    {
+      title: 'Community Benefit Spending',
+      getters: [
+        h => h['TIER_3_GRADE_CB'],
+        h => h['TIER_3_GRADE_CB'], // quality of CBS: same source per dataset
+        h => h['TIER_2_GRADE_Civic'],
+      ],
+    },
+    {
+      title: 'Healthcare Affordability and Billing',
+      getters: [
+        h => h['TIER_3_GRADE_Cost_Eff'],
+        h => h['TIER_2_GRADE_Civic'],
+        h => h['TIER_3_GRADE_Cost_Eff'],
+      ],
+    },
+    {
+      title: 'Healthcare Access and Social Responsibility',
+      getters: [
+        h => h['TIER_3_GRADE_Pat_Exp'],
+        h => h['TIER_3_GRADE_Inclusivity'],
+        h => h['TIER_3_GRADE_Pat_Saf'],
+        h => h['TIER_3_GRADE_Exec_Comp'],
+      ],
+    },
+  ];
+
+  // Borrow helpers from desktop scope if available; otherwise polyfill quick versions:
+  const gradeToStars = (g) => {
+    const map = {"A+":5,A:5,"A-":4.5,"B+":4.5,B:4,"B-":3.5,"C+":3.5,C:3,"C-":2.5,"D+":2.5,D:2,"D-":1.5,F:1};
+    return map[String(g||'').toUpperCase()] ?? 0;
+  };
+  const roundToHalf = (x) => Math.round(x*2)/2;
+  const averageStars = (getters, h) => {
+    const vals = getters.map(get => gradeToStars(get(h))).filter(n => Number.isFinite(n) && n>0);
+    if (!vals.length) return 0;
+    return roundToHalf(vals.reduce((a,b)=>a+b,0)/vals.length);
+  };
+  const starSVG = (fill) => `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="${fill}" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>`;
+  const renderStars = (n) => {
+    const full = Math.floor(n + 1e-9);
+    const half = (n - full) >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    return `<span class="stars">${starSVG('#f48810').repeat(full)}${half?starSVG('#f48810'):''}${starSVG('#a4cc95').repeat(empty)}</span>`;
+  };
+
+  categories.forEach(cat => {
+    const section = document.createElement('section');
+    section.className = 'compare-category';
+    section.innerHTML = `
+      <button class="category-header" aria-expanded="true">
+        <h3>${cat.title}</h3>
+        <span class="icon">▲</span>
+      </button>
+      <div class="category-body">
+        <ul class="hospital-scores"></ul>
+      </div>
+    `;
+    const ul = section.querySelector('.hospital-scores');
+
+    hospitals.forEach(h => {
+      const li = document.createElement('li');
+      const n = averageStars(cat.getters, h);
+      li.innerHTML = `
+        <span class="hospital-name">${h.Name || '—'}</span>
+        ${renderStars(n)}
+      `;
+      ul.appendChild(li);
+    });
+
+    container.appendChild(section);
+  });
+}
+
+
+
 // Desktop-only comparison grid (self-contained)
 // - Reads ?ids=ID1,ID2[,ID3] or falls back to localStorage "gw_compare_ids"
 // - Loads ./data/2025/2025_Lown_Index_GA.json
@@ -17,7 +109,6 @@
   card.querySelector('.header')?.remove();
   card.querySelector('.filters')?.remove();
   card.querySelector('.table-wrap')?.remove();
-  card.querySelector('#cards')?.remove();
 
   const title = document.createElement('h2');
   title.textContent = 'Comparison';
@@ -46,6 +137,9 @@
   }
 
   grid.style.setProperty('--cols', String(chosen.length));
+  
+  renderMobileComparison(chosen);
+
 
   // ---- helpers ----
   const gradeToStars = (g) => {
@@ -191,3 +285,4 @@
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 })();
+

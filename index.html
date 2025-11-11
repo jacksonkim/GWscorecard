@@ -33,7 +33,7 @@
 
     <div class="main-content">
 	  <!-- Sidebar -->
-	  <aside class="sidebar">
+	  <aside class="sidebar" id="filtersDrawer">
 		<!-- View Toggle -->
 		<div class="view-toggle">
 		  <h3>View Results By:</h3>
@@ -104,6 +104,8 @@
 		  <button id="downloadDataBtn" class="btn btn-download">Download Data</button>
 		</div>
 	  </aside>
+	  
+	  <button id="filtersToggle" class="filters-toggle" aria-controls="filtersDrawer" aria-expanded="false">Filters</button>
 
 	  <!-- Main Content Area -->
 	  <main class="content-area">
@@ -149,6 +151,8 @@
 		</section>
 	  </div>
 	</div>
+	
+	<div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
 
     <footer>
         <div class="container">

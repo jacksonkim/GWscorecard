@@ -614,3 +614,32 @@ document.getElementById('hospitalResults').addEventListener('click', (e) => {
   saveCompare();
   updateCompareBtn();
 });
+
+// ==== Filters drawer (mobile) ====
+(function(){
+  const btn = document.getElementById('filtersToggle');
+  const drawer = document.getElementById('filtersDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  if (!btn || !drawer || !backdrop) return;
+
+  const open = () => {
+    document.body.classList.add('drawer-open');
+    backdrop.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    // Make Leaflet reflow if visible
+    setTimeout(()=> window.dispatchEvent(new Event('resize')), 200);
+  };
+  const close = () => {
+    document.body.classList.remove('drawer-open');
+    backdrop.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+    setTimeout(()=> window.dispatchEvent(new Event('resize')), 200);
+  };
+
+  btn.addEventListener('click', ()=>{
+    const isOpen = document.body.classList.contains('drawer-open');
+    isOpen ? close() : open();
+  });
+  backdrop.addEventListener('click', close);
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') close(); });
+})();

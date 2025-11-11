@@ -1300,3 +1300,148 @@ footer {
 body {
   padding-bottom: 90px; /* increases space at bottom for scroll comfort */
 }
+
+/* =============== Variables =============== */
+:root{
+  --gw-green:#6fb353;
+  --gw-orange:#f48810;
+  --gw-pale:#e7f5e5;
+  --shadow-lg:0 12px 32px rgba(0,0,0,.22);
+}
+
+/* ================= Desktop defaults ================= */
+/* Your existing 3-column grid stays on desktop */
+@media (min-width: 993px){
+  .filters-toggle{ display:none; }         /* hide the mobile button on desktop */
+}
+
+/* ================= Mobile layout ================= */
+@media (max-width: 992px){
+  /* Stack: Map → Results; sidebar becomes off-canvas */
+  .main-content{
+    display:block;              /* collapse the 3-column grid */
+    margin-top: 10px;
+    padding: 0 10px;
+  }
+
+  /* Move Map to top and make it viewport-friendly */
+  .map-column{
+    position: static;
+    margin-bottom: 12px;
+  }
+  .map-section #mainMap{
+    height: 45vh;               /* tall enough to be useful */
+    min-height: 280px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* Mobile Filters toggle button (FAB-ish pill) */
+  .filters-toggle{
+    position: sticky;           /* stays visible while scrolling results header */
+    top: 10px;
+    z-index: 30;
+    margin: 8px 0 12px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: #fff;
+    border: 2px solid var(--gw-green);
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  }
+
+  /* Off-canvas drawer */
+  .sidebar{
+    position: fixed;
+    inset: 0 auto 0 0;          /* left side drawer */
+    width: min(88vw, 340px);
+    max-width: 90%;
+    transform: translateX(-102%);
+    transition: transform .25s ease;
+    background:#fff;
+    z-index: 100;
+    border-right: 1px solid #cde3c7;
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* match your accordion styles already defined for .index-page .sidebar … */
+
+  /* Backdrop behind drawer */
+  .drawer-backdrop{
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.32);
+    backdrop-filter: blur(1px);
+    z-index: 90;
+  }
+
+  /* Open state (on <body>) */
+  body.drawer-open .sidebar{ transform: translateX(0); }
+  body.drawer-open{ overflow: hidden; }  /* lock background scroll */
+  body.drawer-open #drawerBackdrop{ display:block; }
+}
+
+/* ================= Reduced motion ================= */
+@media (prefers-reduced-motion: reduce){
+  .sidebar{ transition: none; }
+}
+
+/* Safe default anywhere in main.css (outside media queries) */
+.drawer-backdrop{ display:none; cursor: default; }
+
+/* === DETAILS: Responsive layout (desktop → tablet → phone) === */
+
+/* Tablet: 2-column hero, services fill last row */
+@media (max-width: 1024px) {
+  .detail-hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  /* Make the Services card span full width on the 2nd row */
+  .detail-hero .hero-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Phone: single column, tighter spacing */
+@media (max-width: 640px) {
+  .detail-topbar h1 { font-size: 1.25rem; }
+
+  .detail-hero {
+    grid-template-columns: 1fr;
+    padding: 12px 3vw;
+    gap: 10px;
+  }
+
+  #leafletMap { height: 220px; }
+
+  /* Keep headline + stars readable on narrow screens */
+  .metric-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  /* Service “pills” become 2 columns on phones */
+  .services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* Tap-target friendly submetric rows */
+  .submetric summary {
+    padding: 14px 16px;
+    font-size: 0.98rem;
+  }
+}
+
+/* Very narrow phones: stack service pills to one column */
+@media (max-width: 380px) {
+  .services-grid { grid-template-columns: 1fr; }
+}
+
+/* Optional: slightly smaller stars on phones */
+.detail-hero .star-rating svg { width: 18px; height: 18px; }
+@media (max-width: 640px) {
+  .detail-hero .star-rating svg { width: 16px; height: 16px; }
+}

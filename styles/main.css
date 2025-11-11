@@ -1167,7 +1167,6 @@ footer {
 .compare-page .header,
 .compare-page .filters,
 .compare-page .table-wrap,
-.compare-page #cards { display: none; }
 
 /* Compare page star chips */
 .compare-page .stars{ display:inline-flex; gap:2px; }
@@ -1188,6 +1187,10 @@ footer {
   .compare-table,
   .cmp-grid {
     display: none !important;
+  }
+  
+  #cards {
+    display: block !important;
   }
 
   /* Show the mobile layout */

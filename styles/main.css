@@ -1091,7 +1091,6 @@ footer {
 
 /************  Compare Page (Desktop)  ************/
 .compare-page .table-wrap { display: none; }  /* hide old table if present */
-.compare-page .cards { display: none; }       /* hide mobile for now */
 
 .compare-page .cmp-grid{
   border:1px solid #d9e7d2;           /* soft green divider */
@@ -1184,10 +1183,18 @@ footer {
 /* === MOBILE-ONLY COMPARISON LAYOUT === */
 @media (max-width: 768px) {
   /* Hide your desktop layout */
-  .compare-table,
-  .cmp-grid {
-    display: none !important;
-  }
+	/* Keep the grid container so the header row shows */
+	.compare-page .cmp-grid{ display:block; overflow-x:auto; }
+
+	/* Hide all grid rows… */
+	.compare-page .cmp-row{ display:none; }
+
+	/* …except the header/info-cards row */
+	.compare-page .cmp-row--head{ display:grid; }
+
+	/* And show the mobile sections list */
+	.compare-page #cards{ display:block; }
+
   
   #cards {
     display: block !important;

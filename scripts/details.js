@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         attribution: "&copy; OpenStreetMap contributors"
       }).addTo(map);
 
-      L.marker([lat, lon]).addTo(map).bindPopup(name);
+      L.marker([lat, lon]).addTo(map).bindPopup(hospitalName);
 
       document.getElementById("gmapsLink").href =
         `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;

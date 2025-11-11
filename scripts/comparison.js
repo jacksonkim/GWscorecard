@@ -110,14 +110,21 @@ function renderMobileComparison(hospitals) {
   card.querySelector('.filters')?.remove();
   card.querySelector('.table-wrap')?.remove();
 
-  const title = document.createElement('h2');
-  title.textContent = 'Comparison';
-  title.style.margin = '0 0 12px';
-  card.appendChild(title);
+	const title = document.createElement('h2');
+	title.textContent = 'Comparison';
+	title.style.margin = '0 0 12px';
+	card.insertBefore(title, card.firstChild);  // put title at top
 
-  const grid = document.createElement('div');
-  grid.className = 'cmp-grid';
-  card.appendChild(grid);
+	const grid = document.createElement('div');
+	grid.className = 'cmp-grid';
+
+	// move the existing mobile list (#cards) right under the title
+	const mobileList = document.getElementById('cards');
+	if (mobileList) card.insertBefore(mobileList, grid);
+
+	// now insert the grid
+	card.appendChild(grid);
+
 
   if (ids.length < 2 || ids.length > 3) {
     grid.textContent = 'Please select 2 or 3 hospitals from the results page.';

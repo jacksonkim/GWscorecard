@@ -53,9 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Optional: close drawer after applying filters
-  const applyBtn = document.getElementById('applyFiltersBtn');
-  if (applyBtn) applyBtn.addEventListener('click', closeDrawer);
+    const applyBtn = document.getElementById('applyFiltersBtn');
+	  if (applyBtn) applyBtn.addEventListener('click', closeDrawer);
+
+	  // NEW: X button inside the drawer
+	  const closeBtn = document.getElementById('closeDrawerBtn');
+	  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+});
+
 });
 
 
@@ -779,62 +784,3 @@ document.getElementById('hospitalResults').addEventListener('click', (e) => {
   saveCompare();
   updateCompareBtn();
 });
-
-(function initFiltersDrawer() {
-  const toggle = document.getElementById('filtersToggle');
-  const sidebar = document.getElementById('sidebar');
-  const backdrop = document.getElementById('drawerBackdrop');
-
-  if (!toggle || !sidebar || !backdrop) return;
-
-  let lastFocused = null;
-
-  function openDrawer() {
-    lastFocused = document.activeElement;
-    document.body.classList.add('drawer-open');
-    sidebar.setAttribute('aria-hidden', 'false');
-    toggle.setAttribute('aria-expanded', 'true');
-    backdrop.style.display = 'block';
-    // optional: move focus to first focusable control in the sidebar
-    const firstFocusable = sidebar.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (firstFocusable) firstFocusable.focus({ preventScroll: true });
-  }
-
-  function closeDrawer() {
-    document.body.classList.remove('drawer-open');
-    sidebar.setAttribute('aria-hidden', 'true');
-    toggle.setAttribute('aria-expanded', 'false');
-    backdrop.style.display = 'none';
-    if (lastFocused) lastFocused.focus({ preventScroll: true });
-  }
-
-  toggle.addEventListener('click', (e) => {
-    e.preventDefault();
-    const isOpen = document.body.classList.contains('drawer-open');
-    isOpen ? closeDrawer() : openDrawer();
-  });
-
-  backdrop.addEventListener('click', closeDrawer);
-
-  // Close with Esc
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.body.classList.contains('drawer-open')) {
-      closeDrawer();
-    }
-  });
-
-  // Auto-close drawer if viewport becomes desktop
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 993 && document.body.classList.contains('drawer-open')) {
-      closeDrawer();
-    }
-  });
-
-  // Optional: any element inside the sidebar with this attribute will close the drawer when clicked
-  sidebar.addEventListener('click', (e) => {
-    const el = e.target.closest('[data-close-drawer]');
-    if (el) closeDrawer();
-  });
-})();
-
-

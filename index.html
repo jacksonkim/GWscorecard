@@ -124,21 +124,30 @@
 			</label>
 			<button id="openCompare" class="btn-compare" disabled>Compare (0)</button>
 		  </div>
+
+		  <!-- DESKTOP: table -->
+		  <div class="results-table-wrapper">
+			<table class="results-table">
+			  <thead>
+				<tr>
+				  <th width="10%">Score</th>
+				  <th width="64%">Hospital Name & Location</th>
+				  <th width="20%">Details</th>
+				  <th width="6%">Compare</th>
+				</tr>
+			  </thead>
+			  <tbody id="hospitalResults">
+				<!-- Results populated by JavaScript -->
+			  </tbody>
+			</table>
+		  </div>
+
+		  <!-- MOBILE: cards -->
+		  <div class="results-cards-wrapper">
 			<div id="results" class="results" aria-live="polite"></div>
-		  <table class="results-table">
-			<thead>
-			  <tr>
-				<th width="10%">Score</th>
-				<th width="64%">Hospital Name & Location</th>
-				<th width="20%">Details</th>
-				<th width="6%">Compare</th>
-			  </tr>
-			</thead>
-			<tbody id="hospitalResults">
-			  <!-- Results populated by JavaScript -->
-			</tbody>
-		  </table>
+		  </div>
 		</section>
+
 
 		<!-- Dynamic details mount point -->
 		<div id="detailRoot" style="display:none;"></div>

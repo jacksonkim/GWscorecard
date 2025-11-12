@@ -33,7 +33,8 @@
 
     <div class="main-content">
 	  <!-- Sidebar -->
-	  <aside class="sidebar" id="filtersDrawer">
+	  <aside class="sidebar" id="filtersDrawer" aria-hidden="true">
+		<button id="closeDrawerBtn" class="drawer-close" aria-label="Close Filters">&times;</button>>
 		<!-- View Toggle -->
 		<div class="view-toggle">
 		  <h3>View Results By:</h3>
@@ -123,7 +124,7 @@
 			</label>
 			<button id="openCompare" class="btn-compare" disabled>Compare (0)</button>
 		  </div>
-
+			<div id="results" class="results" aria-live="polite"></div>
 		  <table class="results-table">
 			<thead>
 			  <tr>

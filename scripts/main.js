@@ -3,6 +3,62 @@
 // ===============================
 let hospitalData = [];
 
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle   = document.getElementById('filtersToggle');
+  const drawer   = document.getElementById('filtersDrawer'); // <aside class="sidebar" id="filtersDrawer">
+  const backdrop = document.getElementById('drawerBackdrop');
+
+  if (!toggle || !drawer || !backdrop) return;
+
+  let lastFocused = null;
+
+  const openDrawer = () => {
+    lastFocused = document.activeElement;
+    document.body.classList.add('drawer-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+    backdrop.hidden = false;
+    // optional: focus first interactive element in the drawer
+    const first = drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (first) first.focus({ preventScroll: true });
+  };
+
+  const closeDrawer = () => {
+    document.body.classList.remove('drawer-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+    backdrop.hidden = true;
+    if (lastFocused) lastFocused.focus({ preventScroll: true });
+  };
+
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isOpen = document.body.classList.contains('drawer-open');
+    isOpen ? closeDrawer() : openDrawer();
+  });
+
+  backdrop.addEventListener('click', closeDrawer);
+
+  // Close on Esc
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('drawer-open')) {
+      closeDrawer();
+    }
+  });
+
+  // Auto-close drawer when moving to desktop width
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 993 && document.body.classList.contains('drawer-open')) {
+      closeDrawer();
+    }
+  });
+
+  // Optional: close drawer after applying filters
+  const applyBtn = document.getElementById('applyFiltersBtn');
+  if (applyBtn) applyBtn.addEventListener('click', closeDrawer);
+});
+
+
 // ===============================
 // Load JSON Data
 // ===============================
@@ -146,6 +202,48 @@ function renderHospitals(data) {
     resultsTable.appendChild(detailRow);
   });
 }
+
+// --- Mobile card renderer (for phones) ---
+function renderMobileCards(hospitals) {
+  const container = document.getElementById('results');
+  if (!container) return;
+  const list = Array.isArray(hospitals) ? hospitals : [];
+
+  container.innerHTML = list.map(h => `
+    <article class="result-card">
+      <header class="rc-head">
+        <h3 class="rc-title">${h.Hospital_Name}</h3>
+        <div class="rc-meta">
+          <span class="rc-grade rc-grade-${String(h.Overall_Star_Rating || '').toLowerCase()}">
+            ${h.Overall_Star_Rating ?? '—'}
+          </span>
+          <span class="rc-loc">${h.City || ''}, ${h.State || ''}</span>
+        </div>
+      </header>
+
+      <div class="rc-body">
+        <ul class="rc-metrics">
+          <li><strong>Transparency:</strong> ${h.Transparency ?? h.Balance_Growth ?? '—'}</li>
+          <li><strong>Fiscal Health:</strong> ${h.Fiscal_Health ?? '—'}</li>
+          <li><strong>Staffing:</strong> ${h.Staffing ?? '—'}</li>
+          <li><strong>Community Benefit:</strong> ${h.Quality_of_CBS ?? h.CBS_Category_Rating ?? '—'}</li>
+        </ul>
+      </div>
+
+      <footer class="rc-foot">
+        <a class="btn btn-outline" href="details.html?id=${encodeURIComponent(h.Hospital_ID)}">View details</a>
+        <a class="btn btn-solid" href="details.html?id=${encodeURIComponent(h.Hospital_ID)}&tab=full">Full details</a>
+      </footer>
+    </article>
+  `).join('');
+}
+
+// --- Wrap renderHospitals to always update mobile cards too ---
+const _renderHospitals = renderHospitals;
+renderHospitals = function(...args) {
+  _renderHospitals.apply(this, args);
+  renderMobileCards(args[0]); // first argument is the hospitals array
+};
 
 
 function toggleHospitalDetails(hospitalId, button) {
@@ -614,4 +712,62 @@ document.getElementById('hospitalResults').addEventListener('click', (e) => {
   saveCompare();
   updateCompareBtn();
 });
+
+(function initFiltersDrawer() {
+  const toggle = document.getElementById('filtersToggle');
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('drawerBackdrop');
+
+  if (!toggle || !sidebar || !backdrop) return;
+
+  let lastFocused = null;
+
+  function openDrawer() {
+    lastFocused = document.activeElement;
+    document.body.classList.add('drawer-open');
+    sidebar.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+    backdrop.style.display = 'block';
+    // optional: move focus to first focusable control in the sidebar
+    const firstFocusable = sidebar.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (firstFocusable) firstFocusable.focus({ preventScroll: true });
+  }
+
+  function closeDrawer() {
+    document.body.classList.remove('drawer-open');
+    sidebar.setAttribute('aria-hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+    backdrop.style.display = 'none';
+    if (lastFocused) lastFocused.focus({ preventScroll: true });
+  }
+
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isOpen = document.body.classList.contains('drawer-open');
+    isOpen ? closeDrawer() : openDrawer();
+  });
+
+  backdrop.addEventListener('click', closeDrawer);
+
+  // Close with Esc
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('drawer-open')) {
+      closeDrawer();
+    }
+  });
+
+  // Auto-close drawer if viewport becomes desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 993 && document.body.classList.contains('drawer-open')) {
+      closeDrawer();
+    }
+  });
+
+  // Optional: any element inside the sidebar with this attribute will close the drawer when clicked
+  sidebar.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-close-drawer]');
+    if (el) closeDrawer();
+  });
+})();
+
 

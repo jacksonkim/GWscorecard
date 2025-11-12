@@ -222,13 +222,16 @@ function renderMobileCards(hospitals) {
       </header>
 
       <div class="rc-body">
-        <ul class="rc-metrics">
-          <li><strong>Transparency:</strong> ${h.Transparency ?? h.Balance_Growth ?? '—'}</li>
-          <li><strong>Fiscal Health:</strong> ${h.Fiscal_Health ?? '—'}</li>
-          <li><strong>Staffing:</strong> ${h.Staffing ?? '—'}</li>
-          <li><strong>Community Benefit:</strong> ${h.Quality_of_CBS ?? h.CBS_Category_Rating ?? '—'}</li>
-        </ul>
-      </div>
+		<div class="star-rating" aria-label="${(h.Overall_Star_Rating ?? 0)} out of 5 stars">
+		  ${renderStars(h.Overall_Star_Rating ?? 0)}
+		  </div>
+		  <ul class="rc-metrics">
+			 <li><strong>Transparency:</strong> ${h.Transparency ?? h.Balance_Growth ?? '—'}</li>
+			 <li><strong>Fiscal Health:</strong> ${h.Fiscal_Health ?? '—'}</li>
+			 <li><strong>Staffing:</strong> ${h.Staffing ?? '—'}</li>
+			 <li><strong>Community Benefit:</strong> ${h.Quality_of_CBS ?? h.CBS_Category_Rating ?? '—'}</li>
+		  </ul>
+		</div>
 
       <footer class="rc-foot">
         <a class="btn btn-outline" href="details.html?id=${encodeURIComponent(h.Hospital_ID)}">View details</a>
@@ -238,12 +241,18 @@ function renderMobileCards(hospitals) {
   `).join('');
 }
 
-// --- Wrap renderHospitals to always update mobile cards too ---
-const _renderHospitals = renderHospitals;
-renderHospitals = function(...args) {
-  _renderHospitals.apply(this, args);
-  renderMobileCards(args[0]); // first argument is the hospitals array
-};
+// --- Use cards as the primary render and clear legacy table ---
+  const _renderHospitals = renderHospitals; // keep reference just in case
+  renderHospitals = function(list){
+    // render cards
+    renderMobileCards(list || []);
+    // update count
+    const countEl = document.getElementById('resultsCount');
+    if (countEl) countEl.textContent = `Viewing ${(list?.length)||0} results`;
+    // clear legacy table (keeps DOM but prevents double UI)
+    const tbody = document.getElementById('hospitalResults');
+    if (tbody) tbody.innerHTML = '';
+  };
 
 
 function toggleHospitalDetails(hospitalId, button) {

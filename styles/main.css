@@ -1090,7 +1090,7 @@ footer {
 }
 
 /************  Compare Page (Desktop)  ************/
-.compare-page .table-wrap { display: none; }  /* hide old table if present */
+.compare-page .table-wrap { display: block !important; }  /* hide old table if present */
 
 .compare-page .cmp-grid{
   border:1px solid #d9e7d2;           /* soft green divider */
@@ -1193,7 +1193,7 @@ footer {
 	.compare-page .cmp-row--head{ display:grid; }
 
 	/* And show the mobile sections list */
-	.compare-page #cards{ display:block; }
+	.compare-page #cards{ display:block !important; }
 
   
   #cards {

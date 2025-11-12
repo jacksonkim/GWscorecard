@@ -1,636 +1,1542 @@
-/* ==========================================================================
-   Georgia Watch Scorecard — main.css (drop-in, self-contained)
-   - Reset & variables
-   - Base + layout
-   - Header / search / filters
-   - Buttons & form controls
-   - Results: desktop table
-   - Results: mobile cards
-   - Floating Compare FAB (mobile)
-   - Badges, chips, utilities
-   - Pagination
-   - Modal (optional quick view)
-   - Compare page basics (sticky first column)
-   ========================================================================== */
-
-/* ---------- 1) Modern CSS reset (small, safe) ---------------------------- */
-
-*, *::before, *::after { box-sizing: border-box; }
-* { margin: 0; }
-html, body { height: 100%; }
-body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-img, picture, video, canvas, svg { display: block; max-width: 100%; }
-input, button, textarea, select { font: inherit; }
-a { color: inherit; text-decoration: none; }
-ul[role="list"], ol[role="list"] { list-style: none; padding: 0; margin: 0; }
-button { background: none; border: 0; padding: 0; }
-:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
-
-/* ---------- 2) Design tokens / variables --------------------------------- */
-
-:root{
-  /* Brand (Georgia Watch palette per earlier notes) */
-  --brand-primary: #6fb353;   /* primary green */
-  --brand-primary-dark: #4a8a34;
-  --brand-accent: #f48810;    /* accent orange */
-  --brand-light: #a4cc95;     /* light green */
-  --brand-muted: #eaf3e6;
-
-  /* Neutrals */
-  --bg: #ffffff;
-  --bg-alt: #f8f9fb;
-  --ink: #1b1f24;
-  --ink-2: #3a3f45;
-  --ink-3: #5a6067;
-  --border: #e6e6e8;
-
-  /* Interactive */
-  --blue: #2d6cdf;            /* buttons / links */
-  --blue-ink: #0f2f7a;
-  --blue-border: #1f5ac0;
-  --danger: #d92d20;
-
-  /* Shadows & radii */
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow-1: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-2: 0 6px 18px rgba(0,0,0,0.12);
-
-  /* Typography */
-  --font-system: ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  --fs-12: 0.75rem;
-  --fs-14: 0.875rem;
-  --fs-16: 1rem;
-  --fs-18: 1.125rem;
-  --fs-20: 1.25rem;
-
-  /* Spacing scale */
-  --sp-2: 0.125rem;
-  --sp-4: 0.25rem;
-  --sp-6: 0.375rem;
-  --sp-8: 0.5rem;
-  --sp-10: 0.625rem;
-  --sp-12: 0.75rem;
-  --sp-14: 0.875rem;
-  --sp-16: 1rem;
-  --sp-20: 1.25rem;
-  --sp-24: 1.5rem;
-  --sp-32: 2rem;
+/* ===============================
+   Base Styles
+=============================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Century Gothic", CenturyGothic, "Rubik", sans-serif;
 }
 
-/* ---------- 3) Base & layout --------------------------------------------- */
-
-body{
-  font-family: var(--font-system);
-  color: var(--ink);
-  background: var(--bg);
-  font-size: var(--fs-16);
-  line-height: 1.55;
+body {
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.container{
-  width: min(1100px, 92vw);
-  margin-inline: auto;
-  padding: var(--sp-16) 0 var(--sp-24);
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-.header{
-  padding: var(--sp-16) 0 var(--sp-10);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
+/* ===============================
+   Header
+=============================== */
+header {
+  background: linear-gradient(#6fb353);
+  color: white;
+  padding: 8px 0;
+  position: relative;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.logo-img {
+  height: 80px;
+  width: auto;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+.header-content {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.header-content h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.header-content p {
+  font-size: 18px;
+  font-style: italic;
+}
+
+/* ===============================
+   Three-column Layout (Sidebar | Content | Map)
+=============================== */
+.main-content {
+  display: grid;
+  grid-template-columns: 260px 1fr 350px;
+  gap: 20px;
+  margin-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  align-items: flex-start;
+}
+
+.map-section {
+  height: 100%;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-section h2 {
+  background-color: #6fb353;
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+}
+
+#mainMap {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar,
+.content-area {
+  position: relative;
+  top: auto;
+  align-self: start;
+  height: auto;
+  overflow: visible;
+}
+
+/* ===============================
+   Map Column — scrolls naturally
+=============================== */
+.map-section h2 {
+  background-color: #6fb353;
+  color: #fff;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+}
+
+/* =========================================
+   FIX — Index Page Map Behavior (Safe Scoped)
+========================================= */
+.index-page .map-column {
   position: sticky;
-  top: 0;
-  z-index: 50;
+  top: 10px;
+  align-self: start;
 }
 
-.header__row{
+.index-page .map-section {
+  position: sticky;
+  top: 10px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+  height: auto !important;
+  display: block !important;
+}
+
+.index-page #mainMap {
+  width: 100%;
+  height: 500px !important;  /* fixed visible height */
+  flex: none !important;
+  display: block;
+}
+
+
+/* ===============================
+   Sidebar
+=============================== */
+.sidebar {
+  background: #e7f5e5;
+  border: 2px solid #6fb353;
+  border-radius: 8px;
+  padding: 15px;
+  width: 260px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.location-search {
+  background: #eee;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.location-search h3 {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Accordion buttons */
+.accordion {
+  background: #6fb353;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  margin-top: 5px;
+  font-weight: bold;
+  position: relative;
+  border-radius: 5px;
+}
+
+.accordion.active {
+  background: #5a9445;
+}
+
+.accordion::after {
+  content: "▼";
+  font-size: 0.8em;
+  position: absolute;
+  right: 10px;
+  transition: transform 0.2s ease;
+  color: white;
+}
+
+.accordion.active::after {
+  content: "▲";
+}
+
+.panel {
+  display: none;
+  padding: 10px 15px;
+  background: #eee;
+  border-radius: 0 0 5px 5px;
+}
+
+/* Sidebar buttons */
+.filter-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-actions button {
+  background: #6fb353;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.filter-actions button:hover {
+  background: #5a9445;
+}
+
+#resetFiltersBtn {
+  background: #ccc;
+  color: #333;
+}
+
+#resetFiltersBtn:hover {
+  background: #999;
+}
+
+#applyLocationBtn {
+  margin-top: 10px;
+  background: #6fb353;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  transition: background 0.2s ease;
+}
+
+#applyLocationBtn:hover {
+  background: #5a9445;
+}
+
+/* ===============================
+   Filters, Metrics, and Toggles
+=============================== */
+.view-toggle {
+  background: #e7f5e5;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 8px;
+}
+
+.view-toggle h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.view-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toggle-btn {
+  flex: 1;
+  background: #6fb353;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: #5a9445;
+}
+
+.toggle-btn.active {
+  background: #f48810;
+}
+
+/* ===============================
+   Results Table
+=============================== */
+.search-section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.sort-select-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-bottom: 20px;
+}
+
+.results-table th {
+  background-color: #f0f0f0;
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 2px solid #ddd;
+}
+
+.results-table td {
+  padding: 12px 15px;
+  border: 2px solid #6fb353;
+  border-radius: 8px;
+}
+
+.results-table tr {
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ===============================
+   Buttons (Two per Row)
+=============================== */
+.details-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-detail,
+.view-full-detail {
+  background: #f48810;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.2s ease;
+  width: 140px;
+  text-align: center;
+}
+
+.toggle-detail:hover,
+.view-full-detail:hover {
+  background: #d9740e;
+}
+
+@media (min-width: 992px) {
+  .details-buttons {
+    flex-direction: row;
+  }
+}
+
+.btn-compare{
+	border:1px solid #a4cc95;
+	border-radius:999px;
+	padding:6px 12px;
+	background:#fff
+}
+.btn-compare[disabled]{opacity:.5;
+	cursor:not-allowed
+}
+
+/* Magnifying-glass compare toggle (desktop) */
+.cmp-toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border:1px solid #d1d5db; border-radius:10px;
+  background:#fff; cursor:pointer;
+  transition:box-shadow .15s, transform .05s, border-color .15s;
+}
+.cmp-toggle:hover{ box-shadow:0 1px 6px rgba(0,0,0,.08); }
+.cmp-toggle:active{ transform:translateY(1px); }
+.cmp-toggle[aria-pressed="true"]{ border-color:#6fb353; background:#f6fff7; }
+
+.cmp-icon{ display:none; fill:#374151; }
+.cmp-toggle[aria-pressed="false"] .cmp-icon--off{ display:block; }
+.cmp-toggle[aria-pressed="true"]  .cmp-icon--on { display:block; fill:#6fb353; }
+
+
+/* ===============================
+   Detail Rows (Expandable)
+=============================== */
+.hospital-detail-row {
+  background-color: #f9f9f9;
+  border-top: 2px solid #6fb353;
+}
+
+.detail-info {
+  padding: 10px 20px;
+  font-size: 0.95em;
+  background: #f9f9f9;
+  border-radius: 0 0 8px 8px;
+  line-height: 1.4;
+}
+
+/* ===============================
+   Star Ratings
+=============================== */
+.star-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.star {
+  width: 22px;
+  height: 22px;
+  fill: #a4cc95;
+}
+
+.star.full {
+  fill: #f48810;
+}
+
+.star.half {
+  fill: url(#halfGradient);
+}
+
+/* ===============================
+   Footer
+=============================== */
+footer {
+  background: linear-gradient(#6fb353);
+  color: white;
+  padding: 30px 0;
+  margin-top: 40px;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  list-style: none;
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.copyright {
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ===============================
+   Responsive Adjustments
+=============================== */
+@media (max-width: 992px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  .map-column {
+    position: static;
+    height: auto;
+  }
+  #mainMap {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-nav {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .results-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .footer-content {
+    flex-direction: column;
+  }
+
+  .results-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .details-grid,
+  .detail-page-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hospital-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}
+
+/* ===============================
+   Detail Page Styles
+=============================== */
+.detail-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sp-12);
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 8px 0;
 }
 
-.brand{
-  display: flex; align-items: center; gap: var(--sp-10);
-  font-weight: 800; letter-spacing: 0.2px; font-size: var(--fs-20);
-  color: var(--ink);
-}
-.brand__dot{ width: 12px; height: 12px; border-radius: 999px; background: var(--brand-primary); }
-
-/* ---------- 4) Search / filter panel ------------------------------------- */
-
-.search{
-  margin: var(--sp-16) 0 var(--sp-12);
-  display: grid;
-  gap: var(--sp-12);
-}
-
-.search__row{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--sp-12);
-}
-
-.filters{
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--sp-12);
-  display: grid;
-  gap: var(--sp-12);
-}
-
-.filter-row{
-  display: grid;
-  gap: var(--sp-12);
-}
-
-@media (min-width: 768px){
-  .search__row{ grid-template-columns: 2fr 1fr; }
-  .filter-row{ grid-template-columns: repeat(4, 1fr); }
-}
-
-.input, .select{
-  display: block;
-  width: 100%;
-  padding: 0.625rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: #fff;
-  color: var(--ink);
-}
-.input::placeholder{ color: var(--ink-3); }
-
-.inline{
-  display: flex; gap: var(--sp-8); align-items: center; flex-wrap: wrap;
-}
-
-/* ---------- 5) Buttons & form controls ----------------------------------- */
-
-.btn{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.6rem 0.9rem;
-  border-radius: 10px;
-  font-weight: 700;
-  line-height: 1.2;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: transform 0.02s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  user-select: none;
-  text-align: center;
-  min-height: 44px; /* touch target */
-}
-.btn:active{ transform: translateY(1px); }
-
-.btn-solid{
-  background: var(--blue);
+.detail-topbar .btn.back {
+  background-color: #f48810;
   color: #fff;
-  border-color: var(--blue-border);
-  box-shadow: var(--shadow-1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
 }
-.btn-solid:hover{ filter: brightness(0.97); }
 
-.btn-outline{
+.detail-topbar .btn.back:hover {
+  background-color: #d97706;
+}
+
+.detail-topbar h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  color: #333;
+}
+
+.detail-topbar .spacer {
+  width: 110px; /* roughly the same width as the back button */
+}
+
+.detail-hero-wrap {
+  width: 100%;
   background: #fff;
-  color: var(--ink);
-  border-color: #cfd3da;
-}
-.btn-outline:hover{ background: #f6f7f9; }
-
-.btn-ghost{
-  background: transparent;
-  color: var(--blue);
-  border-color: transparent;
+  border-bottom: 1px solid #eee;
+  margin: 0;
+  padding: 0;
 }
 
-.badge{
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  padding: 0.2rem 0.5rem; border-radius: 999px; font-size: var(--fs-12);
-  background: var(--bg-alt); border: 1px solid var(--border); color: var(--ink-2);
+.detail-hero {
+  width: 100%;               
+  max-width: none;           
+  margin: 0; 
+  padding: 20px 2vw; 
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 1.4fr;
+  gap: 16px;
+  align-items: stretch;
 }
 
-/* ---------- 6) Results — desktop table ----------------------------------- */
-
-.results-wrap{ margin-top: var(--sp-12); }
-
-/* Hide table on small screens (cards are shown); show from 768px+ */
-.results-table{ display: none; width: 100%; border-collapse: collapse; }
-@media (min-width: 768px){
-  .results-table{ display: table; }
+.hero-card {
+  background: #ffffff;
+  border: 2px solid #6fb35322;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.results-table thead th{
-  text-align: left;
-  font-size: var(--fs-14);
-  color: var(--ink-3);
-  padding: 0.75rem 0.5rem;
-  border-bottom: 1px solid var(--border);
+.hero-card h3 {
+  margin-bottom: 4px;
+}
+
+#leafletMap {
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+}
+
+.gmaps-link {
+  margin-top: 6px;
+}
+
+.address-block {
+  margin-top: 8px;
+  line-height: 1.3;
+  font-style: italic;
+  text-align: center;
+}
+
+/* =========================================
+   SERVICES GRID STYLING
+========================================= */
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.services-grid li {
+  background-color: #f9faf9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.services-grid li::before {
+  content: "✔";
+  color: #6fb353; /* your green */
+  font-weight: bold;
+  font-size: 0.85em;
+}
+
+.services-grid li:hover {
+  background-color: #f4fff7;
+}
+
+
+/* ===== Metrics ===== */
+.metrics-wrap {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 2vw 40px;
+}
+
+.metric-section {
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #6fb353; /* sponsor green */
+  color: #ffffff;
+  border-bottom: none;
+}
+
+.metric-header h2 {
+  font-size: 1.15rem;
+  margin: 0;
+  color: #ffffff;
   font-weight: 700;
 }
-.results-table tbody td{
-  padding: 0.75rem 0.5rem;
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
-  font-size: var(--fs-14);
-}
-.results-table tbody tr:hover{ background: #fcfcfd; }
-.results-table .cell-actions { display: flex; gap: var(--sp-8); flex-wrap: wrap; }
-.results-table .cell-compare { width: 42px; }
 
-/* Checkbox (compare) */
-input[type="checkbox"]{
-  width: 18px; height: 18px; accent-color: var(--brand-primary);
+.metric-header .star-rating svg {
+  fill: #f48810; /* orange stars */
 }
 
-/* Desktop "Compare (n)" button */
-.compare-desktop{
-  margin-top: var(--sp-12);
+.submetric {
+  border-top: 1px solid #eee;
+}
+
+.submetric summary {
+  cursor: pointer;
+  padding: 12px 16px;
+  background: #f8f8f8;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.submetric summary::after {
+  content: "▼";
+  font-size: 0.9em;
+  transition: transform 0.2s ease;
+}
+
+.submetric[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.submetric p {
+  padding: 10px 18px 14px;
+  font-size: 0.95em;
+  background: #fff;
+  line-height: 1.4;
+}
+
+#downloadDataBtn {
+  background-color: #f48810; /* Georgia Watch orange */
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#downloadDataBtn:hover {
+  background-color: #d9740e; /* darker orange hover */
+}
+
+
+/* ===============================
+   Methodology Page Styles
+=============================== */
+
+.methodology-hero {
+  background: linear-gradient(135deg, #6fb353, #a4cc95);
+  color: #fff;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.methodology-hero h1 {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.methodology-hero .lead {
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.methodology-content {
+  padding: 40px 20px;
+}
+
+.methodology-content h2 {
+  color: #6fb353;
+  margin-top: 30px;
+}
+
+.methodology-content p,
+.methodology-content ul {
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.category-card {
+  background: #fff;
+  border: 2px solid #6fb35333;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-card h3 {
+  color: #6fb353;
+  margin-bottom: 8px;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.methodology-faq details {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-top: 12px;
+  padding: 10px 14px;
+}
+
+.methodology-faq summary {
+  font-weight: bold;
+  color: #6fb353;
+  cursor: pointer;
+}
+
+.methodology-faq p {
+  margin-top: 8px;
+  color: #333;
+}
+
+/* ===== Methodology Download Section ===== */
+.methodology-download {
+  text-align: center;
+  background: #f8f8f8;
+  padding: 60px 20px;
+  margin: 40px 0;
+  border-top: 2px solid #6fb35333;
+  border-bottom: 2px solid #6fb35333;
+}
+
+.methodology-download h2 {
+  color: #6fb353;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+}
+
+.methodology-download p {
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto 20px;
+}
+
+.btn-download {
+  display: inline-block;
+  background: #f48810;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.btn-download:hover {
+  background: #d9740e;
+}
+
+.btn-download[aria-disabled="true"] {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.last-updated {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+}
+
+/* =========================================
+   INDEX PAGE — LAYOUT + FILTERS
+========================================= */
+
+/* Smaller, cleaner filter headers */
+.index-page .sidebar summary {
+  background: #6fb353;
+  color: #fff;
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  line-height: 1.2;
+  border-radius: 4px 4px 0 0;
+}
+
+.index-page .sidebar summary::marker {
   display: none;
 }
-@media (min-width: 768px){
-  .compare-desktop{ display: block; }
-}
-.compare-desktop .btn[disabled]{ opacity: 0.55; cursor: not-allowed; }
 
-/* ---------- 7) Results — mobile cards ------------------------------------ */
-
-/* Cards are visible by default, hidden on desktop in favor of the table */
-.results{ display: grid; gap: var(--sp-12); }
-@media (min-width: 768px){
-  .results{ display: none; }
+.index-page .sidebar summary::after {
+  content: "▼";
+  font-size: 0.75em;
+  margin-left: 6px;
+  transition: transform 0.2s ease;
 }
 
-.result-card{
-  border: 1px solid var(--border);
+/* Add space between accordion sections */
+.index-page .sidebar details {
+  margin-bottom: 10px; /* space between each filter section */
+  border: 1px solid #cde3c7;
+  border-radius: 6px;
   background: #fff;
-  border-radius: var(--radius);
-  padding: var(--sp-16);
-  box-shadow: var(--shadow-1);
+  overflow: hidden;
 }
 
-.rc-head{
+.index-page .sidebar details:last-of-type {
+  margin-bottom: 0; /* no extra space at the end */
+}
+
+.index-page .sidebar details[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.index-page .filter-group {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 10px;
+  background: #f8f8f8;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+/* =========================================
+   COLUMN BEHAVIOR (NORMAL SCROLL)
+========================================= */
+.main-content {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--sp-8) var(--sp-12);
+  grid-template-columns: 260px 1fr 350px;
+  gap: 20px;
+  margin-top: 10px;
+  padding: 0 10px;
   align-items: start;
 }
-.rc-title{
-  font-size: var(--fs-18);
-  font-weight: 800;
-  line-height: 1.25;
-}
-.rc-actions{
-  display: inline-flex;
-  gap: var(--sp-8);
-  align-items: center;
-  justify-content: flex-end;
-}
-.rc-quick{
-  padding: 0.35rem 0.5rem;
-  border: 1px solid #ddd;
-  background: #f8f8f8;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.rc-compare{
-  display: inline-flex; gap: 0.35rem; align-items: center; font-size: var(--fs-14);
-  color: var(--ink-2);
+
+/* Sidebar + Results scroll normally */
+.index-page .sidebar,
+.index-page .content-area {
+  position: relative;
+  align-self: stretch;
+  height: auto;
+  overflow: visible;
 }
 
-.rc-meta{
-  grid-column: 1 / -1;
+/* Visual alignment between columns */
+.main-content > * {
+  align-self: stretch;
+}
+
+/* =========================================
+   RESULTS BUTTON FIX
+========================================= */
+.details-buttons {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-8) var(--sp-16);
-  font-size: var(--fs-14);
-  color: var(--ink-3);
-}
-
-.rc-body{ margin-top: var(--sp-8); }
-.rc-metrics{
-  display: grid; gap: 0.35rem;
-  list-style: none; padding: 0; margin: 0;
-}
-.rc-metrics li strong{ font-weight: 700; color: var(--ink-2); }
-
-.rc-foot{
-  margin-top: var(--sp-12);
-  display: flex; gap: var(--sp-8); flex-wrap: wrap;
-}
-.rc-foot .btn{ min-width: 44px; }
-
-/* Grade chip (A/B/C/D etc.) */
-.rc-grade{
-  padding: 0.18rem 0.5rem;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: var(--fs-12);
-  border: 1px solid var(--border);
-  background: #f5f6f8;
-  color: var(--ink-2);
-}
-.rc-grade-a{ background: #e7f5ec; color: #0c6b3d; border-color: #cfe8da; }
-.rc-grade-b{ background: #f4f8e8; color: #47610e; border-color: #e7f0cf; }
-.rc-grade-c{ background: #fff6e6; color: #875a06; border-color: #ffe5bf; }
-.rc-grade-d{ background: #fdeceb; color: #8c1d18; border-color: #f8c9c6; }
-
-/* ---------- 8) Floating Compare FAB (mobile) ------------------------------ */
-
-.compare-fab{
-  position: fixed;
-  left: 1rem; right: 1rem; bottom: 1rem;
-  padding: 0.9rem 1.1rem;
-  border-radius: 14px;
-  text-align: center;
-  font-weight: 800;
-  border: 1px solid var(--blue-border);
-  background: var(--blue);
-  color: #fff;
-  box-shadow: var(--shadow-2);
-  display: none;
-  z-index: 1000;
-}
-.compare-fab.is-active{ display: block; }
-.compare-fab[aria-disabled="true"]{ opacity: 0.6; pointer-events: none; }
-
-/* ---------- 9) Badges, chips, helpers ------------------------------------ */
-
-.kbd{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 0.8em; background: #f3f4f6; border: 1px solid #e5e7eb; border-bottom-width: 2px;
-  padding: 0.1rem 0.35rem; border-radius: 6px;
-}
-
-.alert{
-  padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius);
-  background: #fff; color: var(--ink-2);
-}
-.alert--info{ border-color: #cfe1ff; background: #f4f8ff; }
-.alert--warn{ border-color: #ffe4b3; background: #fff8eb; }
-.alert--danger{ border-color: #ffd6d2; background: #fff1f0; }
-
-/* Utilities */
-.hidden{ display: none !important; }
-.mute{ color: var(--ink-3); }
-.hstack{ display: inline-flex; gap: var(--sp-8); align-items: center; }
-.vstack{ display: grid; gap: var(--sp-8); }
-
-/* ---------- 10) Pagination ------------------------------------------------ */
-
-.pagination{
-  display: flex; gap: var(--sp-8); align-items: center; justify-content: center;
-  margin-top: var(--sp-16);
-}
-.page-btn{
-  padding: 0.45rem 0.75rem; border-radius: 10px; border: 1px solid #d8dbe2; background: #fff;
-  font-weight: 700; font-size: var(--fs-14);
-}
-.page-btn[aria-current="page"]{ background: var(--brand-muted); border-color: #cfe0c9; }
-
-/* ---------- 11) Modal (optional quick view) ------------------------------- */
-
-.modal{
-  position: fixed; inset: 0; display: none; z-index: 1100;
-}
-.modal.is-open{ display: grid; place-items: center; }
-.modal__backdrop{
-  position: absolute; inset: 0; background: rgba(17,24,39,0.5);
-}
-.modal__dialog{
-  position: relative; background: #fff; width: min(720px, 92vw);
-  border-radius: 14px; box-shadow: var(--shadow-2); padding: var(--sp-16);
-}
-.modal__header{
-  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-8);
-  margin-bottom: var(--sp-12);
-}
-.modal__title{ font-size: var(--fs-18); font-weight: 800; }
-.modal__close{ width: 40px; height: 40px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; }
-
-/* ---------- 12) Compare page basics -------------------------------------- */
-/* If your compare.html uses .compare to wrap the matrix */
-
-.compare{
-  margin-top: var(--sp-12);
-  overflow: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
-.compare-table{
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  min-width: 720px;
-  background: #fff;
-}
-.compare-table th,
-.compare-table td{
-  border-bottom: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  padding: 0.75rem 0.6rem;
-  vertical-align: top;
-  font-size: var(--fs-14);
-}
-.compare-table th:last-child,
-.compare-table td:last-child{ border-right: 0; }
-
-/* Sticky first column (hospital info) */
-.compare-table .sticky{
-  position: sticky; left: 0; z-index: 2;
-  background: #fff; /* must set to avoid transparency during scroll */
-  box-shadow: 6px 0 8px -6px rgba(0,0,0,0.06);
-}
-.compare-header{
-  background: var(--bg-alt);
-  font-weight: 800; color: var(--ink-2);
-}
-.compare-hospital{
-  display: grid; gap: 2px;
-}
-.compare-name{ font-weight: 800; }
-.compare-sub{ color: var(--ink-3); font-size: var(--fs-12); }
-
-/* Inline stars (if you render ★ via text) */
-.stars{ letter-spacing: 1px; }
-.stars[data-score="5"]{ color: #0c6b3d; }
-.stars[data-score="4"]{ color: #3c914e; }
-.stars[data-score="3"]{ color: #b98900; }
-.stars[data-score="2"]{ color: #b36200; }
-.stars[data-score="1"]{ color: #a33a2a; }
-
-/* ---------- 13) Footer ---------------------------------------------------- */
-
-.footer{
-  margin-top: var(--sp-24);
-  padding: var(--sp-16) 0 var(--sp-24);
-  border-top: 1px solid var(--border);
-  color: var(--ink-3);
-  font-size: var(--fs-14);
+  height: 100%;
+  justify-content: center;
 }
 
-/* ---------- 14) Colorized states / messages ------------------------------- */
-
-.state-ok{ color: var(--brand-primary-dark); }
-.state-warn{ color: #a16207; }
-.state-bad{ color: var(--danger); }
-
-/* ---------- 15) Media queries polish ------------------------------------- */
-
-@media (min-width: 1024px){
-  .container{ width: min(1200px, 90vw); }
-  .rc-title{ font-size: 1.15rem; }
+.details-buttons button {
+  flex: 1;
+  min-width: 100%;
+  box-sizing: border-box;
 }
 
-/* End of file */
+.toggle-detail,
+.view-full-detail {
+  background: #f48810;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background 0.2s ease;
+  text-align: center;
+}
 
-/* ===========================
-   JS Compatibility Layer
-   (aligns with main.js, details.js, comparison.js)
-   =========================== */
+.toggle-detail:hover,
+.view-full-detail:hover {
+  background: #d9740e;
+}
 
-/* Desktop compare button (index.html -> #openCompare.btn-compare) */
-.btn-compare {
+/* =========================================
+   INLINE STAR ALIGNMENT IN PREVIEW PANE
+========================================= */
+.detail-info p.inline-stars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.detail-info .star-rating {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 0.9rem;
-  border-radius: 10px;
-  font-weight: 700;
-  border: 1px solid var(--blue-border);
-  background: var(--blue);
+  gap: 2px;
+  line-height: 1;
+}
+
+.detail-info .star {
+  width: 18px;
+  height: 18px;
+}
+
+/* Optional: neat label column alignment */
+.detail-info p.inline-stars strong {
+  min-width: 85px;
+  display: inline-block;
+  font-size: 0.95em;
+}
+
+.hospital-title {
+  text-align: center;
+  margin: 20px 0 10px;
+}
+
+
+@media (max-width: 992px) {
+  .detail-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+/************  Compare Page (Desktop)  ************/
+.compare-page .table-wrap { display: block !important; }  /* hide old table if present */
+
+.compare-page .cmp-grid{
+  border:1px solid #d9e7d2;           /* soft green divider */
+  border-radius:14px;
+  overflow:auto;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.compare-page .cmp-row{
+  display:grid;
+  grid-template-columns: 260px repeat(var(--cols, 3), 1fr);
+  min-height:48px;
+  border-bottom:1px solid #d9e7d2;
+}
+.compare-page .cmp-row:last-child{ border-bottom:0; }
+
+.compare-page .cmp-cell{
+  padding:14px 16px;
+  border-right:1px solid #d9e7d2;
+  background:#e7f5e5;                 /* pale green background like your Figma */
+}
+.compare-page .cmp-cell:last-child{ border-right:0; }
+
+/* sticky left label column */
+.compare-page .cmp-cell--label{
+  position:sticky; left:0; z-index:3;
+  background:#fff;
+  font-weight:700;
+  color:#0f172a;
+}
+
+/* sticky header row */
+.compare-page .cmp-row--head .cmp-cell{
+  position:sticky; top:0; z-index:4;
+  background:#fff;
+}
+
+/* subtle column split for visual separation of hospital columns */
+.compare-page .cmp-col-split{ box-shadow: inset 1px 0 0 #d9e7d2; }
+
+/* Hospital info card in header */
+.compare-page .hcard{
+  background:#fff;
+  border:1px solid #cfe3c8;
+  border-radius:10px;
+  padding:10px 12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+.compare-page .hcard__name{ font-weight:800; margin-bottom:4px; }
+.compare-page .hcard__meta{ font-size:.9rem; color:#475569; margin-bottom:6px; }
+.compare-page .hinfo{ display:grid; gap:6px; }
+.compare-page .hinfo__row{ display:flex; gap:8px; align-items:center; font-size:.95rem; }
+.compare-page .hinfo__dot{
+  width:8px; height:8px; border-radius:999px; background:#f48810; flex:none;
+}
+
+/* Stars (grade → stars) */
+.compare-page .stars{ display:inline-flex; gap:2px; }
+.compare-page .star{
+  width:18px; height:18px; display:inline-block;
+  background:#a4cc95; /* empty star color */
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+          mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+}
+.compare-page .star.filled{ background:#f48810; }
+
+/* Section label styling (left column) */
+.compare-page .section{ font-weight:800; color:#0f172a; }
+.compare-page .subtle{ color:#64748b; font-weight:600; }
+
+/* Compare page: hide legacy UI */
+.compare-page .header,
+.compare-page .filters,
+.compare-page .table-wrap,
+
+/* Compare page star chips */
+.compare-page .stars{ display:inline-flex; gap:2px; }
+.compare-page .star{
+  width:18px; height:18px; display:inline-block;
+  background:#a4cc95; /* empty star color */
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+          mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox=0 0 24 24><path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/></svg>') center/contain no-repeat;
+}
+.compare-page .star.filled{ background:#f48810; }
+.compare-page .cmp-row:first-child .cmp-cell--label,
+.compare-page .cmp-row .cmp-cell--label { font-weight: 700; }
+
+
+/* === MOBILE-ONLY COMPARISON LAYOUT === */
+@media (max-width: 768px) {
+  /* Hide your desktop layout */
+	/* Keep the grid container so the header row shows */
+	.compare-page .cmp-grid{ display:block; overflow-x:auto; }
+
+	/* Hide all grid rows… */
+	.compare-page .cmp-row{ display:none; }
+
+	/* …except the header/info-cards row */
+	.compare-page .cmp-row--head{ display:grid; }
+
+	/* And show the mobile sections list */
+	.compare-page #cards{ display:block !important; }
+
+  
+  #cards {
+    display: block !important;
+  }
+
+  /* Show the mobile layout */
+  .compare-category {
+    display: block;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1rem;
+  }
+
+  .category-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #e9eff3;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .category-body {
+    background: #fff;
+    padding: 0.75rem 1rem;
+  }
+
+  .metric-title {
+    font-weight: 600;
+    color: #555;
+    margin: 0.5rem 0;
+  }
+
+  .hospital-scores,
+  .hospital-stars {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 1rem 0;
+  }
+
+  .hospital-scores li,
+  .hospital-stars li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .hospital-name {
+    font-weight: 500;
+  }
+
+  .hospital-grade {
+    background: #007c89;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    line-height: 2rem;
+  }
+
+  .metric-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+  }
+
+  .stars {
+    color: #00a3af;
+  }
+}
+
+/* Floating Compare button (desktop + mobile) */
+#openCompare {
+  position: fixed;
+  right: calc(24px + env(safe-area-inset-right));
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 1000;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: #ffffff;
+  border: 2px solid #6fb353;          /* adjust to your theme */
+  color: #333;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover / focus states for desktop users */
+#openCompare:hover:not([disabled]),
+#openCompare:focus-visible {
+  background: #6fb353;
   color: #fff;
-  box-shadow: var(--shadow-1);
-}
-.btn-compare[disabled] { opacity: .55; cursor: not-allowed; }
-
-/* Table rows + expandable details (main.js) */
-.hospital-row { transition: background .15s ease; }
-.hospital-row:hover { background: #fcfcfd; }
-.hospital-detail-row { background: #fff; }
-.details-row { padding: 0; }
-.hospital-detail-container {
-  padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: #fff;
-  box-shadow: var(--shadow-1);
-}
-.hospital-header {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: .75rem; margin-bottom: .5rem;
-}
-.hospital-grade {
-  display: inline-flex; align-items: center; gap: .4rem;
-  padding: .2rem .5rem; border: 1px solid var(--border);
-  border-radius: 999px; font-weight: 800; font-size: var(--fs-12);
-  background: #f5f6f8; color: var(--ink-2);
+  transform: translateY(-2px);
 }
 
-/* Star widgets (main.js, details.js) */
-.star-rating { display: inline-flex; align-items: center; gap: .25rem; }
-.inline-stars { display: inline-flex; gap: 2px; vertical-align: middle; }
-.star { width: 18px; height: 18px; display: inline-block; }
-.star.full   { background: linear-gradient(#f6c800, #e3a500); -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 17.27 18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E") center/contain no-repeat; mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 17.27 18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E") center/contain no-repeat; }
-.star.half   { background: linear-gradient(to right, #f6c800 50%, #e5e7eb 50%); -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 17.27 18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E") center/contain no-repeat; mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 17.27 18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E") center/contain no-repeat; }
-.star.empty  { background: #e5e7eb; -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 17.27 18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E") center/contain no-repeat; mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 17.27 18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E") center/contain no-repeat; }
-.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+/* Disabled look but still tappable for consistency */
+#openCompare[disabled] {
+  opacity: 0.6;
+  pointer-events: auto;
+  cursor: not-allowed;
+}
 
-/* Details grid used in collapsed preview (main.js) */
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap: .75rem;
+/* Ensure content doesn't get hidden behind the floating button */
+body {
+  padding-bottom: 90px; /* increases space at bottom for scroll comfort */
 }
-.details-section h4 { font-size: var(--fs-14); margin-bottom: .25rem; }
-.detail-info { color: var(--ink-3); font-size: var(--fs-14); }
 
-/* Toggle buttons inside details (main.js markup) */
-.toggle-detail,
-.view-full-detail,
-.details-buttons .btn {
-  display: inline-flex; align-items: center; gap: .4rem;
-  padding: .5rem .75rem; border-radius: 10px; border: 1px solid #d8dbe2; background: #fff;
-  font-weight: 700; font-size: var(--fs-14);
-}
-.toggle-detail:hover,
-.view-full-detail:hover { background: #f6f7f9; }
-
-/* Inline compare toggle button (main.js) */
-.cmp-toggle {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px; border-radius: 10px; border: 1px solid #d8dbe2; background: #fff;
-}
-.cmp-toggle[aria-pressed="true"] { border-color: var(--brand-primary); box-shadow: inset 0 0 0 2px var(--brand-primary); }
-.cmp-icon { display: block; }
-.cmp-icon--on { display: none; }
-.cmp-toggle[aria-pressed="true"] .cmp-icon--off { display: none; }
-.cmp-toggle[aria-pressed="true"] .cmp-icon--on  { display: block; }
-
-/* Comparison page card list (comparison.js uses #cards + .hcard*) */
-#cards {
-  display: grid; gap: 0.75rem; margin-top: 0.75rem;
-}
-.hcard {
-  border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 0.9rem; background: #fff; box-shadow: var(--shadow-1);
-}
-.hcard__name {
-  font-weight: 800; font-size: var(--fs-16); margin-bottom: .25rem;
-}
-.hcard__meta {
-  display: flex; flex-wrap: wrap; gap: .5rem 1rem; color: var(--ink-3); font-size: var(--fs-14);
-}
-.hospital-scores { margin-top: .5rem; display: grid; gap: .25rem; }
-.category-header {
-  margin-top: .5rem; font-weight: 800; color: var(--ink-2); font-size: var(--fs-14);
-}
-.category-body { display: grid; gap: .2rem; }
-.icon { display: inline-block; width: 18px; height: 18px; vertical-align: -3px; }
-.stars { letter-spacing: 1px; }
-
-/* Map section hooks referenced in main.js (non-breaking) */
-.main-content { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-.map-section { display: none; }
-/* If you later show a map, just flip display and size it there. */
-
-/* --- BRAND TOUCH-UP --- */
+/* =============== Variables =============== */
 :root{
-  --brand-primary: #6fb353;
-  --brand-primary-dark: #4a8a34;
-  --brand-accent: #f48810;
-  --brand-light: #a4cc95;
-  --brand-muted: #eaf3e6;
-
-  --blue: #2d6cdf;         /* used by solid buttons; keep for now */
-  --blue-border: #1f5ac0;
+  --gw-green:#6fb353;
+  --gw-orange:#f48810;
+  --gw-pale:#e7f5e5;
+  --shadow-lg:0 12px 32px rgba(0,0,0,.22);
 }
 
-/* Buttons that should be green (replace blue with brand where appropriate) */
-.btn-solid,
-#applyFiltersBtn,
-#openCompare,
-#compareFab {
-  background: var(--brand-primary);
-  border-color: var(--brand-primary-dark);
+/* ================= Desktop defaults ================= */
+/* Your existing 3-column grid stays on desktop */
+@media (min-width: 993px){
+  .filters-toggle{ display:none; }         /* hide the mobile button on desktop */
 }
 
-.btn-solid:hover,
-#applyFiltersBtn:hover,
-#openCompare:hover,
-#compareFab:hover {
-  filter: brightness(0.96);
+/* ================= Mobile layout ================= */
+@media (max-width: 992px){
+  /* Stack: Map → Results; sidebar becomes off-canvas */
+  .main-content{
+    display:block;              /* collapse the 3-column grid */
+    margin-top: 10px;
+    padding: 0 10px;
+  }
+
+  /* Move Map to top and make it viewport-friendly */
+  .map-column{
+    position: static;
+    margin-bottom: 12px;
+  }
+  .map-section #mainMap{
+    height: 45vh;               /* tall enough to be useful */
+    min-height: 280px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* Mobile Filters toggle button (FAB-ish pill) */
+  .filters-toggle{
+    position: sticky;           /* stays visible while scrolling results header */
+    top: 10px;
+    z-index: 30;
+    margin: 8px 0 12px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: #fff;
+    border: 2px solid var(--gw-green);
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  }
+
+  /* Off-canvas drawer */
+  .sidebar{
+    position: fixed;
+    inset: 0 auto 0 0;          /* left side drawer */
+    width: min(88vw, 340px);
+    max-width: 90%;
+    transform: translateX(-102%);
+    transition: transform .25s ease;
+    background:#fff;
+    z-index: 100;
+    border-right: 1px solid #cde3c7;
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* match your accordion styles already defined for .index-page .sidebar … */
+
+  /* Backdrop behind drawer */
+  .drawer-backdrop{
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.32);
+    backdrop-filter: blur(1px);
+    z-index: 90;
+  }
+
+  /* Open state (on <body>) */
+  body.drawer-open .sidebar{ transform: translateX(0); }
+  body.drawer-open{ overflow: hidden; }  /* lock background scroll */
+  body.drawer-open #drawerBackdrop{ display:block; }
 }
 
-/* Links / highlights you want green instead of blue */
-a,
-a:visited { color: var(--brand-primary-dark); }
-a:hover { color: var(--brand-primary); }
+/* ================= Reduced motion ================= */
+@media (prefers-reduced-motion: reduce){
+  .sidebar{ transition: none; }
+}
 
-/* Divider lines in primary dark green if desired */
-hr, .divider, .results-table thead th {
-  border-color: var(--brand-primary-dark);
+/* Safe default anywhere in main.css (outside media queries) */
+.drawer-backdrop{ display:none; cursor: default; }
+
+/* === DETAILS: Responsive layout (desktop → tablet → phone) === */
+
+/* Tablet: 2-column hero, services fill last row */
+@media (max-width: 1024px) {
+  .detail-hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  /* Make the Services card span full width on the 2nd row */
+  .detail-hero .hero-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Phone: single column, tighter spacing */
+@media (max-width: 640px) {
+  .detail-topbar h1 { font-size: 1.25rem; }
+
+  .detail-hero {
+    grid-template-columns: 1fr;
+    padding: 12px 3vw;
+    gap: 10px;
+  }
+
+  #leafletMap { height: 220px; }
+
+  /* Keep headline + stars readable on narrow screens */
+  .metric-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  /* Service “pills” become 2 columns on phones */
+  .services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* Tap-target friendly submetric rows */
+  .submetric summary {
+    padding: 14px 16px;
+    font-size: 0.98rem;
+  }
+}
+
+/* Very narrow phones: stack service pills to one column */
+@media (max-width: 380px) {
+  .services-grid { grid-template-columns: 1fr; }
+}
+
+/* Optional: slightly smaller stars on phones */
+.detail-hero .star-rating svg { width: 18px; height: 18px; }
+@media (max-width: 640px) {
+  .detail-hero .star-rating svg { width: 16px; height: 16px; }
+}
+
+/* ===== Mobile overrides (force-apply) ===== */
+
+/* INDEX (hospital list + map) */
+@media (max-width: 992px) {
+  .index-page .main-content {
+    display: block; /* collapse grid to a single column */
+  }
+
+  /* Off-canvas filter drawer */
+  .index-page .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: min(88vw, 360px);
+    height: 100dvh;
+    background: #fff;
+    box-shadow: 2px 0 18px rgba(0,0,0,.15);
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 100;
+  }
+  .index-page body.drawer-open .sidebar { transform: translateX(0); }
+
+  .index-page #drawerBackdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.35);
+    display: none; z-index: 90;
+  }
+  .index-page body.drawer-open #drawerBackdrop { display: block; }
+
+  /* Results stack nicely */
+  .index-page .results-header { position: sticky; top: 0; background: #f5f5f5; z-index: 5; }
+  .index-page .hospital-card { margin: 12px 0; }
+  .index-page #mainMap { height: 360px !important; } /* ensure visible map on phones */
+}
+
+/* COMPARISON (side-by-side) */
+@media (max-width: 992px) {
+  /* Hide the legacy table, use grid/cards instead */
+  .compare-page .table-wrap { display: none !important; }
+
+  /* Ensure grid exists as a horizontal scroller */
+  .compare-page .cmp-grid {
+    display: block;
+    overflow-x: auto;
+    border: 1px solid #d9e7d2;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+
+  /* Grid rows: first column is label, rest are selected hospitals */
+  .compare-page .cmp-row {
+    display: grid;
+    grid-template-columns: 180px repeat(var(--cols, 3), minmax(140px, 1fr));
+    align-items: center;
+    min-height: 48px;
+    border-bottom: 1px solid #d9e7d2;
+  }
+  .compare-page .cmp-row:last-child { border-bottom: 0; }
+
+  /* Sticky left label column */
+  .compare-page .cmp-row .label {
+    position: sticky; left: 0;
+    background: #fff; /* avoid transparency over scroll */
+    box-shadow: 8px 0 8px -8px rgba(0,0,0,.06);
+    z-index: 1;
+    font-weight: 600;
+    padding: 10px 12px;
+  }
+
+  /* Compact cells for small screens */
+  .compare-page .cmp-cell { padding: 10px 12px; }
+  .compare-page .cmp-cell .stars svg { width: 16px; height: 16px; }
+
+  /* Collapsible mobile category sections (if present) */
+  .compare-page .compare-category { border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+  .compare-page .compare-category .category-header {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+    background: #e9eff3; padding: 10px 12px; border: none; font-weight: 600;
+  }
+  .compare-page .compare-category[aria-expanded="false"] .category-body { display: none; }
+}
+
+/* Tiny phones */
+@media (max-width: 380px) {
+  .compare-page .cmp-row { grid-template-columns: 160px repeat(var(--cols, 3), minmax(120px,1fr)); }
 }

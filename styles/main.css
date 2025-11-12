@@ -453,3 +453,81 @@ footer{
 @media (min-width: 1200px){
   .results { grid-template-columns: 1fr 1fr 1fr; }
 }
+
+/* === Comparison Grid (desktop) === */
+.cmp-grid{
+  display:grid;
+  gap:12px;
+  /* JS will set grid-template-columns to "260px repeat(N, 1fr)" */
+}
+
+/* Left labels column */
+.cmp-label{
+  font-weight:700;
+  padding:12px 14px;
+  background:#f2f7f0;
+  border:1px solid #e2e8e4;
+  border-radius:10px;
+  position:sticky; left:0; z-index:1;   /* stays put while you scroll horizontally */
+}
+
+/* Hospital column cell */
+.cmp-cell{
+  padding:12px 14px;
+  border:1px solid #e6e6e6;
+  border-radius:10px;
+  background:#fff;
+}
+
+/* Column header “info card” */
+.cmp-hdr{
+  background:#eaf3e3;
+  border:1px solid #d6e7d1;
+  border-radius:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  padding:12px 14px;
+}
+.cmp-hdr .cmp-name{
+  font-weight:800;
+  text-align:center;
+}
+.cmp-hdr .cmp-sub{
+  opacity:.8;
+  text-align:center;
+  margin-top:2px;
+  font-size:.95rem;
+}
+.cmp-hdr .cmp-bullets{
+  margin-top:10px;
+  padding-left:0;
+  list-style:none;
+}
+.cmp-hdr .cmp-bullets li{
+  display:flex; gap:6px; align-items:center;
+  font-size:.95rem;
+}
+.cmp-dot{ width:8px; height:8px; border-radius:50%; background:#f48810; display:inline-block; }
+
+/* Row label style (left column rows) */
+.cmp-rowlabel{
+  font-weight:700;
+  padding:10px 12px;
+  background:#f4f7f2;
+  border:1px solid #e2e8e4;
+  border-radius:8px;
+}
+
+/* Grade pill (reuses your rc-grade colors if present) */
+.cmp-pill{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:700;
+  background:#eef6ea;
+  color:#2f6a3a;
+}
+
+/* Desktop-only layout; mobile can keep your existing cards */
+@media (max-width: 991px){
+  .cmp-grid{ display:block; }
+}

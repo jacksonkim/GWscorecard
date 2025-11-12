@@ -597,3 +597,40 @@ input[type="checkbox"]{
 .map-section { display: none; }
 /* If you later show a map, just flip display and size it there. */
 
+/* --- BRAND TOUCH-UP --- */
+:root{
+  --brand-primary: #6fb353;
+  --brand-primary-dark: #4a8a34;
+  --brand-accent: #f48810;
+  --brand-light: #a4cc95;
+  --brand-muted: #eaf3e6;
+
+  --blue: #2d6cdf;         /* used by solid buttons; keep for now */
+  --blue-border: #1f5ac0;
+}
+
+/* Buttons that should be green (replace blue with brand where appropriate) */
+.btn-solid,
+#applyFiltersBtn,
+#openCompare,
+#compareFab {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary-dark);
+}
+
+.btn-solid:hover,
+#applyFiltersBtn:hover,
+#openCompare:hover,
+#compareFab:hover {
+  filter: brightness(0.96);
+}
+
+/* Links / highlights you want green instead of blue */
+a,
+a:visited { color: var(--brand-primary-dark); }
+a:hover { color: var(--brand-primary); }
+
+/* Divider lines in primary dark green if desired */
+hr, .divider, .results-table thead th {
+  border-color: var(--brand-primary-dark);
+}

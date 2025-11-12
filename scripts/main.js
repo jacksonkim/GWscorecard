@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ===============================
 // Load JSON Data
 // ===============================
-fetch("./data/2025/2025_Lown_Index_GA.json")
+fetch("./data/2025/2025_GW_HospitalScores.json")
   .then(res => res.json())
   .then(data => {
     hospitalData = data;
@@ -89,59 +89,92 @@ function renderHospitals(data) {
   resultsCount.textContent = `Viewing ${data.length} results`;
 
   if (!data.length) {
-    resultsTable.innerHTML = `<tr><td colspan="4">No hospitals match the selected filters.</td></tr>`;
+    resultsTable.innerHTML = `
+      <tr>
+        <td colspan="4">No hospitals match the selected filters.</td>
+      </tr>
+    `;
     return;
   }
 
+  // Helper to clamp numeric ratings to 0–5
+  const clampRating = (raw) => {
+    const n = Number(raw);
+    if (Number.isNaN(n)) return 0;
+    return Math.max(0, Math.min(5, n));
+  };
+
   data.forEach(hospital => {
-    // Convert letter grade to star rating
-    const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
-    const stars = convertGradeToStars(grade);
+    // Use your new Hospital_ID as the primary id
+    const hid = String(
+      hospital.Hospital_ID ??
+      hospital.hospital_id ??
+      ""
+    );
+
+    // Overall star rating (0–5 numeric)
+    const overall = clampRating(hospital.Overall_Star_Rating);
 
     // === Main Row ===
     const row = document.createElement("tr");
     row.classList.add("hospital-row");
-	
-	const hid = String(hospital.RECORD_ID || "");
-	if (hid) row.dataset.id = hid;
+    if (hid) row.dataset.id = hid;
 
-
-
+    // Column 1: Overall grade stars
     const gradeCell = document.createElement("td");
     gradeCell.innerHTML = `
-      <div class="star-rating" aria-label="${stars.value} out of 5 stars">
-        ${renderStars(stars.value)}
+      <div class="star-rating" aria-label="${overall} out of 5 stars">
+        ${renderStars(overall)}
       </div>
+      <div class="overall-label">Overall score</div>
     `;
     row.appendChild(gradeCell);
 
+    // Column 2: Hospital name + location
     const nameCell = document.createElement("td");
+
+    const name   = hospital.Hospital_Name || "Unnamed Hospital";
+    const city   = hospital.City || "";
+    const state  = hospital.State || "";
+    const zip    = hospital.ZIP_Code || "";
+    const county = hospital.County ? `${hospital.County} County` : "";
+    const addressLine = hospital.Street_Address
+      ? `${hospital.Street_Address}, ${city}, ${state} ${zip}`
+      : `${city}, ${state} ${zip}`.trim();
+
+    const detailsUrl = `details.html?id=${encodeURIComponent(hid)}`;
+
     nameCell.innerHTML = `
-      <strong>
-        <a href="details.html?id=${hospital.RECORD_ID}" class="hospital-link">
-          ${hospital.Name || "Unnamed Hospital"}
-        </a>
-      </strong><br>
-      ${hospital.City || ""}, ${hospital.State || ""}
+      <div class="hospital-main">
+        <strong>
+          <a href="${detailsUrl}" class="hospital-link">
+            ${name}
+          </a>
+        </strong>
+        <div class="hospital-meta">
+          ${addressLine ? `<div class="hospital-address">${addressLine}</div>` : ""}
+          ${county ? `<div class="hospital-county">${county}</div>` : ""}
+        </div>
+      </div>
     `;
     row.appendChild(nameCell);
 
-    // === Buttons ===
+    // Column 3: Accordion toggle + "Full details" button
     const buttonCell = document.createElement("td");
     buttonCell.classList.add("details-buttons");
 
     const detailsButton = document.createElement("button");
-    detailsButton.textContent = "View Details ▼";
+    detailsButton.type = "button";
+    detailsButton.textContent = "View Category Scores ▼";
     detailsButton.classList.add("toggle-detail");
 
     const fullDetailsButton = document.createElement("button");
-    fullDetailsButton.textContent = "View Full Details";
+    fullDetailsButton.type = "button";
+    fullDetailsButton.textContent = "Full details";
     fullDetailsButton.classList.add("view-full-detail");
     fullDetailsButton.addEventListener("click", () => {
-      if (hospital.RECORD_ID) {
-        window.location.href = `details.html?id=${hospital.RECORD_ID}`;
-      } else {
-        showErrorPopup("Sorry, we couldn't find more details for this hospital.");
+      if (hid) {
+        window.location.href = detailsUrl;
       }
     });
 
@@ -149,59 +182,84 @@ function renderHospitals(data) {
     buttonCell.appendChild(fullDetailsButton);
     row.appendChild(buttonCell);
 
-	const cmpCell = document.createElement("td");
-	cmpCell.innerHTML = `
-	  <button
-		class="cmp-toggle js-compare-toggle"
-		type="button"
-		aria-pressed="${compareSet.has(hid) ? 'true' : 'false'}"
-		data-id="${hid}"
-		title="${compareSet.has(hid) ? 'Selected for comparison' : 'Select for comparison'}"
-	  >
-		<!-- Outline = unselected -->
-		<svg class="cmp-icon cmp-icon--off" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-		  <path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2C6.6 2 3 5.6 3 10s3.6 8 8 8a7.96 7.96 0 0 0 4.9-1.7l4.6 4.6 1.4-1.4-4.6-4.6A7.96 7.96 0 0 0 19 10c0-4.4-3.6-8-8-8z"/>
-		</svg>
+    // Column 4: Compare toggle (uses existing compareSet / localStorage)
+    const cmpCell = document.createElement("td");
+    const isSelected = compareSet && compareSet.has(hid);
 
-		<!-- Filled = selected -->
-		<svg class="cmp-icon cmp-icon--on" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-		  <path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 1 0 10.5 17a6.47 6.47 0 0 0 3.23-.87l.27.28v.79L21 22.49 22.49 21 15.5 14zM10.5 15C7.5 15 5 12.5 5 9.5S7.5 4 10.5 4 16 6.5 16 9.5 13.5 15 10.5 15z"/>
-		</svg>
-	  </button>
-	`;
-	row.appendChild(cmpCell);
+    cmpCell.innerHTML = `
+      <button
+        class="cmp-toggle js-compare-toggle"
+        type="button"
+        aria-pressed="${isSelected ? "true" : "false"}"
+        data-id="${hid}"
+        title="${isSelected ? "Selected for comparison" : "Select for comparison"}"
+      >
+        <!-- Outline = unselected -->
+        <svg class="cmp-icon cmp-icon--off" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2C6.6 2 3 5 3 9.5S6.6 17 11 17s8-3.6 8-7.5S15.4 2 11 2zm0 3a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z"/>
+        </svg>
 
-	
-    // === Detail Row (collapsed preview) ===
+        <!-- Filled = selected -->
+        <svg class="cmp-icon cmp-icon--on" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 1 0 10.5 17a6.47 6.47 0 0 0 4.93-2.32l.27.28h.8l5 5-1.5 1.5-5-5zm-5 1.5C7.5 15.5 5 13 5 10s2.5-5 5.5-5 5.5 2.5 5.5 5-2.5 5.5-5.5 5.5z"/>
+        </svg>
+      </button>
+    `;
+    row.appendChild(cmpCell);
+
+    // === Accordion detail row with 4 main categories ===
     const detailRow = document.createElement("tr");
     detailRow.classList.add("hospital-detail-row");
     detailRow.style.display = "none";
 
     const detailCell = document.createElement("td");
     detailCell.colSpan = 4;
+
+    const ftih = clampRating(hospital.FTIH_Category_Rating);
+    const cbs  = clampRating(hospital.CBS_Category_Rating);
+    const hab  = clampRating(hospital.HAB_Category_Rating);
+    const hasr = clampRating(hospital.HASR_Category_Rating);
+
     detailCell.innerHTML = `
-	  <div class="detail-info">
-		<p class="inline-stars"><strong>Outcome:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Outcome || "F").value)}</p>
-		<p class="inline-stars"><strong>Value:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Value || "F").value)}</p>
-		<p class="inline-stars"><strong>Civic:</strong> ${renderStars(convertGradeToStars(hospital.TIER_2_GRADE_Civic || "F").value)}</p>
-		<p class="inline-stars"><strong>Safety:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Saf || "F").value)}</p>
-		<p class="inline-stars"><strong>Experience:</strong> ${renderStars(convertGradeToStars(hospital.TIER_3_GRADE_Pat_Exp || "F").value)}</p>
-	  </div>
-	`;
+      <div class="detail-info category-grid">
+        <div class="category-row">
+          <h4>Financial Transparency &amp; Institutional Health</h4>
+          <div class="category-stars">${renderStars(ftih)}</div>
+        </div>
+        <div class="category-row">
+          <h4>Community Benefit Spending</h4>
+          <div class="category-stars">${renderStars(cbs)}</div>
+        </div>
+        <div class="category-row">
+          <h4>Healthcare Affordability &amp; Billing</h4>
+          <div class="category-stars">${renderStars(hab)}</div>
+        </div>
+        <div class="category-row">
+          <h4>Healthcare Access &amp; Social Responsibility</h4>
+          <div class="category-stars">${renderStars(hasr)}</div>
+        </div>
+      </div>
+    `;
     detailRow.appendChild(detailCell);
 
-    // === Toggle Logic (single listener) ===
+    // Toggle accordion open/close
     detailsButton.addEventListener("click", () => {
-      const isHidden = detailRow.style.display === "none" || detailRow.style.display === "";
+      const isHidden =
+        detailRow.style.display === "none" ||
+        detailRow.style.display === "";
+
       detailRow.style.display = isHidden ? "table-row" : "none";
-      detailsButton.textContent = isHidden ? "Hide Details ▲" : "View Details ▼";
+      detailsButton.textContent = isHidden
+        ? "Hide Category Scores ▲"
+        : "View Category Scores ▼";
     });
 
-    // === Append both rows ===
+    // Append both rows to the table
     resultsTable.appendChild(row);
     resultsTable.appendChild(detailRow);
   });
 }
+
 
 // --- Mobile card renderer (for phones) ---
 function renderMobileCards(hospitals) {

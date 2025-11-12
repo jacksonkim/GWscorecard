@@ -113,4 +113,3 @@ function renderGrid(hospitals){
 
   renderGrid(hospitals);
 })();
-

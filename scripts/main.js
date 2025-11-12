@@ -212,11 +212,11 @@ function renderMobileCards(hospitals) {
   container.innerHTML = list.map(h => `
     <article class="result-card">
       <header class="rc-head">
-        <h3 class="rc-title">${h.Hospital_Name}</h3>
+        <h3 class="rc-title">${h.Name}</h3>
         <div class="rc-meta">
-          <span class="rc-grade rc-grade-${String(h.Overall_Star_Rating || '').toLowerCase()}">
-            ${h.Overall_Star_Rating ?? '—'}
-          </span>
+          <span class="rc-grade rc-grade-${String(h.TIER_1_GRADE_Lown_Composite || '').toLowerCase()}">
+			  ${h.TIER_1_GRADE_Lown_Composite ?? '—'}
+			</span>
           <span class="rc-loc">${h.City || ''}, ${h.State || ''}</span>
         </div>
       </header>
@@ -226,16 +226,16 @@ function renderMobileCards(hospitals) {
 		  ${renderStars(h.Overall_Star_Rating ?? 0)}
 		  </div>
 		  <ul class="rc-metrics">
-			 <li><strong>Transparency:</strong> ${h.Transparency ?? h.Balance_Growth ?? '—'}</li>
-			 <li><strong>Fiscal Health:</strong> ${h.Fiscal_Health ?? '—'}</li>
-			 <li><strong>Staffing:</strong> ${h.Staffing ?? '—'}</li>
-			 <li><strong>Community Benefit:</strong> ${h.Quality_of_CBS ?? h.CBS_Category_Rating ?? '—'}</li>
+			 <li><strong>Outcome:</strong> ${h.TIER_2_GRADE_Outcome ?? '—'}</li>
+			 <li><strong>Value:</strong> ${h.TIER_2_GRADE_Value ?? '—'}</li>
+			 <li><strong>Civic:</strong> ${h.TIER_2_GRADE_Civic ?? '—'}</li>
+			 <li><strong>Patient Experience:</strong> ${h.TIER_3_GRADE_Pat_Exp ?? '—'}</li>
 		  </ul>
 		</div>
 
       <footer class="rc-foot">
-        <a class="btn btn-outline" href="details.html?id=${encodeURIComponent(h.Hospital_ID)}">View details</a>
-        <a class="btn btn-solid" href="details.html?id=${encodeURIComponent(h.Hospital_ID)}&tab=full">Full details</a>
+        <a class="btn btn-outline" href="details.html?id=${encodeURIComponent(h.RECORD_ID)}">View details</a>
+        <a class="btn btn-solid" href="details.html?id=${encodeURIComponent(h.RECORD_ID)}&tab=full">Full details</a>
       </footer>
     </article>
   `).join('');

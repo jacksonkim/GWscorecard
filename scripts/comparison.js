@@ -1,6 +1,6 @@
 // comparison.js — grid layout matching your desktop mock
 
-const DATA_URL = "data/2025_Lown_Index_GA.json"; // adjust if your path differs
+const DATA_URL = "./data/2025/2025_Lown_Index_GA.json";
 
 // Normalize current JSON structure
 function normalizeLown(h){
@@ -113,3 +113,4 @@ function renderGrid(hospitals){
 
   renderGrid(hospitals);
 })();
+

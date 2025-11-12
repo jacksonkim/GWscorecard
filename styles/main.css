@@ -445,3 +445,11 @@ footer{
   background-color: rgba(0,0,0,0.05);
   outline: none;
 }
+/* Card grid columns */
+.results { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 768px){
+  .results { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1200px){
+  .results { grid-template-columns: 1fr 1fr 1fr; }
+}

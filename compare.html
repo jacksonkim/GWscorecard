@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Hospitals | Georgia Watch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/compare.css">
+</head>
+<body class="compare-page">
+    <header>
+        <div class="container">
+            <div class="top-nav">
+                <div class="logo">
+                    <img src="images/logo2White.png" width="auto" height="80" />
+                    <span>Georgia Watch</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html">Rankings</a>
+                    <a href="methodology.html">Methodology</a>
+                    <a href="https://georgiawatch.org/about/">About Us</a>
+                    <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+                </div>
+            </div>
+            <div class="header-content">
+                <h1>COMPARE HOSPITALS</h1>
+                <p>Side-by-side comparison of hospital performance metrics</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Header Controls -->
+    <div class="mobile-header-controls">
+        <button class="mobile-nav-toggle">
+            <span>☰</span> Menu
+        </button>
+        <button class="mobile-filter-toggle" style="visibility: hidden;">
+            <span>🔍</span> Filters
+        </button>
+    </div>
+
+    <!-- Mobile Navigation Panel -->
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-panel">
+            <div class="mobile-nav-header">
+                <h3>Navigation</h3>
+                <button class="mobile-nav-close">×</button>
+            </div>
+            <div class="mobile-nav-links">
+                <a href="index.html">Rankings</a>
+                <a href="methodology.html">Methodology</a>
+                <a href="compare.html">Compare Hospitals</a>
+                <a href="https://georgiawatch.org/about/">About Us</a>
+                <a href="https://georgiawatch.org/support-us/donate/" class="donate-btn">Donate</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container compare-container">
+        <!-- Selection Section -->
+        <section class="selection-section">
+            <div class="selection-cards">
+                <div class="hospital-selection-card">
+                    <h3>Hospital 1</h3>
+                    <div class="dropdown-container">
+                        <select id="hospital1Select" class="hospital-dropdown">
+                            <option value="">Select Hospital 1</option>
+                        </select>
+                    </div>
+                    <div class="selected-hospital" id="selectedHospital1">
+                        <p class="placeholder">No hospital selected</p>
+                    </div>
+                </div>
+
+                <div class="hospital-selection-card">
+                    <h3>Hospital 2</h3>
+                    <div class="dropdown-container">
+                        <select id="hospital2Select" class="hospital-dropdown">
+                            <option value="">Select Hospital 2</option>
+                        </select>
+                    </div>
+                    <div class="selected-hospital" id="selectedHospital2">
+                        <p class="placeholder">No hospital selected</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="compare-actions">
+                <button id="compareNowBtn" class="compare-now-btn" disabled>
+                    Compare Selected Hospitals
+                </button>
+                <button id="clearSelectionBtn" class="clear-selection-btn">
+                    Clear Selection
+                </button>
+            </div>
+        </section>
+
+        <!-- Comparison Results -->
+        <section class="comparison-results" id="comparisonResults" style="display: none;">
+            <div class="results-header">
+                <h2>Hospital Comparison</h2>
+                <button id="backToSelectionBtn" class="back-to-selection-btn">
+                    ← Back to Selection
+                </button>
+            </div>
+
+            <div class="comparison-grid" id="comparisonGrid">
+                <!-- Comparison content will be populated by JavaScript -->
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="#">Georgia Watch</a></li>
+                    <li><a href="index.html">Rankings</a></li>
+                    <li><a href="methodology.html">Methodology</a></li>
+                    <li><a href="compare.html">Compare Hospitals</a></li>
+                    <li><a href="https://georgiawatch.org/about/">About Us</a></li>
+                    <li><a href="https://georgiawatch.org/support-us/donate/">Donate</a></li>
+                    <li><a href="#">Legal/Privacy</a></li>
+                </ul>
+                <div class="copyright">
+                    <p>Georgia Watch is a non-profit, nonpartisan 501(c)3 organization. © 2024 Georgia Watch. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/compare.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

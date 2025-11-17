@@ -333,6 +333,14 @@ Compare Page Styles
     background: #f8f9fa;
 }
 
+.metric-hospital-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+
 .hospital-1-value {
     border-left: 3px solid #6fb353;
 }

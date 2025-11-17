@@ -2,785 +2,866 @@
 // Data Storage
 // ===============================
 let hospitalData = [];
-
-document.addEventListener('DOMContentLoaded', () => {
-  const toggle   = document.getElementById('filtersToggle');
-  const drawer   = document.getElementById('filtersDrawer'); // <aside class="sidebar" id="filtersDrawer">
-  const backdrop = document.getElementById('drawerBackdrop');
-
-  if (!toggle || !drawer || !backdrop) return;
-
-  let lastFocused = null;
-
-  const openDrawer = () => {
-    lastFocused = document.activeElement;
-    document.body.classList.add('drawer-open');
-    drawer.setAttribute('aria-hidden', 'false');
-    toggle.setAttribute('aria-expanded', 'true');
-    backdrop.hidden = false;
-    // optional: focus first interactive element in the drawer
-    const first = drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (first) first.focus({ preventScroll: true });
-  };
-
-  const closeDrawer = () => {
-    document.body.classList.remove('drawer-open');
-    drawer.setAttribute('aria-hidden', 'true');
-    toggle.setAttribute('aria-expanded', 'false');
-    backdrop.hidden = true;
-    if (lastFocused) lastFocused.focus({ preventScroll: true });
-  };
-
-  toggle.addEventListener('click', (e) => {
-    e.preventDefault();
-    const isOpen = document.body.classList.contains('drawer-open');
-    isOpen ? closeDrawer() : openDrawer();
-  });
-
-  backdrop.addEventListener('click', closeDrawer);
-
-  // Close on Esc
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.body.classList.contains('drawer-open')) {
-      closeDrawer();
-    }
-  });
-
-  // Auto-close drawer when moving to desktop width
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 993 && document.body.classList.contains('drawer-open')) {
-      closeDrawer();
-    }
-  });
-
-    const applyBtn = document.getElementById('applyFiltersBtn');
-	  if (applyBtn) applyBtn.addEventListener('click', closeDrawer);
-
-	  // NEW: X button inside the drawer
-	  const closeBtn = document.getElementById('closeDrawerBtn');
-	  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
-});
-
-});
-
+let filteredHospitalData = [];
 
 // ===============================
 // Load JSON Data
 // ===============================
 fetch("./data/2025/2025_GW_HospitalScores.json")
-  .then(res => res.json())
-  .then(data => {
-    hospitalData = data;
-    console.log("Hospital data loaded:", hospitalData.length, "records");
+    .then(res => res.json())
+    .then(data => {
+        hospitalData = data;
+        filteredHospitalData = [...hospitalData];
+        console.log("Hospital data loaded:", hospitalData.length, "records");
 
-    // Initial render
-    renderHospitals(hospitalData);
-	initHospitalMap(hospitalData);
+        // Initial render
+        renderHospitals(hospitalData);
+        initHospitalMap(hospitalData);
+        initMobileMap(hospitalData);
 
-  })
-  .catch(err => console.error("Error loading JSON:", err));
+        // Initialize mobile UI
+        initMobileUI();
+    })
+    .catch(err => console.error("Error loading JSON:", err));
+
+// ===============================
+// Mobile Navigation & Filter Functions
+// ===============================
+function initMobileUI() {
+    // Initialize mobile event listeners
+    initMobileEventListeners();
+    // Initialize mobile navigation
+    initMobileNavigation();
+}
+
+function initMobileNavigation() {
+    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+    const mobileNavClose = document.querySelector('.mobile-nav-close');
+    const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
+    
+    if (mobileNavToggle && mobileNavOverlay) {
+        mobileNavToggle.addEventListener('click', toggleMobileNavigation);
+        if (mobileNavClose) {
+            mobileNavClose.addEventListener('click', toggleMobileNavigation);
+        }
+        mobileNavOverlay.addEventListener('click', function(e) {
+            if (e.target === this) toggleMobileNavigation();
+        });
+    }
+}
+
+function toggleMobileNavigation() {
+    const body = document.body;
+    const overlay = document.querySelector('.mobile-nav-overlay');
+    const panel = document.querySelector('.mobile-nav-panel');
+    
+    if (!overlay || !panel) return;
+    
+    body.classList.toggle('mobile-nav-open');
+    overlay.style.display = body.classList.contains('mobile-nav-open') ? 'block' : 'none';
+    
+    setTimeout(() => {
+        panel.classList.toggle('active');
+    }, 10);
+}
+
+function initMobileEventListeners() {
+    // Mobile navigation toggle
+    document.querySelector('.mobile-nav-toggle')?.addEventListener('click', toggleMobileNavigation);
+    document.querySelector('.mobile-nav-close')?.addEventListener('click', toggleMobileNavigation);
+    document.querySelector('.mobile-nav-overlay')?.addEventListener('click', function(e) {
+        if (e.target === this) toggleMobileNavigation();
+    });
+
+    // Mobile filter toggle
+    document.querySelector('.mobile-filter-toggle')?.addEventListener('click', toggleMobileFilters);
+    document.querySelector('.mobile-filter-close')?.addEventListener('click', toggleMobileFilters);
+    document.querySelector('.mobile-filter-overlay')?.addEventListener('click', function(e) {
+        if (e.target === this) toggleMobileFilters();
+    });
+
+    // Mobile filter buttons
+    document.getElementById('mobileApplyFiltersBtn')?.addEventListener('click', function() {
+        applyAllFilters();
+        toggleMobileFilters();
+    });
+
+    document.getElementById('mobileResetFiltersBtn')?.addEventListener('click', function() {
+        resetAllFilters();
+        setTimeout(() => {
+            toggleMobileFilters();
+        }, 100);
+    });
+
+    document.getElementById('mobileApplyLocationBtn')?.addEventListener('click', function() {
+        applyAllFilters();
+        toggleMobileFilters();
+    });
+
+    // Mobile view toggle buttons
+    const mobileViewSystemsBtn = document.getElementById('mobileViewSystemsBtn');
+    const mobileViewIndividualsBtn = document.getElementById('mobileViewIndividualsBtn');
+    const mobileFilterCriticalBtn = document.getElementById('mobileFilterCriticalBtn');
+    const mobileFilterAcuteBtn = document.getElementById('mobileFilterAcuteBtn');
+    const mobileCompareHospitalsBtn = document.getElementById('mobileCompareHospitalsBtn');
+
+    if (mobileViewSystemsBtn) {
+        mobileViewSystemsBtn.addEventListener('click', function() {
+            document.getElementById('viewSystemsBtn').click();
+            syncMobileViewButtons();
+        });
+    }
+
+    if (mobileViewIndividualsBtn) {
+        mobileViewIndividualsBtn.addEventListener('click', function() {
+            document.getElementById('viewIndividualsBtn').click();
+            syncMobileViewButtons();
+        });
+    }
+
+    if (mobileCompareHospitalsBtn) {
+        mobileCompareHospitalsBtn.addEventListener('click', function() {
+            document.getElementById('compareHospitalsBtn').click();
+            syncMobileViewButtons();
+        });
+    }
+
+    if (mobileFilterCriticalBtn) {
+        mobileFilterCriticalBtn.addEventListener('click', function() {
+            document.getElementById('filterCriticalBtn').click();
+            syncMobileFilterButtons();
+        });
+    }
+
+    if (mobileFilterAcuteBtn) {
+        mobileFilterAcuteBtn.addEventListener('click', function() {
+            document.getElementById('filterAcuteBtn').click();
+            syncMobileFilterButtons();
+        });
+    }
+
+    // Sync checkbox states
+    syncFilterInputs();
+}
+
+function syncMobileViewButtons() {
+    const viewSystemsBtn = document.getElementById('viewSystemsBtn');
+    const viewIndividualsBtn = document.getElementById('viewIndividualsBtn');
+    const compareHospitalsBtn = document.getElementById('compareHospitalsBtn');
+    const mobileViewSystemsBtn = document.getElementById('mobileViewSystemsBtn');
+    const mobileViewIndividualsBtn = document.getElementById('mobileViewIndividualsBtn');
+    const mobileCompareHospitalsBtn = document.getElementById('mobileCompareHospitalsBtn');
+    const individualOptions = document.getElementById('individualOptions');
+    const mobileIndividualOptions = document.getElementById('mobileIndividualOptions');
+
+    if (viewSystemsBtn && mobileViewSystemsBtn) {
+        if (viewSystemsBtn.classList.contains('active')) {
+            mobileViewSystemsBtn.classList.add('active');
+            mobileViewIndividualsBtn.classList.remove('active');
+            mobileCompareHospitalsBtn.classList.remove('active');
+            if (mobileIndividualOptions) mobileIndividualOptions.style.display = 'none';
+        } else if (viewIndividualsBtn.classList.contains('active')) {
+            mobileViewSystemsBtn.classList.remove('active');
+            mobileViewIndividualsBtn.classList.add('active');
+            mobileCompareHospitalsBtn.classList.remove('active');
+            if (mobileIndividualOptions) mobileIndividualOptions.style.display = 'block';
+        } else if (compareHospitalsBtn.classList.contains('active')) {
+            mobileViewSystemsBtn.classList.remove('active');
+            mobileViewIndividualsBtn.classList.remove('active');
+            mobileCompareHospitalsBtn.classList.add('active');
+            if (mobileIndividualOptions) mobileIndividualOptions.style.display = 'none';
+        }
+    }
+}
+
+function syncMobileFilterButtons() {
+    const filterCriticalBtn = document.getElementById('filterCriticalBtn');
+    const filterAcuteBtn = document.getElementById('filterAcuteBtn');
+    const mobileFilterCriticalBtn = document.getElementById('mobileFilterCriticalBtn');
+    const mobileFilterAcuteBtn = document.getElementById('mobileFilterAcuteBtn');
+
+    if (filterCriticalBtn && mobileFilterCriticalBtn) {
+        if (filterCriticalBtn.classList.contains('active')) {
+            mobileFilterCriticalBtn.classList.add('active');
+            mobileFilterAcuteBtn.classList.remove('active');
+        } else if (filterAcuteBtn.classList.contains('active')) {
+            mobileFilterCriticalBtn.classList.remove('active');
+            mobileFilterAcuteBtn.classList.add('active');
+        } else {
+            mobileFilterCriticalBtn.classList.remove('active');
+            mobileFilterAcuteBtn.classList.remove('active');
+        }
+    }
+}
+
+function toggleMobileFilters() {
+    const body = document.body;
+    const overlay = document.querySelector('.mobile-filter-overlay');
+    const panel = document.querySelector('.mobile-filter-panel');
+    
+    body.classList.toggle('mobile-filter-open');
+    overlay.style.display = body.classList.contains('mobile-filter-open') ? 'block' : 'none';
+    
+    setTimeout(() => {
+        panel.classList.toggle('active');
+        // Sync button states when opening
+        if (body.classList.contains('mobile-filter-open')) {
+            syncMobileViewButtons();
+            syncMobileFilterButtons();
+            syncFilterInputs();
+        }
+    }, 10);
+}
+
+function syncFilterInputs() {
+    // Sync checkbox states between mobile and desktop
+    const desktopCheckboxes = document.querySelectorAll('.sidebar input[type="checkbox"]');
+    const mobileCheckboxes = document.querySelectorAll('.mobile-filter-content input[type="checkbox"]');
+    
+    desktopCheckboxes.forEach((checkbox, index) => {
+        if (mobileCheckboxes[index]) {
+            mobileCheckboxes[index].checked = checkbox.checked;
+        }
+    });
+
+    // Sync input values
+    const zipInput = document.getElementById('zipInput');
+    const mobileZipInput = document.getElementById('mobileZipInput');
+    const radiusSelect = document.getElementById('radiusSelect');
+    const mobileRadiusSelect = document.getElementById('mobileRadiusSelect');
+
+    if (zipInput && mobileZipInput) {
+        mobileZipInput.value = zipInput.value;
+    }
+    if (radiusSelect && mobileRadiusSelect) {
+        mobileRadiusSelect.value = radiusSelect.value;
+    }
+}
+
+// ===============================
+// Mobile Map Functions
+// ===============================
+let mobileMap = null;
+let mobileMapMarkers = [];
+
+function initMobileMap(data) {
+    const mapDiv = document.getElementById('mobileMainMap');
+    if (!mapDiv) return;
+
+    if (!mobileMap) {
+        mobileMap = L.map('mobileMainMap').setView([32.7, -83.4], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(mobileMap);
+    }
+
+    updateMobileMapMarkers(data);
+}
+
+function updateMobileMapMarkers(data) {
+    // Clear old markers
+    mobileMapMarkers.forEach(marker => mobileMap.removeLayer(marker));
+    mobileMapMarkers = [];
+
+    if (data.length === 0) return;
+
+    // Add new markers
+    data.forEach(hospital => {
+        let lat = parseFloat(hospital.Latitude);
+        let lon = parseFloat(hospital.Longitude);
+
+        // If no coordinates, approximate from ZIP code
+        if ((!lat || !lon) && hospital.ZIP_Code) {
+            const [zipLat, zipLon] = getZipCoords(hospital.ZIP_Code);
+            lat = lat || zipLat;
+            lon = lon || zipLon;
+        }
+
+        if (!lat || !lon) return;
+
+        const overallScore = hospital.Overall_Star_Rating;
+        const stars = convertGradeToStars(overallScore);
+
+        const popupHTML = `
+            <div class="map-popup">
+                <strong>${hospital.Hospital_Name || 'Unnamed Hospital'}</strong><br>
+                ${hospital.City || ''}, ${hospital.State || ''}<br>
+                <div class="star-rating">${renderStars(stars.value)}</div>
+                <a href="details.html?id=${hospital.Hospital_ID}" class="view-full-detail">
+                    View Full Details
+                </a>
+            </div>
+        `;
+
+        const marker = L.marker([lat, lon]).addTo(mobileMap).bindPopup(popupHTML);
+        mobileMapMarkers.push(marker);
+    });
+
+    // Adjust map to fit all visible markers
+    if (mobileMapMarkers.length > 0) {
+        const group = L.featureGroup(mobileMapMarkers);
+        mobileMap.fitBounds(group.getBounds().pad(0.2));
+    }
+
+    // Ensure map is properly sized
+    setTimeout(() => {
+        if (mobileMap) {
+            mobileMap.invalidateSize();
+        }
+    }, 100);
+}
 
 // ===============================
 // Render Hospitals
 // ===============================
 function renderHospitals(data) {
-  const resultsTable = document.getElementById("hospitalResults");
-  const resultsCount = document.getElementById("resultsCount");
+    const resultsTable = document.getElementById('hospitalResults');
+    const resultsCount = document.getElementById('resultsCount');
 
-  // Clear old results
-  resultsTable.innerHTML = "";
+    // Clear old results
+    resultsTable.innerHTML = '';
 
-  // Update results count
-  resultsCount.textContent = `Viewing ${data.length} results`;
+    // Update results count
+    resultsCount.textContent = `Viewing ${data.length} results`;
 
-  if (!data.length) {
-    resultsTable.innerHTML = `
-      <tr>
-        <td colspan="4">No hospitals match the selected filters.</td>
-      </tr>
-    `;
-    return;
-  }
+    if (!data.length) {
+        resultsTable.innerHTML = `<tr><td colspan="3">No hospitals match the selected filters.</td></tr>`;
+        return;
+    }
 
-  // Helper to clamp numeric ratings to 0–5
-  const clampRating = (raw) => {
-    const n = Number(raw);
-    if (Number.isNaN(n)) return 0;
-    return Math.max(0, Math.min(5, n));
-  };
+    data.forEach(hospital => {
+        // Use numeric overall star rating
+        const overallScore = hospital.Overall_Star_Rating;
+        const stars = convertGradeToStars(overallScore);
 
-  data.forEach(hospital => {
-    // Use your new Hospital_ID as the primary id
-    const hid = String(
-      hospital.Hospital_ID ??
-      hospital.hospital_id ??
-      ""
-    );
+        // === Main Row ===
+        const row = document.createElement('tr');
+        row.classList.add('hospital-row');
 
-    // Overall star rating (0–5 numeric)
-    const overall = clampRating(hospital.Overall_Star_Rating);
+        const gradeCell = document.createElement('td');
+        gradeCell.innerHTML = `
+            <div class="star-rating" aria-label="${stars.value} out of 5 stars">
+                ${renderStars(stars.value)}
+            </div>
+        `;
+        row.appendChild(gradeCell);
 
-    // === Main Row ===
-    const row = document.createElement("tr");
-    row.classList.add("hospital-row");
-    if (hid) row.dataset.id = hid;
+        const nameCell = document.createElement('td');
+        nameCell.innerHTML = `
+            <strong>
+                <a href="details.html?id=${hospital.Hospital_ID}" class="hospital-link">
+                    ${hospital.Hospital_Name || 'Unnamed Hospital'}
+                </a>
+            </strong><br>
+            ${hospital.City || ''}, ${hospital.State || ''}
+        `;
+        row.appendChild(nameCell);
 
-    // Column 1: Overall grade stars
-    const gradeCell = document.createElement("td");
-    gradeCell.innerHTML = `
-      <div class="star-rating" aria-label="${overall} out of 5 stars">
-        ${renderStars(overall)}
-      </div>
-      <div class="overall-label">Overall score</div>
-    `;
-    row.appendChild(gradeCell);
+        // === Buttons ===
+        const buttonCell = document.createElement('td');
+        buttonCell.classList.add('details-buttons');
 
-    // Column 2: Hospital name + location
-    const nameCell = document.createElement("td");
+        const detailsButton = document.createElement('button');
+        detailsButton.textContent = 'View Details ▼';
+        detailsButton.classList.add('toggle-detail');
 
-    const name   = hospital.Hospital_Name || "Unnamed Hospital";
-    const city   = hospital.City || "";
-    const state  = hospital.State || "";
-    const zip    = hospital.ZIP_Code || "";
-    const county = hospital.County ? `${hospital.County} County` : "";
-    const addressLine = hospital.Street_Address
-      ? `${hospital.Street_Address}, ${city}, ${state} ${zip}`
-      : `${city}, ${state} ${zip}`.trim();
+        const fullDetailsButton = document.createElement('button');
+        fullDetailsButton.textContent = 'View Full Details';
+        fullDetailsButton.classList.add('view-full-detail');
+        fullDetailsButton.addEventListener('click', () => {
+            if (hospital.Hospital_ID != null) {
+                window.location.href = `details.html?id=${hospital.Hospital_ID}`;
+            } else {
+                showErrorPopup('Sorry, we couldn\'t find more details for this hospital.');
+            }
+        });
 
-    const detailsUrl = `details.html?id=${encodeURIComponent(hid)}`;
+        buttonCell.appendChild(detailsButton);
+        buttonCell.appendChild(fullDetailsButton);
+        row.appendChild(buttonCell);
 
-    nameCell.innerHTML = `
-      <div class="hospital-main">
-        <strong>
-          <a href="${detailsUrl}" class="hospital-link">
-            ${name}
-          </a>
-        </strong>
-        <div class="hospital-meta">
-          ${addressLine ? `<div class="hospital-address">${addressLine}</div>` : ""}
-          ${county ? `<div class="hospital-county">${county}</div>` : ""}
-        </div>
-      </div>
-    `;
-    row.appendChild(nameCell);
+        // === Detail Row (collapsed preview) ===
+        const detailRow = document.createElement('tr');
+        detailRow.classList.add('hospital-detail-row');
+        detailRow.style.display = 'none';
 
-    // Column 3: Accordion toggle + "Full details" button
-    const buttonCell = document.createElement("td");
-    buttonCell.classList.add("details-buttons");
+        const ftiScore = convertGradeToStars(hospital.FTIH_Category_Rating).value;
+        const cbsScore = convertGradeToStars(hospital.CBS_Category_Rating).value;
+        const habScore = convertGradeToStars(hospital.HAB_Category_Rating).value;
+        const hasrScore = convertGradeToStars(hospital.HASR_Category_Rating).value;
+        const overallPreviewScore = convertGradeToStars(hospital.Overall_Star_Rating).value;
 
-    const detailsButton = document.createElement("button");
-    detailsButton.type = "button";
-    detailsButton.textContent = "View Category Scores ▼";
-    detailsButton.classList.add("toggle-detail");
+        const detailCell = document.createElement('td');
+        detailCell.colSpan = 3;
+        detailCell.innerHTML = `
+            <div class="detail-info">
+                <p class="inline-stars"><strong>Financial Transparency & Institutional Health:</strong> ${renderStars(ftiScore)}</p>
+                <p class="inline-stars"><strong>Community Benefit Spending:</strong> ${renderStars(cbsScore)}</p>
+                <p class="inline-stars"><strong>Affordability & Billing:</strong> ${renderStars(habScore)}</p>
+                <p class="inline-stars"><strong>Access & Social Responsibility:</strong> ${renderStars(hasrScore)}</p>
+                <p class="inline-stars"><strong>Overall:</strong> ${renderStars(overallPreviewScore)}</p>
+            </div>
+        `;
+        detailRow.appendChild(detailCell);
 
-    const fullDetailsButton = document.createElement("button");
-    fullDetailsButton.type = "button";
-    fullDetailsButton.textContent = "Full details";
-    fullDetailsButton.classList.add("view-full-detail");
-    fullDetailsButton.addEventListener("click", () => {
-      if (hid) {
-        window.location.href = detailsUrl;
-      }
+        // === Toggle Logic (single listener) ===
+        detailsButton.addEventListener('click', () => {
+            const isHidden = detailRow.style.display === 'none' || detailRow.style.display === '';
+            detailRow.style.display = isHidden ? 'table-row' : 'none';
+            detailsButton.textContent = isHidden ? 'Hide Details ▲' : 'View Details ▼';
+        });
+
+        // === Append both rows ===
+        resultsTable.appendChild(row);
+        resultsTable.appendChild(detailRow);
     });
 
-    buttonCell.appendChild(detailsButton);
-    buttonCell.appendChild(fullDetailsButton);
-    row.appendChild(buttonCell);
-
-    // Column 4: Compare toggle (uses existing compareSet / localStorage)
-    const cmpCell = document.createElement("td");
-    const isSelected = compareSet && compareSet.has(hid);
-
-    cmpCell.innerHTML = `
-      <button
-        class="cmp-toggle js-compare-toggle"
-        type="button"
-        aria-pressed="${isSelected ? "true" : "false"}"
-        data-id="${hid}"
-        title="${isSelected ? "Selected for comparison" : "Select for comparison"}"
-      >
-        <!-- Outline = unselected -->
-        <svg class="cmp-icon cmp-icon--off" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0-2C6.6 2 3 5 3 9.5S6.6 17 11 17s8-3.6 8-7.5S15.4 2 11 2zm0 3a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z"/>
-        </svg>
-
-        <!-- Filled = selected -->
-        <svg class="cmp-icon cmp-icon--on" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15.5 14h-.79l-.28-.27A6.5 6.5 0 1 0 10.5 17a6.47 6.47 0 0 0 4.93-2.32l.27.28h.8l5 5-1.5 1.5-5-5zm-5 1.5C7.5 15.5 5 13 5 10s2.5-5 5.5-5 5.5 2.5 5.5 5-2.5 5.5-5.5 5.5z"/>
-        </svg>
-      </button>
-    `;
-    row.appendChild(cmpCell);
-
-    // === Accordion detail row with 4 main categories ===
-    const detailRow = document.createElement("tr");
-    detailRow.classList.add("hospital-detail-row");
-    detailRow.style.display = "none";
-
-    const detailCell = document.createElement("td");
-    detailCell.colSpan = 4;
-
-    const ftih = clampRating(hospital.FTIH_Category_Rating);
-    const cbs  = clampRating(hospital.CBS_Category_Rating);
-    const hab  = clampRating(hospital.HAB_Category_Rating);
-    const hasr = clampRating(hospital.HASR_Category_Rating);
-
-    detailCell.innerHTML = `
-      <div class="detail-info category-grid">
-        <div class="category-row">
-          <h4>Financial Transparency &amp; Institutional Health</h4>
-          <div class="category-stars">${renderStars(ftih)}</div>
-        </div>
-        <div class="category-row">
-          <h4>Community Benefit Spending</h4>
-          <div class="category-stars">${renderStars(cbs)}</div>
-        </div>
-        <div class="category-row">
-          <h4>Healthcare Affordability &amp; Billing</h4>
-          <div class="category-stars">${renderStars(hab)}</div>
-        </div>
-        <div class="category-row">
-          <h4>Healthcare Access &amp; Social Responsibility</h4>
-          <div class="category-stars">${renderStars(hasr)}</div>
-        </div>
-      </div>
-    `;
-    detailRow.appendChild(detailCell);
-
-    // Toggle accordion open/close
-    detailsButton.addEventListener("click", () => {
-      const isHidden =
-        detailRow.style.display === "none" ||
-        detailRow.style.display === "";
-
-      detailRow.style.display = isHidden ? "table-row" : "none";
-      detailsButton.textContent = isHidden
-        ? "Hide Category Scores ▲"
-        : "View Category Scores ▼";
-    });
-
-    // Append both rows to the table
-    resultsTable.appendChild(row);
-    resultsTable.appendChild(detailRow);
-  });
+    // Update mobile map
+    if (mobileMap) {
+        updateMobileMapMarkers(data);
+    }
 }
 
+// ===============================
+// View Toggle and Filter Buttons
+// ===============================
+const viewSystemsBtn = document.getElementById('viewSystemsBtn');
+const viewIndividualsBtn = document.getElementById('viewIndividualsBtn');
+const compareHospitalsBtn = document.getElementById('compareHospitalsBtn');
+const individualOptions = document.getElementById('individualOptions');
+const filterCriticalBtn = document.getElementById('filterCriticalBtn');
+const filterAcuteBtn = document.getElementById('filterAcuteBtn');
 
-// --- Mobile card renderer (for phones) ---
-function renderMobileCards(hospitals) {
-  const container = document.getElementById('results');
-  if (!container) return;
-  const list = Array.isArray(hospitals) ? hospitals : [];
-
-  container.innerHTML = list.map(h => `
-    <article class="result-card">
-      <header class="rc-head">
-        <h3 class="rc-title">${h.Name}</h3>
-        <div class="rc-meta">
-          <span class="rc-grade rc-grade-${String(h.TIER_1_GRADE_Lown_Composite || '').toLowerCase()}">
-			  ${h.TIER_1_GRADE_Lown_Composite ?? '—'}
-			</span>
-          <span class="rc-loc">${h.City || ''}, ${h.State || ''}</span>
-        </div>
-      </header>
-
-      <div class="rc-body">
-		<div class="star-rating" aria-label="${(h.Overall_Star_Rating ?? 0)} out of 5 stars">
-		  ${renderStars(h.Overall_Star_Rating ?? 0)}
-		  </div>
-		  <ul class="rc-metrics">
-			 <li><strong>Outcome:</strong> ${h.TIER_2_GRADE_Outcome ?? '—'}</li>
-			 <li><strong>Value:</strong> ${h.TIER_2_GRADE_Value ?? '—'}</li>
-			 <li><strong>Civic:</strong> ${h.TIER_2_GRADE_Civic ?? '—'}</li>
-			 <li><strong>Patient Experience:</strong> ${h.TIER_3_GRADE_Pat_Exp ?? '—'}</li>
-		  </ul>
-		</div>
-
-      <footer class="rc-foot">
-        <a class="btn btn-outline" href="details.html?id=${encodeURIComponent(h.RECORD_ID)}">View details</a>
-        <a class="btn btn-solid" href="details.html?id=${encodeURIComponent(h.RECORD_ID)}&tab=full">Full details</a>
-      </footer>
-    </article>
-  `).join('');
+function deactivateAllViewButtons() {
+    viewSystemsBtn.classList.remove('active');
+    viewIndividualsBtn.classList.remove('active');
+    compareHospitalsBtn.classList.remove('active');
 }
-
-// --- Use cards as the primary render and clear legacy table ---
-  const _renderHospitals = renderHospitals; // keep reference just in case
-  renderHospitals = function(list){
-    // render cards
-    renderMobileCards(list || []);
-    // update count
-    const countEl = document.getElementById('resultsCount');
-    if (countEl) countEl.textContent = `Viewing ${(list?.length)||0} results`;
-    // clear legacy table (keeps DOM but prevents double UI)
-    const tbody = document.getElementById('hospitalResults');
-    if (tbody) tbody.innerHTML = '';
-  };
-
-
-function toggleHospitalDetails(hospitalId, button) {
-  const existingRow = document.querySelector(`.details-row[data-id="${hospitalId}"]`);
-  if (existingRow) {
-    existingRow.remove(); // close if already open
-    return;
-  }
-
-  const hospital = hospitalData.find(h => h.RECORD_ID === hospitalId);
-  if (!hospital) {
-    console.error("Hospital not found:", hospitalId);
-    return;
-  }
-
-  const detailsRow = document.createElement("tr");
-  detailsRow.classList.add("details-row");
-  detailsRow.setAttribute("data-id", hospitalId);
-
-  detailsRow.innerHTML = `
-    <td colspan="3">
-      <div class="hospital-details-dropdown show">
-        <div class="details-grid">
-          ${renderGrades(hospital)}
-        </div>
-      </div>
-    </td>
-  `;
-
-  const currentRow = button.closest("tr");
-  currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
-}
-
-
-function renderGrades(hospital) {
-  const metrics = [
-    { key: "TIER_1_GRADE_Lown_Composite", label: "Tier 1 Composite" },
-    { key: "TIER_2_GRADE_Outcome", label: "Tier 2 Outcome" },
-    { key: "TIER_2_GRADE_Value", label: "Tier 2 Value" },
-    { key: "TIER_2_GRADE_Civic", label: "Tier 2 Civic" },
-    { key: "TIER_3_GRADE_Outcome", label: "Tier 3 Outcome" },
-    { key: "TIER_3_GRADE_Pat_Saf", label: "Tier 3 Patient Safety" },
-    { key: "TIER_3_GRADE_Pat_Exp", label: "Tier 3 Patient Experience" },
-    { key: "TIER_3_GRADE_OU", label: "Tier 3 Overuse" },
-    { key: "TIER_3_GRADE_Cost_Eff", label: "Tier 3 Cost Efficiency" },
-    { key: "TIER_3_GRADE_Exec_Comp", label: "Tier 3 Exec Comp" },
-    { key: "TIER_3_GRADE_CB", label: "Tier 3 Community Benefit" },
-    { key: "TIER_3_GRADE_Inclusivity", label: "Tier 3 Inclusivity" }
-  ];
-
-  return metrics.map(m => {
-	  const grade = hospital[m.key] || "N/A";
-	  const stars = convertGradeToStars(grade);
-	  return `
-		<div class="details-section">
-		  <h4>${m.label}</h4>
-		  <div class="star-rating" aria-label="${stars.value} out of 5 stars (Grade ${grade})">
-			${renderStars(stars.value)}
-			<span class="sr-only">${stars.value} out of 5 stars (Grade ${grade})</span>
-		  </div>
-		</div>
-	  `;
-	}).join("");
-
-}
-
-
-
-const viewSystemsBtn = document.getElementById("viewSystemsBtn");
-const viewIndividualsBtn = document.getElementById("viewIndividualsBtn");
-const individualOptions = document.getElementById("individualOptions");
-
-const filterCriticalBtn = document.getElementById("filterCriticalBtn");
-const filterAcuteBtn = document.getElementById("filterAcuteBtn");
 
 function deactivateHospitalTypeButtons() {
-  filterCriticalBtn.classList.remove("active");
-  filterAcuteBtn.classList.remove("active");
+    filterCriticalBtn.classList.remove('active');
+    filterAcuteBtn.classList.remove('active');
 }
 
+// View Systems toggle
+viewSystemsBtn.addEventListener('click', () => {
+    deactivateAllViewButtons();
+    viewSystemsBtn.classList.add('active');
+    individualOptions.style.display = 'none';
+    applyAllFilters();
+});
+
+// View Individuals toggle
+viewIndividualsBtn.addEventListener('click', () => {
+    deactivateAllViewButtons();
+    viewIndividualsBtn.classList.add('active');
+    individualOptions.style.display = 'block';
+    applyAllFilters();
+});
+
+// Compare Hospitals toggle
+compareHospitalsBtn.addEventListener('click', () => {
+    deactivateAllViewButtons();
+    compareHospitalsBtn.classList.add('active');
+    individualOptions.style.display = 'none';
+    // Redirect to compare page
+    window.location.href = 'compare.html';
+});
+
 // Critical Access toggle
-filterCriticalBtn.addEventListener("click", () => {
-  const isActive = filterCriticalBtn.classList.contains("active");
-
-  deactivateHospitalTypeButtons();
-  if (!isActive) {
-    filterCriticalBtn.classList.add("active");
-  }
-
-  console.log("Hospital type selected:", getSelectedHospitalType());
+filterCriticalBtn.addEventListener('click', () => {
+    const isActive = filterCriticalBtn.classList.contains('active');
+    deactivateHospitalTypeButtons();
+    if (!isActive) {
+        filterCriticalBtn.classList.add('active');
+    }
+    applyAllFilters();
 });
 
 // Acute Care toggle
-filterAcuteBtn.addEventListener("click", () => {
-  const isActive = filterAcuteBtn.classList.contains("active");
-
-  deactivateHospitalTypeButtons();
-  if (!isActive) {
-    filterAcuteBtn.classList.add("active");
-  }
-
-  console.log("Hospital type selected:", getSelectedHospitalType());
+filterAcuteBtn.addEventListener('click', () => {
+    const isActive = filterAcuteBtn.classList.contains('active');
+    deactivateHospitalTypeButtons();
+    if (!isActive) {
+        filterAcuteBtn.classList.add('active');
+    }
+    applyAllFilters();
 });
 
 // Helper function to get current selection
 function getSelectedHospitalType() {
-  if (filterCriticalBtn.classList.contains("active")) return "Critical Access";
-  if (filterAcuteBtn.classList.contains("active")) return "Acute Care";
-  return null;
+    if (filterCriticalBtn.classList.contains('active')) return 'Critical Access';
+    if (filterAcuteBtn.classList.contains('active')) return 'Acute Care';
+    return null;
 }
 
-viewSystemsBtn.addEventListener("click", () => {
-  viewSystemsBtn.classList.add("active");
-  viewIndividualsBtn.classList.remove("active");
-  individualOptions.style.display = "none";
-
-  console.log("View set to: Hospital Systems");
-  // TODO: Implement system-level rendering
-  renderHospitals(hospitalData); // placeholder
+// ===============================
+// Apply Location Button
+// ===============================
+document.getElementById('applyLocationBtn').addEventListener('click', () => {
+    applyAllFilters();
 });
 
-viewIndividualsBtn.addEventListener("click", () => {
-  viewIndividualsBtn.classList.add("active");
-  viewSystemsBtn.classList.remove("active");
-  individualOptions.style.display = "block";
+// ===============================
+// Main Filter Function
+// ===============================
+function applyAllFilters() {
+    let filtered = [...hospitalData];
 
-  console.log("View set to: Individual Hospitals");
-  // TODO: Implement individual rendering with critical/acute filtering
-  renderHospitals(hospitalData); // placeholder
-});
+    // Apply hospital type filters (map to Care_Level)
+    const selectedHospitalType = getSelectedHospitalType();
+    if (selectedHospitalType === 'Critical Access') {
+        // Approximated as primary/small hospitals in this schema
+        filtered = filtered.filter(hospital => hospital.Care_Level === 'Primary');
+    } else if (selectedHospitalType === 'Acute Care') {
+        filtered = filtered.filter(hospital => hospital.Care_Level === 'Acute Care');
+    }
 
+    // Apply checkbox filters
+    const checked = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+    
+    if (checked.length > 0) {
+        filtered = filtered.filter(hospital => {
+            return checked.every(val => {
+                switch(val) {
+                    case 'Urban':
+                        return hospital.Urban_Rural === 'Urban';
+                    case 'Rural':
+                        return hospital.Urban_Rural === 'Rural';
+                    case 'Non-profit':
+                        return hospital.Ownership_Type === 'Non-profit' || hospital.Ownership_Type === 'Nonprofit';
+                    case 'For Profit':
+                        return hospital.Ownership_Type === 'For Profit' || hospital.Ownership_Type === 'For-profit';
+                    // The remaining categories (Church Affiliated, Academic Medical Center, Safety Net)
+                    // are not explicit in this schema, so we fall back to a text search.
+                    case 'Church Affiliated':
+                    case 'Academic Medical Center':
+                    case 'Safety Net':
+                        return JSON.stringify(hospital).toLowerCase().includes(val.toLowerCase());
+                    default:
+                        return JSON.stringify(hospital).toLowerCase().includes(val.toLowerCase());
+                }
+            });
+        });
+    }
+
+    // Apply location filter
+    const zip = document.getElementById('zipInput').value.trim();
+    const radius = document.getElementById('radiusSelect').value;
+    
+    if (zip && /^\d{5}$/.test(zip)) {
+        const coords = getZipCoords(zip);
+        filtered = filtered.filter(hospital => {
+            let lat = parseFloat(hospital.Latitude);
+            let lon = parseFloat(hospital.Longitude);
+
+            if ((!lat || !lon) && hospital.ZIP_Code) {
+                const [zipLat, zipLon] = getZipCoords(hospital.ZIP_Code);
+                lat = lat || zipLat;
+                lon = lon || zipLon;
+            }
+
+            if (!lat || !lon) return false;
+
+            const distance = calculateDistance(coords[0], coords[1], lat, lon);
+            return distance <= parseInt(radius);
+        });
+    }
+
+    filteredHospitalData = filtered;
+
+    // Apply sorting and render
+    sortAndRender(filteredHospitalData);
+    updateMapMarkers(filteredHospitalData);
+    updateMobileMapMarkers(filteredHospitalData);
+}
+
+// ===============================
+// Distance Calculation
+// ===============================
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 3959; // Earth's radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// ===============================
+// Sorting Function
+// ===============================
 function sortAndRender(data) {
-  const sortValue = document.getElementById("sortSelect").value;
+    const sortValue = document.getElementById('sortSelect').value;
+    let sorted = [...data];
 
-  let sorted = [...data];
+    if (sortValue === 'grade') {
+        // Sort by numeric overall star rating (high to low)
+        sorted.sort((a, b) => {
+            const aScore = typeof a.Overall_Star_Rating === 'number' ? a.Overall_Star_Rating : -1;
+            const bScore = typeof b.Overall_Star_Rating === 'number' ? b.Overall_Star_Rating : -1;
+            return bScore - aScore;
+        });
+    } else if (sortValue === 'distance') {
+        // Distance sorting handled in applyAllFilters
+    } else if (sortValue === 'name') {
+        sorted.sort((a, b) => (a.Hospital_Name || '').localeCompare(b.Hospital_Name || ''));
+    } else if (sortValue === 'size') {
+        // Sort by Size_Group (XS < S < M < L < XL < XXL)
+        const sizeOrder = {
+            'XS': 1,
+            'S': 2,
+            'M': 3,
+            'L': 4,
+            'XL': 5,
+            'XXL': 6
+        };
+        sorted.sort((a, b) => {
+            const sizeA = sizeOrder[a.Size_Group] || 0;
+            const sizeB = sizeOrder[b.Size_Group] || 0;
+            return sizeA - sizeB; // Small to large
+        });
+    }
 
-  if (sortValue === "grade") {
-    sorted.sort((a, b) => {
-      const gradeA = a.TIER_1_GRADE_Lown_Composite || "F";
-      const gradeB = b.TIER_1_GRADE_Lown_Composite || "F";
-      return gradeA.localeCompare(gradeB); // or reverse it if needed
-    });
-  } else if (sortValue === "distance") {
-    sorted.sort((a, b) => {
-      return (a.distance || 99999) - (b.distance || 99999); // assumes `.distance` was set by ZIP logic
-    });
-  } else if (sortValue === "name") {
-    sorted.sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
-  }
-    else if (sortValue === "size") {
-    const sizeOrder = ["Small", "Medium", "Large", "Extra Large"];
-
-    sorted.sort((a, b) => {
-      const sizeA = a.Size || "";
-      const sizeB = b.Size || "";
-      const indexA = sizeOrder.indexOf(sizeA) !== -1 ? sizeOrder.indexOf(sizeA) : 999;
-      const indexB = sizeOrder.indexOf(sizeB) !== -1 ? sizeOrder.indexOf(sizeB) : 999;
-      return indexA - indexB;
-    });
-  }
-
-
-  renderHospitals(sorted);
+    renderHospitals(sorted);
 }
 
 // ===============================
-// Apply Filters
+// Apply Filters Button
 // ===============================
-document.getElementById("applyFiltersBtn").addEventListener("click", () => {
-  const zip = document.getElementById("zipInput").value.trim();
-  const radius = document.getElementById("radiusSelect").value;
-  const checked = [...document.querySelectorAll("input[type='checkbox']:checked")].map(cb => cb.value);
-
-  console.log("ZIP:", zip, "Radius:", radius);
-  console.log("Selected Filters:", checked);
-
-  // TODO: Real filtering logic (hook into fields in JSON)
-  let filtered = hospitalData.filter(h => {
-    return checked.every(val =>
-      JSON.stringify(h).toLowerCase().includes(val.toLowerCase())
-    );
-  });
-
-  renderHospitals(filtered);
-  initHospitalMap(filtered);
-
+document.getElementById('applyFiltersBtn').addEventListener('click', () => {
+    applyAllFilters();
 });
 
 // ===============================
 // Reset Filters
 // ===============================
-document.getElementById("resetFiltersBtn").addEventListener("click", () => {
-  document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
-  document.getElementById("zipInput").value = "";
-  document.getElementById("radiusSelect").selectedIndex = 0;
-  console.log("Filters reset");
+function resetAllFilters() {
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.getElementById('zipInput').value = '';
+    document.getElementById('radiusSelect').selectedIndex = 0;
 
-  renderHospitals(hospitalData);
+    // Reset view buttons
+    deactivateAllViewButtons();
+    deactivateHospitalTypeButtons();
+
+    // Reset to all data
+    filteredHospitalData = [...hospitalData];
+    renderHospitals(hospitalData);
+    updateMapMarkers(hospitalData);
+    updateMobileMapMarkers(hospitalData);
+}
+
+document.getElementById('resetFiltersBtn').addEventListener('click', resetAllFilters);
+
+// ===============================
+// Sort Event Listener
+// ===============================
+document.getElementById('sortSelect').addEventListener('change', () => {
+    sortAndRender(filteredHospitalData);
 });
 
 // ===============================
-// Download Data (Stub)
+// Download Data
 // ===============================
-document.getElementById("downloadDataBtn").addEventListener("click", () => {
-  console.log("Download triggered");
-  // TODO: backend or SheetJS export
+document.getElementById('downloadDataBtn').addEventListener('click', () => {
+    console.log('Download triggered');
+    // TODO: backend or SheetJS export
 });
 
-function showHospitalDetailPage(hospitalId) {
-    document.querySelector('.main-content').style.display = 'none';
-    document.querySelector('.map-section').style.display = 'none';
+// ===============================
+// Map Functions
+// ===============================
+let map = null;
+let mapMarkers = [];
 
-    const hospital = hospitalData.find(h => h.RECORD_ID == hospitalId);
-
-    if (!hospital) {
-        window.location.href = window.location.pathname;
+function initHospitalMap(data) {
+    const mapDiv = document.getElementById('mainMap');
+    if (!mapDiv) {
+        console.error('Map container not found!');
         return;
     }
 
-    const detailContainer = document.createElement('div');
-    detailContainer.className = 'hospital-detail-container';
+    // Initialize map only once
+    if (!map) {
+        console.log('Initializing map...');
+        map = L.map('mainMap').setView([32.7, -83.4], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+        console.log('Map initialized successfully');
+    }
 
-    const gradeClass = `grade-${hospital.TIER_1_GRADE_Lown_Composite}`;
+    updateMapMarkers(data);
+}
 
-    const lat = 32.6782 + (Math.random() - 0.5) * 2;
-    const lng = -83.2226 + (Math.random() - 0.5) * 2;
+function updateMapMarkers(data) {
+    console.log('Updating map markers with', data.length, 'hospitals');
 
-    detailContainer.innerHTML = `
-        <div class="hospital-header">
-            <h2>${hospital.HOSPITAL_NAME}</h2>
-            <span class="hospital-grade ${gradeClass}">${hospital.TIER_1_GRADE_Lown_Composite}</span>
-        </div>
-        <p><strong>Location:</strong> ${hospital.CITY}, ${hospital.STATE}</p>
-        <p><strong>Type:</strong> ${hospital.HOSPITAL_TYPE}</p>
-        <p><strong>Ownership:</strong> ${hospital.OWNERSHIP}</p>
-        <p><strong>System Name:</strong> ${hospital.SYSTEM_NAME}</p>
-        <p><strong>Zip Code:</strong> ${hospital.ZIP_CODE}</p>
-        <button onclick="window.location.reload()">Back to Results</button>
-    `;
+    // Clear old markers
+    mapMarkers.forEach(marker => map.removeLayer(marker));
+    mapMarkers = [];
 
-    document.body.appendChild(detailContainer);
+    if (data.length === 0) {
+        console.log('No data to display on map');
+        return;
+    }
+
+    // Add new markers
+    data.forEach(hospital => {
+        let lat = parseFloat(hospital.Latitude);
+        let lon = parseFloat(hospital.Longitude);
+
+        // If no coordinates, approximate from ZIP code
+        if ((!lat || !lon) && hospital.ZIP_Code) {
+            const [zipLat, zipLon] = getZipCoords(hospital.ZIP_Code);
+            lat = lat || zipLat;
+            lon = lon || zipLon;
+        }
+
+        if (!lat || !lon) {
+            console.warn('No coordinates for hospital:', hospital.Hospital_Name);
+            return;
+        }
+
+        const overallScore = hospital.Overall_Star_Rating;
+        const stars = convertGradeToStars(overallScore);
+
+        const popupHTML = `
+            <div class="map-popup">
+                <strong>${hospital.Hospital_Name || 'Unnamed Hospital'}</strong><br>
+                ${hospital.City || ''}, ${hospital.State || ''}<br>
+                <div class="star-rating">${renderStars(stars.value)}</div>
+                <a href="details.html?id=${hospital.Hospital_ID}" class="view-full-detail">
+                    View Full Details
+                </a>
+            </div>
+        `;
+
+        const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
+        mapMarkers.push(marker);
+    });
+
+    console.log('Added', mapMarkers.length, 'markers to map');
+
+    // Adjust map to fit all visible markers
+    if (mapMarkers.length > 0) {
+        const group = L.featureGroup(mapMarkers);
+        map.fitBounds(group.getBounds().pad(0.2));
+        console.log('Map bounds adjusted to fit markers');
+    }
+
+    // Ensure map is properly sized
+    setTimeout(() => {
+        map.invalidateSize();
+        console.log('Map size invalidated');
+    }, 100);
+}
+
+// ===============================
+// ZIP-Based Coordinate Approximation
+// ===============================
+function getZipCoords(zip) {
+    const lookup = {
+        '30303': [33.7525, -84.3915], // Atlanta
+        '30606': [33.9597, -83.3764], // Athens
+        '31404': [32.0760, -81.0886], // Savannah
+        '31533': [31.5185, -82.8499], // Douglas
+        '30553': [34.3434, -83.8003], // Lavonia
+        '30720': [34.7698, -84.9719], // Dalton
+        '31201': [32.8306, -83.6513], // Macon
+        '31901': [32.464, -84.9877], // Columbus
+        '31401': [32.0809, -81.0912], // Savannah
+        '31701': [31.5795, -84.1557], // Albany
+        '39817': [30.9043, -84.5762], // Bainbridge
+        '30161': [34.2546, -85.1647], // Rome
+        '30501': [34.2963, -83.8255], // Gainesville
+        '30117': [33.5801, -85.0767], // Carrollton
+        '31093': [32.6184, -83.6272], // Warner Robins
+        '31405': [32.0316, -81.1028], // Savannah
+        '31021': [32.5563, -82.8947], // Dublin
+        '31792': [30.8365, -83.9787] // Thomasville
+    };
+
+    const coords = lookup[String(zip)] || [32.5, -83.5]; // Default to central Georgia
+    return coords;
 }
 
 // ===============================
 // Star Rating Utilities
 // ===============================
-function convertGradeToStars(grade) {
-  const gradeMap = {
-    "A+": 5,
-    "A": 5,
-    "A-": 4.5,
-    "B+": 4.5,
-    "B": 4,
-    "B-": 3.5,
-    "C+": 3.5,
-    "C": 3,
-    "C-": 2.5,
-    "D+": 2.5,
-    "D": 2,
-    "D-": 1.5,
-    "F": 1,
-  };
-  const value = gradeMap[grade.trim()] || 0;
-  return { value };
+// Now expects numeric 0–5 scores from the dataset
+function convertGradeToStars(score) {
+    let value = parseFloat(score);
+    if (isNaN(value)) value = 0;
+    // Clamp between 0 and 5
+    value = Math.max(0, Math.min(5, value));
+    return { value };
 }
 
 function renderStars(value) {
-  let html = "";
-  for (let i = 1; i <= 5; i++) {
-    if (value >= i) {
-      html += fullStarSVG();
-    } else if (value >= i - 0.5) {
-      html += halfStarSVG();
-    } else {
-      html += emptyStarSVG();
+    let html = '';
+
+    for (let i = 1; i <= 5; i++) {
+        if (value >= i) {
+            html += fullStarSVG();
+        } else if (value >= i - 0.5) {
+            html += halfStarSVG();
+        } else {
+            html += emptyStarSVG();
+        }
     }
-  }
-  return html;
+
+    return html;
 }
 
 function fullStarSVG() {
-  return `
-    <svg class="star full" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
-    </svg>
-  `;
+    return `
+        <svg class="star full" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+        </svg>
+    `;
 }
 
 function halfStarSVG() {
-  return `
-    <svg class="star half" viewBox="0 0 24 24" aria-hidden="true">
-      <defs>
-        <linearGradient id="halfGradient" x1="0" x2="1">
-          <stop offset="50%" stop-color="#f48810" />
-          <stop offset="50%" stop-color="#a4cc95" />
-        </linearGradient>
-      </defs>
-      <path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
-    </svg>
-  `;
+    return `
+        <svg class="star half" viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+                <linearGradient id="halfGradient" x1="0" x2="1">
+                    <stop offset="50%" stop-color="#f48810" />
+                    <stop offset="50%" stop-color="#a4cc95" />
+                </linearGradient>
+            </defs>
+            <path fill="url(#halfGradient)" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+        </svg>
+    `;
 }
 
 function emptyStarSVG() {
-  return `
-    <svg class="star empty" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
-    </svg>
-  `;
-}
-
-// ===============================
-// Leaflet Map Integration
-// ===============================
-let map; // Global map instance so we can reuse it
-let mapMarkers = []; // Store current markers to clear them later
-
-// ===============================
-// ZIP-Based Coordinate Approximation (for hospitals without lat/lon)
-// ===============================
-function getZipCoords(zip) {
-  const baseLat = 31.0;   // southern edge of Georgia
-  const baseLon = -85.5;  // western edge of Georgia
-  const zipNum = parseInt(String(zip).replace(/\D/g, "")) || 30000;
-
-  // Spread zip codes somewhat evenly across the state
-  const offsetLat = ((zipNum % 300) / 100) * 0.8; // 0–2.4° northward variation
-  const offsetLon = ((zipNum % 700) / 100) * 0.8; // 0–2.4° eastward variation
-
-  return [baseLat + offsetLat, baseLon + offsetLon];
-}
-
-function initHospitalMap(data) {
-  const mapDiv = document.getElementById("mainMap");
-  if (!mapDiv) return;
-
-  // Initialize only once
-	if (!map) {
-	  map = L.map("mainMap").setView([32.7, -83.4], 7); // centered around Georgia
-	  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-		attribution: "&copy; OpenStreetMap contributors"
-	  }).addTo(map);
-	}
-
-  // Clear old markers
-  mapMarkers.forEach(marker => map.removeLayer(marker));
-  mapMarkers = [];
-
-  // Add new markers
-  data.forEach(hospital => {
-    // Try all common latitude/longitude field names
-	let lat =
-	  parseFloat(hospital.Latitude) ||
-	  parseFloat(hospital.LAT) ||
-	  parseFloat(hospital.lat) ||
-	  parseFloat(hospital.latitude);
-	let lon =
-	  parseFloat(hospital.Longitude) ||
-	  parseFloat(hospital.LON) ||
-	  parseFloat(hospital.lon) ||
-	  parseFloat(hospital.longitude);
-
-	// If no coordinates, approximate from ZIP code
-	if ((!lat || !lon) && hospital.Zip) {
-	  [lat, lon] = getZipCoords(hospital.Zip);
-	}
-	if (!lat || !lon) return; // Skip entries missing coordinates
-
-    const grade = hospital.TIER_1_GRADE_Lown_Composite || "N/A";
-    const stars = convertGradeToStars(grade);
-
-    const popupHTML = `
-      <strong>${hospital.HOSPITAL_NAME || hospital.Name}</strong><br>
-      ${hospital.CITY || ""}, ${hospital.STATE || ""}<br>
-      <div class="star-rating">${renderStars(stars.value)}</div>
-      <a href="details.html?id=${hospital.RECORD_ID}" target="_blank" class="view-full-detail">
-        View Full Details
-      </a>
+    return `
+        <svg class="star empty" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
+        </svg>
     `;
-
-    const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
-    mapMarkers.push(marker);
-  });
-
-  // Adjust map to fit all visible markers
-  if (mapMarkers.length > 0) {
-    const group = L.featureGroup(mapMarkers);
-    map.fitBounds(group.getBounds().pad(0.2));
-  } else {
-    // Reset to Georgia default if no markers
-    map.setView([32.1656, -82.9001], 7);
-  }
-  
-  setTimeout(() => {
-  map.invalidateSize();
-	}, 200);
 }
 
 // ===============================
 // Error Popup Utility
 // ===============================
 function showErrorPopup(message) {
-  const popup = document.createElement("div");
-  popup.className = "error-popup";
-  popup.innerHTML = `<p>${message}</p>`;
-  document.body.appendChild(popup);
+    const popup = document.createElement('div');
+    popup.className = 'error-popup';
+    popup.innerHTML = `<p>${message}</p>`;
+    document.body.appendChild(popup);
 
-  // Animate fade-in
-  setTimeout(() => popup.classList.add("visible"), 10);
-
-  // Auto-remove after 4 seconds
-  setTimeout(() => {
-    popup.classList.remove("visible");
-    setTimeout(() => popup.remove(), 400);
-  }, 4000);
+    setTimeout(() => popup.classList.add('visible'), 10);
+    setTimeout(() => {
+        popup.classList.remove('visible');
+        setTimeout(() => popup.remove(), 400);
+    }, 4000);
 }
-
-// === Compare state ===
-const COMPARE_KEY = 'gw_compare_ids';
-let compareSet;
-try { compareSet = new Set(JSON.parse(localStorage.getItem(COMPARE_KEY) || '[]')); }
-catch { compareSet = new Set(); }
-
-const openCompareBtn = document.getElementById('openCompare');
-
-function saveCompare(){ localStorage.setItem(COMPARE_KEY, JSON.stringify([...compareSet])); }
-function updateCompareBtn(){
-  if (!openCompareBtn) return;
-  const n = compareSet.size;
-  openCompareBtn.textContent = `Compare (${n})`;
-  openCompareBtn.disabled = n === 0;
-}
-updateCompareBtn();
-
-if (openCompareBtn){
-  openCompareBtn.addEventListener('click', ()=>{
-    const ids = [...compareSet].join(',');
-    window.location.href = `comparison.html?ids=${encodeURIComponent(ids)}`;
-  });
-}
-
-// Delegate clicks for the magnifying-glass toggle
-document.getElementById('hospitalResults').addEventListener('click', (e) => {
-  const btn = e.target.closest('.js-compare-toggle');
-  if (!btn) return;
-
-  const id = String(btn.dataset.id || '');
-  if (!id) return;
-
-  const willSelect = btn.getAttribute('aria-pressed') === 'false';
-
-  if (willSelect) {
-    if (compareSet.size >= 3) {
-      // bounce
-      btn.blur();
-      return;
-    }
-    compareSet.add(id);
-    btn.setAttribute('aria-pressed', 'true');
-    btn.title = 'Selected for comparison';
-  } else {
-    compareSet.delete(id);
-    btn.setAttribute('aria-pressed', 'false');
-    btn.title = 'Select for comparison';
-  }
-
-  saveCompare();
-  updateCompareBtn();
-});

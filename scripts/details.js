@@ -118,9 +118,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 h["Servcies_Offered"]; // as per schema note
             
             if (typeof rawServices === "string" && rawServices.trim() && rawServices.toUpperCase() !== "NULL") {
-                const parsed = rawServices.split(",").map(s => s.trim()).filter(Boolean);
-                if (parsed.length) services = parsed;
-            } else if (Array.isArray(rawServices) && rawServices.length) {
+				const parsed = rawServices
+					// split on commas, semicolons, pipes, or line breaks
+					.split(/[,;\n\r|]+/)
+					.map(s => s.trim())
+					.filter(Boolean);
+
+				if (parsed.length) services = parsed;
+			} else if (Array.isArray(rawServices) && rawServices.length) {
                 services = rawServices.map(s => String(s).trim()).filter(Boolean);
             }
             
@@ -156,6 +161,43 @@ document.addEventListener("DOMContentLoaded", async () => {
             el.innerHTML = renderStars(starVal, `${score} of 5`);
         }
         
+		
+		// ===== Metric-level stars (numeric 0–5) =====
+		const metricFieldMap = {
+			// Financial Transparency & Institutional Health
+			balanceGrowthStars:   "Balance_Growth",
+			transparencyStars:    "Transparency",
+			fiscalHealthStars:    "Fiscal_Health",
+			staffingStars:        "Staffing",
+
+			// Community Benefit Spending
+			taxBenefitStars:      "Tax_Benefit",
+			qualityCbsStars:      "Quality_of_CBS",
+			strategicUseStars:    "Strategic_Use",
+
+			// Healthcare Affordability & Billing
+			financialBurdenStars: "Financial_Burden",
+			charityCareStars:     "Charity_Care",
+			medicalDebtStars:     "Medical_Debt",
+
+			// Healthcare Access & Social Responsibility
+			rangeServicesStars:    "Range_of_Services",
+			demoAlignStars:        "Demographic_Alignment",
+			workforceTrainingStars:"Workforce_Training",
+			payEquityStars:        "Pay_Equity_Ratio"
+		};
+
+		for (const [id, field] of Object.entries(metricFieldMap)) {
+			const el = document.getElementById(id);
+			if (!el) continue;
+
+			const raw = h[field];
+			const score = parseFloat(raw);
+			const starVal = convertGradeToStars(score).value;
+
+			el.innerHTML = renderStars(starVal, `${score} of 5`);
+		}
+
         // ===== Map =====
         const mapDiv = document.getElementById("leafletMap");
         if (mapDiv) {

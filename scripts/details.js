@@ -3,6 +3,12 @@
 // Updated for 2025 GW numeric dataset
 // =======================================
 document.addEventListener("DOMContentLoaded", async () => {
+	
+	if (typeof initMobileNavigation === "function") {
+        initMobileNavigation();
+    }
+	
+
     const params = new URLSearchParams(window.location.search);
     const hospitalId = params.get("id");
     

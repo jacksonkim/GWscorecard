@@ -554,7 +554,7 @@ Detail Page Styles
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 4px;
-    padding: 8px 0;
+    padding: 8px 20;
 }
 
 .detail-topbar .btn.back {
@@ -864,9 +864,18 @@ Methodology Page Styles
     margin: 0 auto 20px;
 }
 
+#compareHospitalsBtn.toggle-btn {
+    background: #f48810;
+}
+
+#compareHospitalsBtn.toggle-btn:hover {
+    background: #d9740e;
+}
+
+
 .btn-download {
     display: inline-block;
-    background: #6fb353;
+    background: #f48810;
     color: #fff;
     padding: 12px 24px;
     border-radius: 6px;
@@ -876,7 +885,7 @@ Methodology Page Styles
 }
 
 .btn-download:hover {
-    background: #5aa345;
+    background: #d9740e;
 }
 
 .btn-download[aria-disabled="true"] {

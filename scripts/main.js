@@ -354,9 +354,20 @@ function updateMobileMapMarkers(data) {
     });
 
     if (mobileMapMarkers.length > 0) {
-        const group = L.featureGroup(mobileMapMarkers);
-        mobileMap.fitBounds(group.getBounds().pad(0.2));
-    }
+		const group = L.featureGroup(mobileMapMarkers);
+		const bounds = group.getBounds().pad(0.2);
+
+		// Get the desktop map's current zoom + center
+		if (map) {
+			const center = map.getCenter();
+			const zoom = map.getZoom();
+			mobileMap.setView(center, zoom);
+		} else {
+			// fallback: desktop wasn't initialized yet
+			mobileMap.fitBounds(bounds);
+		}
+	}
+
 
     setTimeout(() => {
         if (mobileMap) {
@@ -562,6 +573,8 @@ document.getElementById('applyLocationBtn').addEventListener('click', () => {
 // ===============================
 function applyAllFilters() {
     let filtered = [...hospitalData];
+	
+	
 
     // Apply hospital type filters (map to Care_Level)
     const selectedHospitalType = getSelectedHospitalType();
@@ -599,6 +612,8 @@ function applyAllFilters() {
             });
         });
     }
+	
+	filtered = filterByZipAndRadius(filtered);
 
     // Apply location filter
     const zip = document.getElementById('zipInput').value.trim();
@@ -683,6 +698,61 @@ function sortAndRender(data) {
 
     renderHospitals(sorted);
 }
+
+function filterByZipAndRadius(hospitals) {
+    const zipInput = document.getElementById('zipInput');
+    const radiusSelect = document.getElementById('radiusSelect');
+
+    if (!zipInput || !radiusSelect) return hospitals;
+
+    const zip = zipInput.value.trim();
+    const radiusMiles = Number(radiusSelect.value);
+
+    if (!zip || Number.isNaN(radiusMiles)) {
+        return hospitals; // no filtering
+    }
+
+    // Convert ZIP → coords
+    const [zipLat, zipLon] = getZipCoords(zip);
+
+    if (!zipLat || !zipLon) {
+        console.warn("ZIP lookup failed:", zip);
+        return hospitals;
+    }
+
+    // Haversine distance between two lat/lon pairs
+    function distanceMiles(lat1, lon1, lat2, lon2) {
+        const R = 3958.8; // earth radius in miles
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+            Math.sin(dLat/2) ** 2 +
+            Math.cos(lat1*Math.PI/180) *
+            Math.cos(lat2*Math.PI/180) *
+            Math.sin(dLon/2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // Filter hospitals by distance
+    return hospitals.filter(h => {
+        let lat = Number(h.Latitude);
+        let lon = Number(h.Longitude);
+
+        // Use ZIP fallback if missing coords
+        if ((Number.isNaN(lat) || Number.isNaN(lon)) && h.ZIP_Code) {
+            const [zLat, zLon] = getZipCoords(h.ZIP_Code);
+            lat = zLat;
+            lon = zLon;
+        }
+
+        if (Number.isNaN(lat) || Number.isNaN(lon)) return false;
+
+        const dist = distanceMiles(zipLat, zipLon, lat, lon);
+        return dist <= radiusMiles;
+    });
+}
+
 
 // ===============================
 // Apply Filters Button

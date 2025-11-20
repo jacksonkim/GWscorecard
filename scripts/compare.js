@@ -417,27 +417,14 @@ function createHospitalInfoRow() {
         } else {
             const name = getHospitalShortName(h);
 
-            // Try a few possible field names for beds, etc.
-            const beds =
-                h.Beds ||
-                h.Bed_Count ||
-                h.Total_Beds ||
-                h.BedSize ||
-                'N/A';
+            // match GA JSON fields
+            const beds = h.Bed_Size ?? 'N/A';
+            const setting = h.Urban_Rural || 'N/A';
 
-            const setting =
-                h.Urban_Rural ||
-                h.Setting ||
-                'N/A';
+            // In_System is 0/1 in GA file
+            const inSystem = (h.In_System === 1 || h.In_System === '1') ? 'Yes' : 'No';
 
-            const criticalAccess = normalizeYesNo(
-                h.Critical_Access || h.CriticalAccess
-            );
-
-            const system = normalizeYesNo(
-                h.System || h.System_Affiliation || h.System_Affil
-            );
-
+            const systemName = h.System_Name || 'Independent';
             const county = h.County || 'N/A';
 
             col.innerHTML = `
@@ -449,8 +436,8 @@ function createHospitalInfoRow() {
                     <ul class="hospital-info-list">
                         <li><span class="bullet-dot"></span>Beds: ${beds}</li>
                         <li><span class="bullet-dot"></span>${setting}</li>
-                        <li><span class="bullet-dot"></span>Critical Access: ${criticalAccess}</li>
-                        <li><span class="bullet-dot"></span>System: ${system}</li>
+                        <li><span class="bullet-dot"></span>In System: ${inSystem}</li>
+                        <li><span class="bullet-dot"></span>System: ${systemName}</li>
                         <li><span class="bullet-dot"></span>County: ${county}</li>
                     </ul>
                 </div>
@@ -462,6 +449,7 @@ function createHospitalInfoRow() {
 
     return row;
 }
+
 
 
 // ===============================

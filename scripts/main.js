@@ -264,53 +264,107 @@ function updateMobileMapMarkers(data) {
     mobileMapMarkers.forEach(marker => mobileMap.removeLayer(marker));
     mobileMapMarkers = [];
 
-    if (data.length === 0) return;
+    if (!data || data.length === 0) return;
 
-    // Add new markers
     data.forEach(hospital => {
-        let lat = parseFloat(hospital.Latitude);
-        let lon = parseFloat(hospital.Longitude);
+        let lat = Number(hospital.Latitude);
+        let lon = Number(hospital.Longitude);
 
-        // If no coordinates, approximate from ZIP code
-        if ((!lat || !lon) && hospital.ZIP_Code) {
+        const latBad = Number.isNaN(lat);
+        const lonBad = Number.isNaN(lon);
+
+        if ((latBad || lonBad) && hospital.ZIP_Code) {
             const [zipLat, zipLon] = getZipCoords(hospital.ZIP_Code);
-            lat = lat || zipLat;
-            lon = lon || zipLon;
+            lat = zipLat;
+            lon = zipLon;
         }
 
-        if (!lat || !lon) return;
+        if (Number.isNaN(lat) || Number.isNaN(lon)) {
+            console.warn('No usable coordinates for hospital (mobile):', hospital.Hospital_Name);
+            return;
+        }
 
-        const overallScore = hospital.Overall_Star_Rating;
-        const stars = convertGradeToStars(overallScore);
+        const overallScore = Number(hospital.Overall_Star_Rating);
+        const overallStars = convertGradeToStars(overallScore);
+        const ftiScore = convertGradeToStars(hospital.FTIH_Category_Rating).value;
+        const hasrScore = convertGradeToStars(hospital.HASR_Category_Rating).value;
+
+        const typeLabel = hospital.Ownership_Type && hospital.Care_Level
+            ? `${hospital.Ownership_Type} – ${hospital.Care_Level}`
+            : (hospital.Ownership_Type || hospital.Care_Level || 'Type unknown');
+
+        const bedLabel = hospital.Bed_Size ? `${hospital.Bed_Size} beds` : 'Bed size N/A';
+
+        const systemLabel = hospital.In_System
+            ? (hospital.System_Name ? `Part of ${hospital.System_Name}` : 'Part of a health system')
+            : 'Independent';
 
         const popupHTML = `
             <div class="map-popup">
-                <strong>${hospital.Hospital_Name || 'Unnamed Hospital'}</strong><br>
-                ${hospital.City || ''}, ${hospital.State || ''}<br>
-                <div class="star-rating">${renderStars(stars.value)}</div>
+                <strong class="map-popup-title">
+                    ${hospital.Hospital_Name || 'Unnamed Hospital'}
+                </strong>
+                <div class="map-popup-location">
+                    ${(hospital.City || '')}, ${(hospital.State || '')}
+                </div>
+
+                <div class="map-popup-section">
+                    <div class="map-popup-overall">
+                        <span class="map-popup-label">Overall:</span>
+                        <span class="map-popup-stars" aria-label="${overallStars.value} out of 5 stars">
+                            ${renderStars(overallStars.value)}
+                        </span>
+                        ${Number.isFinite(overallScore)
+                            ? `<span class="map-popup-score">${overallScore.toFixed(1)} / 5</span>`
+                            : ''}
+                    </div>
+
+                    <div class="map-popup-submetrics">
+                        <div class="map-popup-submetric">
+                            <span class="map-popup-label">Transparency & Health:</span>
+                            <span class="map-popup-stars">
+                                ${renderStars(ftiScore)}
+                            </span>
+                        </div>
+                        <div class="map-popup-submetric">
+                            <span class="map-popup-label">Access & Responsibility:</span>
+                            <span class="map-popup-stars">
+                                ${renderStars(hasrScore)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="map-popup-meta">
+                    <span>${typeLabel}</span><br>
+                    <span>${bedLabel}</span><br>
+                    <span>${systemLabel}</span>
+                </div>
+
                 <a href="details.html?id=${hospital.Hospital_ID}" class="view-full-detail">
                     View Full Details
                 </a>
             </div>
         `;
 
-        const marker = L.marker([lat, lon]).addTo(mobileMap).bindPopup(popupHTML);
+        const marker = L.marker([lat, lon]).addTo(mobileMap).bindPopup(popupHTML, {
+            maxWidth: 320
+        });
         mobileMapMarkers.push(marker);
     });
 
-    // Adjust map to fit all visible markers
     if (mobileMapMarkers.length > 0) {
         const group = L.featureGroup(mobileMapMarkers);
         mobileMap.fitBounds(group.getBounds().pad(0.2));
     }
 
-    // Ensure map is properly sized
     setTimeout(() => {
         if (mobileMap) {
             mobileMap.invalidateSize();
         }
     }, 100);
 }
+
 
 // ===============================
 // Render Hospitals
@@ -707,61 +761,117 @@ function updateMapMarkers(data) {
     mapMarkers.forEach(marker => map.removeLayer(marker));
     mapMarkers = [];
 
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
         console.log('No data to display on map');
         return;
     }
 
-    // Add new markers
     data.forEach(hospital => {
-        let lat = parseFloat(hospital.Latitude);
-        let lon = parseFloat(hospital.Longitude);
+        // Use numeric coordinates
+        let lat = Number(hospital.Latitude);
+        let lon = Number(hospital.Longitude);
 
-        // If no coordinates, approximate from ZIP code
-        if ((!lat || !lon) && hospital.ZIP_Code) {
+        const latBad = Number.isNaN(lat);
+        const lonBad = Number.isNaN(lon);
+
+        // Fallback: approximate from ZIP only if lat/lon are invalid
+        if ((latBad || lonBad) && hospital.ZIP_Code) {
             const [zipLat, zipLon] = getZipCoords(hospital.ZIP_Code);
-            lat = lat || zipLat;
-            lon = lon || zipLon;
+            lat = zipLat;
+            lon = zipLon;
         }
 
-        if (!lat || !lon) {
-            console.warn('No coordinates for hospital:', hospital.Hospital_Name);
+        if (Number.isNaN(lat) || Number.isNaN(lon)) {
+            console.warn('No usable coordinates for hospital:', hospital.Hospital_Name);
             return;
         }
 
-        const overallScore = hospital.Overall_Star_Rating;
-        const stars = convertGradeToStars(overallScore);
+        // Overall and category scores (0–5)
+        const overallScore = Number(hospital.Overall_Star_Rating);
+        const overallStars = convertGradeToStars(overallScore);
+
+        const ftiScore = convertGradeToStars(hospital.FTIH_Category_Rating).value;
+        const hasrScore = convertGradeToStars(hospital.HASR_Category_Rating).value;
+
+        // Type / beds / system info
+        const typeLabel = hospital.Ownership_Type && hospital.Care_Level
+            ? `${hospital.Ownership_Type} – ${hospital.Care_Level}`
+            : (hospital.Ownership_Type || hospital.Care_Level || 'Type unknown');
+
+        const bedLabel = hospital.Bed_Size ? `${hospital.Bed_Size} beds` : 'Bed size N/A';
+
+        const systemLabel = hospital.In_System
+            ? (hospital.System_Name ? `Part of ${hospital.System_Name}` : 'Part of a health system')
+            : 'Independent';
 
         const popupHTML = `
             <div class="map-popup">
-                <strong>${hospital.Hospital_Name || 'Unnamed Hospital'}</strong><br>
-                ${hospital.City || ''}, ${hospital.State || ''}<br>
-                <div class="star-rating">${renderStars(stars.value)}</div>
+                <strong class="map-popup-title">
+                    ${hospital.Hospital_Name || 'Unnamed Hospital'}
+                </strong>
+                <div class="map-popup-location">
+                    ${(hospital.City || '')}, ${(hospital.State || '')}
+                </div>
+
+                <div class="map-popup-section">
+                    <div class="map-popup-overall">
+                        <span class="map-popup-label">Overall:</span>
+                        <span class="map-popup-stars" aria-label="${overallStars.value} out of 5 stars">
+                            ${renderStars(overallStars.value)}
+                        </span>
+                        ${Number.isFinite(overallScore)
+                            ? `<span class="map-popup-score">${overallScore.toFixed(1)} / 5</span>`
+                            : ''}
+                    </div>
+
+                    <div class="map-popup-submetrics">
+                        <div class="map-popup-submetric">
+                            <span class="map-popup-label">Transparency & Health:</span>
+                            <span class="map-popup-stars">
+                                ${renderStars(ftiScore)}
+                            </span>
+                        </div>
+                        <div class="map-popup-submetric">
+                            <span class="map-popup-label">Access & Responsibility:</span>
+                            <span class="map-popup-stars">
+                                ${renderStars(hasrScore)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="map-popup-meta">
+                    <span>${typeLabel}</span><br>
+                    <span>${bedLabel}</span><br>
+                    <span>${systemLabel}</span>
+                </div>
+
                 <a href="details.html?id=${hospital.Hospital_ID}" class="view-full-detail">
                     View Full Details
                 </a>
             </div>
         `;
 
-        const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML);
+        const marker = L.marker([lat, lon]).addTo(map).bindPopup(popupHTML, {
+            maxWidth: 320
+        });
         mapMarkers.push(marker);
     });
 
     console.log('Added', mapMarkers.length, 'markers to map');
 
-    // Adjust map to fit all visible markers
     if (mapMarkers.length > 0) {
         const group = L.featureGroup(mapMarkers);
         map.fitBounds(group.getBounds().pad(0.2));
         console.log('Map bounds adjusted to fit markers');
     }
 
-    // Ensure map is properly sized
     setTimeout(() => {
         map.invalidateSize();
         console.log('Map size invalidated');
     }, 100);
 }
+
 
 // ===============================
 // ZIP-Based Coordinate Approximation

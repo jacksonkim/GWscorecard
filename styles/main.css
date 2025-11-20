@@ -719,18 +719,36 @@ SERVICES GRID STYLING
 .submetric summary {
     cursor: pointer;
     padding: 12px 16px;
+    padding-right: 40px;        /* make room for the arrow on the far right */
     background: #f8f8f8;
     font-weight: 600;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    /* remove justify-content: space-between; */
+    position: relative;         /* so the arrow can be absolutely positioned */
 }
 
 .submetric summary::after {
     content: "▼";
     font-size: 0.9em;
     transition: transform 0.2s ease;
+    position: absolute;
+    right: 16px;                /* pin arrow to the far right */
 }
+
+/* Make the star span push to the right in submetric rows */
+.submetric summary span[id$="Stars"] {
+    margin-left: auto;          /* pushes stars to the right side */
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Right-align stars inside their own container */
+.submetric summary .star-rating {
+    justify-content: flex-end;
+    gap: 3px;
+}
+
 
 .submetric[open] summary::after {
     transform: rotate(180deg);
@@ -1448,4 +1466,74 @@ body.mobile-filter-open {
     .mobile-filter-toggle {
         min-height: 50px;
     }
+}
+
+.map-popup {
+    font-size: 0.9rem;
+    line-height: 1.35;
+    max-width: 300px;
+}
+
+.map-popup-title {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+}
+
+.map-popup-location {
+    margin-bottom: 0.35rem;
+    color: #555;
+}
+
+.map-popup-section {
+    margin-bottom: 0.4rem;
+}
+
+.map-popup-overall {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.map-popup-label {
+    font-weight: 600;
+    margin-right: 0.15rem;
+}
+
+.map-popup-stars svg {
+    width: 14px;
+    height: 14px;
+}
+
+.map-popup-score {
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.map-popup-submetrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.map-popup-submetric {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.map-popup-meta {
+    margin: 0.35rem 0;
+    font-size: 0.8rem;
+    color: #444;
+}
+
+.map-popup .view-full-detail {
+    display: inline-block;
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+    text-decoration: underline;
 }

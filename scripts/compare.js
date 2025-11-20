@@ -239,6 +239,11 @@ function populateComparison() {
     const comparisonGrid = document.getElementById('comparisonGrid');
     if (!comparisonGrid) return;
     comparisonGrid.innerHTML = '';
+	
+	// Add top "Hospital Information" cards
+	const infoRow = createHospitalInfoRow();
+	comparisonGrid.appendChild(infoRow);
+
 
     // Define comparison categories and metrics using the new schema
     const categories = [
@@ -398,6 +403,67 @@ function getFormattedValue(hospital, metric) {
     return value;
 }
 
+function createHospitalInfoRow() {
+    const row = document.createElement('div');
+    row.className = 'hospital-info-row';
+
+    ['hospital1', 'hospital2'].forEach(slot => {
+        const h = selectedHospitals[slot];
+        const col = document.createElement('div');
+        col.className = `hospital-info-card ${slot}`;
+
+        if (!h) {
+            col.innerHTML = '<p class="placeholder">No hospital selected</p>';
+        } else {
+            const name = getHospitalShortName(h);
+
+            // Try a few possible field names for beds, etc.
+            const beds =
+                h.Beds ||
+                h.Bed_Count ||
+                h.Total_Beds ||
+                h.BedSize ||
+                'N/A';
+
+            const setting =
+                h.Urban_Rural ||
+                h.Setting ||
+                'N/A';
+
+            const criticalAccess = normalizeYesNo(
+                h.Critical_Access || h.CriticalAccess
+            );
+
+            const system = normalizeYesNo(
+                h.System || h.System_Affiliation || h.System_Affil
+            );
+
+            const county = h.County || 'N/A';
+
+            col.innerHTML = `
+                <div class="hospital-info-header">
+                    <h3>${name}</h3>
+                </div>
+                <div class="hospital-info-body">
+                    <h4>Hospital Information</h4>
+                    <ul class="hospital-info-list">
+                        <li><span class="bullet-dot"></span>Beds: ${beds}</li>
+                        <li><span class="bullet-dot"></span>${setting}</li>
+                        <li><span class="bullet-dot"></span>Critical Access: ${criticalAccess}</li>
+                        <li><span class="bullet-dot"></span>System: ${system}</li>
+                        <li><span class="bullet-dot"></span>County: ${county}</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        row.appendChild(col);
+    });
+
+    return row;
+}
+
+
 // ===============================
 // Star Rating Utilities (numeric 0–5)
 // ===============================
@@ -451,3 +517,12 @@ function emptyStarSVG() {
         </svg>
     `;
 }
+
+function normalizeYesNo(value) {
+    if (value === null || value === undefined || value === '' || value === 'NULL') return 'N/A';
+    const v = String(value).trim().toLowerCase();
+    if (['y', 'yes', 'true', '1'].includes(v)) return 'Yes';
+    if (['n', 'no', 'false', '0'].includes(v)) return 'No';
+    return value;
+}
+

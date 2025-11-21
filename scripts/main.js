@@ -4,10 +4,13 @@
 let hospitalData = [];
 let filteredHospitalData = [];
 
+// Single source for data file
+const DATA_URL = "./data/current/GeorgiaWatch_HospitalScores.json";
+
 // ===============================
 // Load JSON Data
 // ===============================
-fetch("./data/2025/2025_GW_HospitalScores.json")
+fetch(DATA_URL)
     .then(res => res.json())
     .then(data => {
         hospitalData = data;
@@ -23,6 +26,20 @@ fetch("./data/2025/2025_GW_HospitalScores.json")
         initMobileUI();
     })
     .catch(err => console.error("Error loading JSON:", err));
+
+// ===============================
+// Load GA ZIP Coordinate Lookup
+// ===============================
+let zipCoords = {};
+
+fetch("./data/util/ga_zip_coords.json")
+  .then(res => res.json())
+  .then(data => {
+      zipCoords = data;
+      console.log("GA ZIP lookup loaded:", Object.keys(zipCoords).length, "ZIPs");
+  })
+  .catch(err => console.error("Error loading ZIP lookup:", err));
+
 
 // ===============================
 // Mobile Navigation & Filter Functions
@@ -615,30 +632,7 @@ function applyAllFilters() {
 	
 	filtered = filterByZipAndRadius(filtered);
 
-    // Apply location filter
-    const zip = document.getElementById('zipInput').value.trim();
-    const radius = document.getElementById('radiusSelect').value;
-    
-    if (zip && /^\d{5}$/.test(zip)) {
-        const coords = getZipCoords(zip);
-        filtered = filtered.filter(hospital => {
-            let lat = parseFloat(hospital.Latitude);
-            let lon = parseFloat(hospital.Longitude);
-
-            if ((!lat || !lon) && hospital.ZIP_Code) {
-                const [zipLat, zipLon] = getZipCoords(hospital.ZIP_Code);
-                lat = lat || zipLat;
-                lon = lon || zipLon;
-            }
-
-            if (!lat || !lon) return false;
-
-            const distance = calculateDistance(coords[0], coords[1], lat, lon);
-            return distance <= parseInt(radius);
-        });
-    }
-
-    filteredHospitalData = filtered;
+	filteredHospitalData = filtered;
 
     // Apply sorting and render
     sortAndRender(filteredHospitalData);
@@ -709,49 +703,41 @@ function filterByZipAndRadius(hospitals) {
     const radiusMiles = Number(radiusSelect.value);
 
     if (!zip || Number.isNaN(radiusMiles)) {
-        return hospitals; // no filtering
+        return hospitals; // no ZIP or radius = no filter
     }
 
-    // Convert ZIP → coords
-    const [zipLat, zipLon] = getZipCoords(zip);
-
-    if (!zipLat || !zipLon) {
+    // Convert ZIP → coords safely
+    const coords = getZipCoords(zip);
+    if (!coords) {
         console.warn("ZIP lookup failed:", zip);
+        showErrorPopup("We could not find that ZIP code in our Georgia list. Please check the ZIP or try another one.");
         return hospitals;
     }
 
-    // Haversine distance between two lat/lon pairs
-    function distanceMiles(lat1, lon1, lat2, lon2) {
-        const R = 3958.8; // earth radius in miles
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a =
-            Math.sin(dLat/2) ** 2 +
-            Math.cos(lat1*Math.PI/180) *
-            Math.cos(lat2*Math.PI/180) *
-            Math.sin(dLon/2) ** 2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    }
+    const [zipLat, zipLon] = coords;
 
-    // Filter hospitals by distance
+    // Use the global calculateDistance function
     return hospitals.filter(h => {
         let lat = Number(h.Latitude);
         let lon = Number(h.Longitude);
 
-        // Use ZIP fallback if missing coords
+        // Fallback if hospital missing coords but has a ZIP
         if ((Number.isNaN(lat) || Number.isNaN(lon)) && h.ZIP_Code) {
-            const [zLat, zLon] = getZipCoords(h.ZIP_Code);
-            lat = zLat;
-            lon = zLon;
+            const fallback = getZipCoords(h.ZIP_Code);
+            if (fallback) {
+                const [zLat, zLon] = fallback;
+                lat = zLat;
+                lon = zLon;
+            }
         }
 
         if (Number.isNaN(lat) || Number.isNaN(lon)) return false;
 
-        const dist = distanceMiles(zipLat, zipLon, lat, lon);
+        const dist = calculateDistance(zipLat, zipLon, lat, lon);
         return dist <= radiusMiles;
     });
 }
+
 
 
 // ===============================
@@ -792,10 +778,22 @@ document.getElementById('sortSelect').addEventListener('change', () => {
 // ===============================
 // Download Data
 // ===============================
-document.getElementById('downloadDataBtn').addEventListener('click', () => {
-    console.log('Download triggered');
-    // TODO: backend or SheetJS export
-});
+const dlBtn = document.getElementById("downloadDataBtn");
+
+if (dlBtn) {
+    const csvPath = DATA_URL.replace(".json", ".csv");
+
+    dlBtn.addEventListener("click", () => {
+        const link = document.createElement("a");
+        link.href = csvPath;
+
+        // Automatically match the file name
+        const fileName = csvPath.split("/").pop();
+        link.download = fileName;
+
+        link.click();
+    });
+}
 
 // ===============================
 // Map Functions
@@ -947,30 +945,14 @@ function updateMapMarkers(data) {
 // ZIP-Based Coordinate Approximation
 // ===============================
 function getZipCoords(zip) {
-    const lookup = {
-        '30303': [33.7525, -84.3915], // Atlanta
-        '30606': [33.9597, -83.3764], // Athens
-        '31404': [32.0760, -81.0886], // Savannah
-        '31533': [31.5185, -82.8499], // Douglas
-        '30553': [34.3434, -83.8003], // Lavonia
-        '30720': [34.7698, -84.9719], // Dalton
-        '31201': [32.8306, -83.6513], // Macon
-        '31901': [32.464, -84.9877], // Columbus
-        '31401': [32.0809, -81.0912], // Savannah
-        '31701': [31.5795, -84.1557], // Albany
-        '39817': [30.9043, -84.5762], // Bainbridge
-        '30161': [34.2546, -85.1647], // Rome
-        '30501': [34.2963, -83.8255], // Gainesville
-        '30117': [33.5801, -85.0767], // Carrollton
-        '31093': [32.6184, -83.6272], // Warner Robins
-        '31405': [32.0316, -81.1028], // Savannah
-        '31021': [32.5563, -82.8947], // Dublin
-        '31792': [30.8365, -83.9787] // Thomasville
-    };
-
-    const coords = lookup[String(zip)] || [32.5, -83.5]; // Default to central Georgia
-    return coords;
+    if (!zipCoords || !zipCoords[zip]) {
+        console.warn("No coordinates found for ZIP:", zip);
+        return null;
+    }
+    const { lat, lon } = zipCoords[zip];
+    return [lat, lon];
 }
+
 
 // ===============================
 // Star Rating Utilities

@@ -1,7 +1,10 @@
 // =======================================
 // Georgia Watch Details Page Script
-// Updated for 2025 GW numeric dataset
 // =======================================
+
+// Single source for data file
+const DATA_URL = "./data/current/GeorgiaWatch_HospitalScores.json";
+
 document.addEventListener("DOMContentLoaded", async () => {
 	
 	if (typeof initMobileNavigation === "function") {
@@ -18,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     
     try {
-        const res = await fetch("./data/2025/2025_GW_HospitalScores.json");
+        const res = await fetch(DATA_URL);
         const data = await res.json();
         
         const h = data.find(x => String(x.Hospital_ID) === String(hospitalId));
@@ -238,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ====== STAR UTILITIES ======
-// Now expects numeric 0–5 scores from the dataset
+// expects numeric 0–5 scores from the dataset
 function convertGradeToStars(score) {
     let value = parseFloat(score);
     if (isNaN(value)) value = 0;

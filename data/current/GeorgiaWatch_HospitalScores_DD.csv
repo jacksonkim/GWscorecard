@@ -1,0 +1,45 @@
+﻿Field Name,Description,Data Type,Example Value
+Hospital_ID,Numeric identifier for each hospital; used as the primary key in the dataset.,Integer,1
+Hospital_Name,Official name of the hospital or medical center.,String,Appling Hospital
+Street_Address,Street address of the hospital’s primary location.,String,163 E Tollison St
+City,City where the hospital is located.,String,Baxley
+State,"Two-letter state abbreviation (for this dataset, always GA).",String,GA
+ZIP_Code,Five-digit ZIP code for the hospital’s address.,String,31513
+County,Name of the Georgia county where the hospital is located.,String,Appling
+County_FIPS,"Five-digit FIPS code for the county, stored as text to preserve leading zeros.",String,13001
+Latitude,Decimal latitude coordinate used for mapping and spatial filtering.,Number (float),33.54609
+Longitude,Decimal longitude coordinate used for mapping and spatial filtering.,Number (float),-82.3163154
+Urban_Rural,Indicates whether the hospital is classified as Urban or Rural.,String (enum),Rural
+In_System,"Flag indicating whether the hospital is part of a larger health system (1 = in system, 0 = independent).",Integer (0/1),0
+System_Name,"Name of the health system the hospital belongs to, if applicable.",String,Appling Healthcare
+Ownership_Type,"Hospital ownership category (e.g., Nonprofit, Government, For-profit).",String,Government
+Care_Level,"General level or type of care provided (e.g., Primary, Specialty, Regional Referral, Acute Care).",String,Primary
+Bed_Size,Approximate number of hospital beds; used for size comparisons and filters.,Integer,64
+Size_Group,"Categorical size band based on bed count (e.g., S, L, XL, XXL).",String (enum),S
+Hospital_URL,URL for the hospital’s website or a search link when a direct URL is not available.,String (URL),https://www.applinghealthcare.org
+Balance_Growth,Score (1–5) indicating how well the hospital balances financial growth with mission-driven priorities.,Integer (1–5),4
+Transparency,Score (1–5) representing financial transparency and reporting practices.,Integer (1–5),4
+Fiscal_Health,Score (1–5) reflecting overall fiscal stability and financial health.,Integer (1–5),3
+Staffing,Score (1–5) indicating adequacy and stability of staffing levels.,Integer (1–5),4
+FTIH_Category_Rating,"Aggregate category rating (1–5) for Finance, Transparency, Investment, and Hiring (FTIH) metrics.",Integer (1–5),4
+Tax_Benefit,Score (1–5) representing how effectively tax benefits are used in support of community obligations.,Integer (1–5),3
+Quality_of_CBS,Score (1–5) for the quality of community benefit spending (CBS).,Integer (1–5),3
+Strategic_Use,Score (1–5) indicating how strategically community benefit and related resources are deployed.,Integer (1–5),4
+CBS_Category_Rating,Aggregate category rating (1–5) for Community Benefit Spending metrics.,Integer (1–5),4
+Financial_Burden,"Score (1–5) reflecting the financial burden on patients (e.g., affordability, billing practices).",Integer (1–5),3
+Charity_Care,Score (1–5) indicating the level and adequacy of charity care provided.,Integer (1–5),3
+Medical_Debt,"Score (1–5) representing hospital performance related to medical debt (e.g., debt practices, relief).",Integer (1–5),3
+HAB_Category_Rating,Aggregate category rating (1–5) for Hospital Affordability and Billing (HAB) metrics.,Integer (1–5),4
+Range_of_Services,Score (1–5) reflecting the breadth of services available at the hospital.,Integer (1–5),3
+Demographic_Alignment,Score (1–5) indicating how well services align with the needs and demographics of the community.,Integer (1–5),4
+Workforce_Training,Score (1–5) representing investment in workforce development and training.,Integer (1–5),3
+Pay_Equity_Ratio,Score (1–5) reflecting pay equity within the hospital system.,Integer (1–5),4
+HASR_Category_Rating,Aggregate category rating (1–5) for Healthcare Access and Social Responsibility (HASR) metrics.,Integer (1–5),4
+Overall_Star_Rating,Final overall performance rating (1–5 stars) used for rankings and comparison.,Integer (1–5),3
+Services_Offered,List of key clinical and support services offered; stored as a newline-separated string.,String (multi-line),"Emergency Care\nImaging & Radiology\nOutpatient Surgery\nPharmacy\netc…
+OR
+Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+etc…"

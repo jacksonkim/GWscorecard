@@ -1,0 +1,434 @@
+﻿Hospital_ID,Hospital_Name,Street_Address,City,State,ZIP_Code,County,County_FIPS,Latitude,Longitude,Urban_Rural,In_System,System_Name,Ownership_Type,Care_Level,Bed_Size,Size_Group,Hospital_URL,Balance_Growth,Transparency,Fiscal_Health,Staffing,FTIH_Category_Rating,Tax_Benefit,Quality_of_CBS,Strategic_Use,CBS_Category_Rating,Financial_Burden,Charity_Care,Medical_Debt,HAB_Category_Rating,Range_of_Services,Demographic_Alignment,Workforce_Training,Pay_Equity_Ratio,HASR_Category_Rating,Overall_Star_Rating,Services_Offered
+1,Appling Hospital,163 E Tollison St,Baxley,GA,31513,Appling,13001,33.54609,-82.3163154,Rural,0,Appling Healthcare,Government,Primary,64,S,https://www.applinghealthcare.org,4,4,3,4,4,3,3,4,4,3,3,3,4,3,4,3,4,4,3,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+2,Bacon County Hospital,302 S Wayne St,Alma,GA,31510,Bacon,13005,31.538626,-82.459238,Rural,0,Bacon County Hospital and Health System,Government,Primary,25,S,https://www.baconcountyhospital.com,3,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,"Emergency Care
+Imaging & Radiology
+Pharmacy
+Physical Therapy
+Rehabilitation"
+3,Burke Medical Center,351 S Liberty St,Waynesboro,GA,30830,Burke,13033,33.0833,-82.0134,Urban,0,Burke Health,Government,Primary,40,S,https://www.burkemedicalcenter.com,3,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,"Cardiology
+Emergency Care
+Imaging & Radiology
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+5,Piedmont Hospital,1968 Peachtree Rd NW,Atlanta,GA,30309,Fulton,13121,33.80915,-84.39547,Urban,1,Piedmont Healthcare,Nonprofit,Regional Referral,643,XXL,https://www.piedmont.org/locations/piedmont-atlanta,5,5,4,4,5,4,4,4,4,3,4,3,4,4,4,4,4,4,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+6,Phoebe Putney Memorial Hospital,417 W 3rd Ave,Albany,GA,31701,Dougherty,13095,31.59022,-84.15779,Urban,1,Phoebe Putney Health System,Nonprofit,Regional Referral,691,XXL,https://www.phoebehealth.com,4,4,4,4,4,3,3,4,4,3,3,3,4,4,4,4,4,4,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient SurgeryPediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+7,Northside Hospital Atlanta,1000 Johnson Ferry Rd NE,Atlanta,GA,30342,Fulton,13121,33.908404,-84.354543,Urban,1,Northside Hospital,Nonprofit,Regional Referral,685,XXL,https://www.northside.com/locations/atlanta,5,4,4,5,5,3,4,4,4,3,3,3,4,4,4,4,5,4,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+8,Tanner Medical Center â€“ Villa Rica,601 Dallas Hwy,Villa Rica,GA,30180,Carroll,13045,33.56995,-85.07421,Urban,1,Tanner Health System,Nonprofit,Specialty,53,S,https://www.tanner.org,4,4,3,4,4,3,3,3,3,3,3,3,3,3,3,3,3,3,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services Pharmacy
+Physical Therapy
+Rehabilitation"
+9,Emory University Hospital,1364 Clifton Rd NE,Atlanta,GA,30322,DeKalb,13089,33.7954,-84.3202,Urban,1,Emory Healthcare,Nonprofit,Regional Referral,733,XXL,https://www.emoryhealthcare.org,5,5,5,5,5,4,4,5,5,4,4,4,5,5,5,5,5,5,4,"Emergency Care
+Cardiology
+Imaging & Radiology
+Oncology
+Maternity & Neonatal ICU
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation
+Pediatric Services
+Behavioral Health"
+10,St. Mary's Hospital,1230 Baxter St,Athens,GA,30606,Clarke,13059,34.16608,-83.4013,Urban,1,St. Mary's Healthcare System,Nonprofit,Regional Referral,196,L,https://www.stmaryshealthcaresystem.org,4,4,4,4,4,3,4,4,4,3,3,3,4,4,4,4,4,4,4,"Behavioral Health
+Cardiology Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+11,Wellstar Kennestone Hospital,677 Church St NE,Marietta,GA,30060,Cobb,13067,33.96795,-84.55135,Urban,1,Wellstar Health System,Nonprofit,Regional Referral,633,XXL,https://www.wellstar.org,5,4,4,5,5,4,4,4,4,3,4,3,4,4,4,4,4,4,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+12,Candler County Hospital,400 Cedar St,Metter,GA,30439,Candler,13043,32.0809,-81.0912,Urban,0,Candler County Hospital Authority,Nonprofit,Primary,25,S,https://www.google.com/search?q=Candler+County+Hospital+Metter+GA+hospital,4,3,4,4,5,5,3,4,4,5,5,5,4,3,4,5,3,5,3,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+13,Clinch Memorial Hospital,1050 Valdosta Hwy,Homerville,GA,31634,Clinch,13113,31.0339,-82.76445,Urban,0,South Georgia Medical Center,Nonprofit,Primary,25,S,https://www.google.com/search?q=Clinch+Memorial+Hospital+Homerville+GA+hospital,4,4,4,5,3,4,5,5,4,3,5,4,4,5,5,3,5,3,4,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+14,Coffee Regional Medical Center,1101 Ocila Road,Douglas,GA,31533,Coffee,13159,31.5047,-82.8586,Urban,0,Coffee Regional Medical Center,Nonprofit,Primary,82,S,https://www.google.com/search?q=Coffee+Regional+Medical+Center+Douglas+GA+hospital,3,3,3,3,5,3,4,5,4,3,3,4,4,3,4,5,4,4,5,"Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+15,Colquitt Regional Medical Center,3131 S Main St,Moultrie,GA,31768,Colquitt,13071,31.1621,-83.7921,Urban,0,Colquitt Regional Health System,Nonprofit,Specialty,155,L,https://www.google.com/search?q=Colquitt+Regional+Medical+Center+Moultrie+GA+hospital,4,4,3,4,4,3,5,3,3,5,3,5,3,5,3,3,3,5,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+16,Crisp Regional Hospital,902 7th St N,Cordele,GA,31015,Crisp,13191,31.97761,-83.781268,Urban,0,Crisp Regional Health Services,Nonprofit,Specialty,211,XL,https://www.google.com/search?q=Crisp+Regional+Hospital+Cordele+GA+hospital,3,5,3,5,3,3,4,3,4,3,5,4,4,5,3,3,3,5,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+17,Dodge County Hospital,901 Griffin Ave,Eastman,GA,31023,Dodge,13091,32.18507,-83.17896,Urban,0,Dodge County Hospital,Nonprofit,Primary,94,S,https://www.google.com/search?q=Dodge+County+Hospital+Eastman+GA+hospital,4,3,4,5,5,4,4,3,5,3,3,3,3,4,3,5,4,4,4,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+18,"Donalsonville Hospital, Inc.",102 Hospital Circle,Donalsonville,GA,39845,Seminole,13135,31.05102,-84.88167,Urban,0,"Donalsonville Hospital, Inc.",Nonprofit,Primary,61,S,"https://www.google.com/search?q=Donalsonville+Hospital,+Inc.+Donalsonville+GA+hospital",4,3,5,5,5,3,3,4,5,3,3,3,4,5,4,5,5,4,5,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+19,Dorminy Medical Center,200 Perry House Rd,Fitzgerald,GA,31750,Ben Hill,13019,31.69762,-83.25991,Urban,0,Dorminy Medical Center,Nonprofit,Primary,75,S,https://www.google.com/search?q=Dorminy+Medical+Center+Fitzgerald+GA+hospital,3,3,3,4,5,4,5,4,3,4,5,3,3,5,3,4,5,4,4,"Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+20,East Georgia Regional Medical Center,1499 Fair Rd,Statesboro,GA,30458,Bulloch,13031,32.4488,-81.7832,Urban,0,Community Health Systems,Nonprofit,Primary,142,L,https://www.google.com/search?q=East+Georgia+Regional+Medical+Center+Statesboro+GA+hospital,5,5,5,4,4,4,5,5,3,4,4,5,3,5,4,5,3,5,4,"Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+21,Effingham Health System,459 GA-119,Springfield,GA,31329,Effingham County,13103,32.36369,-81.32069,Urban,0,Effingham Health System,Nonprofit,Primary,25,S,https://www.google.com/search?q=Effingham+Health+System+Springfield+GA+hospital,3,5,4,5,5,5,4,5,4,5,5,4,4,3,4,3,5,4,5,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+22,Elbert Memorial Hospital,4 Medical Dr,Elberton,GA,30635,Elbert County,13105,34.11332,-82.87487,Urban,0,Elbert Memorial Hospital,Nonprofit,Primary,25,S,https://www.google.com/search?q=Elbert+Memorial+Hospital+Elberton+GA+hospital,5,5,3,3,4,4,3,5,5,4,3,5,3,5,3,4,4,4,3,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+23,Emanuel Medical Center,117 Kite Rd,Swainsboro,GA,30401,Emanuel County,13107,32.59258,-82.34732,Urban,0,Emanuel Medical Center,Nonprofit,Primary,88,S,https://www.google.com/search?q=Emanuel+Medical+Center+Swainsboro+GA+hospital,4,3,4,4,3,4,3,5,5,5,3,4,5,5,5,3,4,4,5,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Orthopedics
+Pharmacy
+Physical Therapy
+Rehabilitation"
+24,Evans Memorial Hospital,200 N River St,Claxton,GA,30417,Evans County,13109,32.1589,-81.9043,Urban,0,Evans Memorial Hospital,Nonprofit,Primary,49,S,https://www.google.com/search?q=Evans+Memorial+Hospital+Claxton+GA+hospital,3,4,4,3,4,5,3,4,5,5,3,5,5,5,5,5,5,4,3,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+25,Irwin County Hospital,710 N Irwin Ave,Ocilla,GA,31774,Irwin County,13155,31.60329,-83.25134,Urban,0,Irwin County Hospital,Nonprofit,Primary,34,S,https://www.google.com/search?q=Irwin+County+Hospital+Ocilla+GA+hospital,5,5,3,3,5,5,4,5,4,3,4,4,5,4,5,5,3,5,3,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+26,Jasper Memorial Hospital,898 College St,Monticello,GA,31064,Jasper County,13159,33.31422,-83.6864,Urban,0,"Jasper Health Services, Inc.",Nonprofit,Primary,17,S,https://www.google.com/search?q=Jasper+Memorial+Hospital+Monticello+GA+hospital,4,5,3,5,5,4,3,5,4,5,5,5,4,4,4,5,4,4,3,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery Pharmacy
+Physical Therapy
+Rehabilitation"
+27,Jeff Davis Hospital,163 S Tallahassee St,Hazlehurst,GA,31539,Jeff Davis County,13161,31.85727,-82.60728,Urban,0,Jeff Davis Hospital,Nonprofit,Primary,25,S,https://www.google.com/search?q=Jeff+Davis+Hospital+Hazlehurst+GA+hospital,5,5,4,5,3,4,3,3,4,3,3,4,5,3,3,4,5,3,5,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+28,Jefferson Hospital,1067 Peachtree St,Louisville,GA,30434,Jefferson County,13163,32.121,-82.412,Urban,0,Jefferson Hospital,Nonprofit,Primary,37,S,https://www.google.com/search?q=Jefferson+Hospital+Louisville+GA+hospital,5,4,3,3,5,3,3,5,3,5,4,5,5,4,4,5,3,3,4,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+29,Liberty Regional Medical Center,462 Elma G Miles Pkwy,Hinesville,GA,31313,"Liberty County, Georgia",13179,31.8469,-81.5959,Urban,0,Liberty Regional Medical Center,Nonprofit,Primary,25,S,https://www.google.com/search?q=Liberty+Regional+Medical+Center+Hinesville+GA+hospital,4,5,3,5,5,4,5,4,3,5,3,4,4,5,5,4,5,5,3,"Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+30,Miller County Hospital,208 N Cuthbert St,Colquitt,GA,39837,Miller County,13187,31.1713,-84.7338,Urban,0,Miller County Hospital,Nonprofit,Primary,25,S,https://www.google.com/search?q=Miller+County+Hospital+Colquitt+GA+hospital,5,4,4,4,5,4,3,3,4,5,3,5,5,5,5,3,4,4,5,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+31,Monroe County Hospital,88 Martin Luther King Jr Dr,Forsyth,GA,31029,Monroe County,13207,33.0309,-83.945,Urban,0,Monroe County Hospital,Nonprofit,Primary,25,S,https://www.google.com/search?q=Monroe+County+Hospital+Forsyth+GA+hospital,4,4,3,5,4,5,3,4,4,3,5,3,5,4,5,5,5,4,3,"Emergency Care
+Imaging & Radiology
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+32,Morgan Medical Center,1740 Lions Club Rd,Madison,GA,30650,Morgan County,13189,33.5849,-83.4807,Urban,0,Morgan Medical Center,Nonprofit,Primary,25,S,https://www.google.com/search?q=Morgan+Medical+Center+Madison+GA+hospital,4,4,3,3,5,5,5,4,3,3,5,3,5,4,4,4,3,5,5,"Cardiology
+Emergency Care
+Imaging & Radiology
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+33,Shepherd Center,2020 Peachtree Rd NW,Atlanta,GA,30309,Fulton,13121,33.749,-84.388,Urban,0,Shepherd Center,Nonprofit,Specialty,152,L,https://www.google.com/search?q=Shepherd+Center+Atlanta+GA+hospital,5,3,5,4,4,4,3,5,4,3,4,3,5,4,4,4,4,4,3,"Behavioral Health
+Imaging & Radiology
+Pharmacy
+Physical Therapy
+Rehabilitation"
+34,Southwest Georgia Regional Medical Center,361 Randolph St,Cuthbert,GA,39840,Randolph County,13243,31.7716,-84.7887,Urban,0,Southwest Georgia Health System,Nonprofit,Primary,25,L,https://www.google.com/search?q=Southwest+Georgia+Regional+Medical+Center+Cuthbert+GA+hospital,4,3,4,4,3,4,3,4,4,5,4,3,5,3,3,4,3,3,5,"Emergency Care
+Imaging & Radiology
+Pharmacy
+Physical Therapy
+Rehabilitation"
+35,Stephens County Hospital,163 Hospital Dr,Toccoa,GA,30577,Stephens County,13257,34.5787,-83.3324,Urban,0,Stephens County Hospital,Nonprofit,Primary,96,S,https://www.google.com/search?q=Stephens+County+Hospital+Toccoa+GA+hospital,3,4,3,3,4,4,3,3,3,4,5,5,5,3,3,3,3,5,3,"Emergency Care
+Imaging & Radiology
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+36,Taylor Regional Hospital,222 Perry Hwy,Hawkinsville,GA,31036,Taylor County,13235,32.4745,-83.7406,Urban,0,Taylor Regional Hospital,Nonprofit,Specialty,151,L,https://www.google.com/search?q=Taylor+Regional+Hospital+Hawkinsville+GA+hospital,3,3,5,5,5,5,4,3,5,4,4,3,5,3,3,4,4,4,5,"Cardiology
+Emergency Care
+Imaging & Radiology
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+37,Tift Regional Medical Center,901 East 18th St,Tifton,GA,31794,Tift County,13277,31.4605,-83.5228,Urban,0,"Tift Regional Health System, Inc.",Nonprofit,Specialty,181,XL,https://www.google.com/search?q=Tift+Regional+Medical+Center+Tifton+GA+hospital,5,3,5,4,5,5,4,3,3,4,4,5,4,5,5,5,3,3,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+38,Upson Regional Medical Center,801 W Gordon St,Thomaston,GA,30286,Upson County,13293,32.8818,-84.3278,Urban,0,Upson Regional Medical Center,Nonprofit,Primary,115,L,https://www.google.com/search?q=Upson+Regional+Medical+Center+Thomaston+GA+hospital,5,5,4,4,4,5,3,4,4,3,4,5,5,5,4,5,5,5,5,"Cardiology
+Emergency Care
+Imaging & Radiology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+39,Warm Springs Medical Center,5995 Spring St,Warm Springs,GA,31830,Meriwether County,13189,32.8944,-84.6786,Urban,0,Warm Springs Medical Center,Nonprofit,Primary,104,L,https://www.google.com/search?q=Warm+Springs+Medical+Center+Warm+Springs+GA+hospital,3,3,4,4,5,3,4,4,5,5,3,5,4,3,4,4,3,5,4,"Emergency Care
+Imaging & Radiology
+Pharmacy
+Physical Therapy
+Rehabilitation"
+40,Washington County Regional Medical Center,610 Sparta Rd,Sandersville,GA,31082,Washington County,13181,32.9956,-82.8044,Urban,0,Washington County Regional Medical Center,Nonprofit,Primary,56,S,https://www.google.com/search?q=Washington+County+Regional+Medical+Center+Sandersville+GA+hospital,4,5,5,4,4,4,5,5,4,5,3,3,5,4,5,3,5,4,5,"Emergency Care
+Imaging & Radiology
+Orthopedics
+Outpatient Surgery
+Pharmacy
+Physical Therapy
+Rehabilitation"
+41,Hamilton Medical Center,1200 MEMORIAL DRIVE,Dalton,GA,30720,Whitfield County,13313,34.7889,-84.985,Urban,1,Hamilton Health Care System,Non-profit,Acute Care,177,L,https://www.google.com/search?q=Hamilton+Medical+Center+Dalton+GA+hospital,3,3,5,3,3,3,4,3,3,3,3,3,4,5,3,4,4,3,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+42,Memorial Satilla Health,1900 TEBEAU STREET,Waycross,GA,31501,Ware County,13305,31.2249,-82.348,Urban,1,HCA Healthcare,Non-profit,Acute Care,345,XXL,https://www.google.com/search?q=Memorial+Satilla+Health+Waycross+GA+hospital,3,3,4,3,3,5,5,3,4,4,4,5,3,3,3,3,3,3,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+43,Northside Hospital Forsyth,1200 NORTHSIDE FORSYTH DRIVE,Cumming,GA,30041,Forsyth,13117,34.2073,-84.1402,Urban,1,Northside Hospital System,Non-profit,Acute Care,181,L,https://www.google.com/search?q=Northside+Hospital+Forsyth+Cumming+GA+hospital,4,4,4,4,4,4,4,4,3,3,3,4,3,4,3,5,3,3,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+44,Northside Hospital Cherokee,450 NORTHSIDE CHEROKEE BOULEVARD,Canton,GA,30115,Cherokee,13057,34.2368,-84.4908,Urban,1,Northside Hospital System,Non-profit,Acute Care,146,L,https://www.google.com/search?q=Northside+Hospital+Cherokee+Canton+GA+hospital,3,3,4,4,3,3,3,4,3,5,5,4,3,3,3,3,5,4,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+45,Tanner Medical Center - Carrollton,705 DIXIE STREET,Carrollton,GA,30117,Carroll County,13045,33.5707,-85.0732,Urban,1,Tanner Health System,Non-profit,Acute Care,263,XL,https://www.google.com/search?q=Tanner+Medical+Center+-+Carrollton+Carrollton+GA+hospital,4,3,4,4,3,4,3,4,3,4,4,5,4,3,4,5,4,4,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+46,Tanner Medical Center - Villa Rica,601 DALLAS HIGHWAY,Villa Rica,GA,30180,Carroll County,13045,33.7324,-84.919,Urban,1,Tanner Health System,Non-profit,Acute Care,95,L,https://www.google.com/search?q=Tanner+Medical+Center+-+Villa+Rica+Villa+Rica+GA+hospital,5,5,3,3,3,4,3,5,4,4,4,4,3,3,3,3,3,3,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+47,Wellstar West Georgia Medical Center,1514 VERNON ROAD,Lagrange,GA,30240,Troup,13285,33.0454,-85.031,Urban,1,Wellstar Health System,Non-profit,Acute Care,177,L,https://www.google.com/search?q=Wellstar+West+Georgia+Medical+Center+Lagrange+GA+hospital,3,3,5,3,3,5,3,4,3,3,4,3,3,3,3,3,5,3,4,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+48,Piedmont Newton,5126 HOSPITAL DRIVE NE,Covington,GA,30014,Newton County,13217,33.6018,-83.8487,Urban,1,Piedmont Healthcare,Non-profit,Acute Care,196,XL,https://www.google.com/search?q=Piedmont+Newton+Covington+GA+hospital,5,3,4,3,3,4,3,5,3,3,3,3,4,4,3,3,5,4,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy Rehabilitation"
+49,AdventHealth Gordon,1035 RED BUD ROAD,Calhoun,GA,30701,Gordon County,13129,34.5103,-84.931,Urban,1,AdventHealth,Non-profit,Acute Care,289,xl,https://www.google.com/search?q=AdventHealth+Gordon+Calhoun+GA+hospital,4,4,3,4,4,4,3,4,4,3,4,4,3,4,3,4,3,3,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"
+50,Candler Hospital,5353 REYNOLDS STREET,Savannah,GA,31412,Chatham,13051,32.0809,-81.0912,Urban,1,St. Josephâ€™s / Candler Health System,Non-profit,Acute Care,162,L,https://www.google.com/search?q=Candler+Hospital+Savannah+GA+hospital,4,3,3,3,3,4,3,4,4,4,4,3,3,4,4,4,5,3,3,"Behavioral Health
+Cardiology
+Emergency Care
+Imaging & Radiology
+Maternity & Neonatal ICU
+Oncology
+Orthopedics
+Outpatient Surgery
+Pediatric Services
+Pharmacy
+Physical Therapy
+Rehabilitation"

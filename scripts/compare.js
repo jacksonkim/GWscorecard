@@ -1,12 +1,14 @@
 // ===============================
 // Hospital Comparison Script
-// Updated for 2025 GW numeric dataset
 // ===============================
 let hospitalData = [];
 let selectedHospitals = {
     hospital1: null,
     hospital2: null
 };
+
+// Single source for data file
+const DATA_URL = "./data/current/GeorgiaWatch_HospitalScores.json";
 
 // Load hospital data
 document.addEventListener('DOMContentLoaded', function() {
@@ -26,7 +28,7 @@ function getHospitalShortName(h) {
 
 async function loadHospitalData() {
     try {
-        const response = await fetch('./data/2025/2025_GW_HospitalScores.json');
+        const response = await fetch(DATA_URL);
         hospitalData = await response.json();
         console.log('Hospital data loaded for comparison:', hospitalData.length, 'hospitals');
         populateHospitalDropdowns();

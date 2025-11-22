@@ -103,3 +103,8 @@ function initMobileNavigation() {
         if (e.target === this) toggleMobileNavigation();
     });
 }
+
+// Ensure mobile navigation works regardless of JSON loading
+document.addEventListener('DOMContentLoaded', () => {
+    initMobileNavigation();
+});

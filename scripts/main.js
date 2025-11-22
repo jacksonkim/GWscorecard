@@ -18,9 +18,6 @@ fetch(DATA_URL)
         renderHospitals(hospitalData);
         initHospitalMap(hospitalData);
         initMobileMap(hospitalData);
-
-        // Initialize mobile UI
-        initMobileUI();
     })
     .catch(err => console.error("Error loading JSON:", err));
 

@@ -7,9 +7,6 @@ let selectedHospitals = {
     hospital2: null
 };
 
-// Single source for data file
-const DATA_URL = "./data/current/GeorgiaWatch_HospitalScores.json";
-
 // Load hospital data
 document.addEventListener('DOMContentLoaded', function() {
     loadHospitalData();

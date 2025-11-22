@@ -2,9 +2,6 @@
 // Georgia Watch Details Page Script
 // =======================================
 
-// Single source for data file
-const DATA_URL = "./data/current/GeorgiaWatch_HospitalScores.json";
-
 document.addEventListener("DOMContentLoaded", async () => {
 	
 	if (typeof initMobileNavigation === "function") {
@@ -283,34 +280,3 @@ function emptyStarSVG() {
         <path fill="#ddd" d="M12 .587l3.668 7.431L24 9.748l-6 5.848 1.416 8.26L12 19.896l-7.416 3.96L6 15.596 0 9.748l8.332-1.73z"/>
     </svg>`;
 }
-
-// ====== ZIPCODE FALLBACK FUNCTION ======
-function getZipCoords(zip) {
-    // Basic GA ZIP-to-lat/lon lookup (approximate centers)
-    const lookup = {
-        "30303": [33.7525, -84.3915], // Atlanta
-        "30720": [34.7698, -84.9719], // Dalton
-        "31201": [32.8306, -83.6513], // Macon
-        "31901": [32.464, -84.9877], // Columbus
-        "31401": [32.0809, -81.0912], // Savannah
-        "31520": [31.1499, -81.4915], // Brunswick
-        "31701": [31.5795, -84.1557], // Albany
-        "39817": [30.9043, -84.5762], // Bainbridge
-        "30601": [33.959, -83.3767], // Athens
-        "30161": [34.2546, -85.1647], // Rome
-        "30501": [34.2963, -83.8255], // Gainesville
-        "39840": [31.3141, -84.6191], // Dawson
-        "30040": [34.2282, -84.1596], // Cumming
-        "30809": [33.5515, -82.0903], // Evans/Augusta area
-        "31794": [31.4505, -83.5085], // Tifton
-        "30263": [33.3768, -84.8038], // Newnan
-        "31021": [32.5404, -82.9056], // Dublin
-        "30114": [34.196, -84.5049], // Canton
-        "30240": [33.036, -85.0318], // LaGrange
-        "31525": [31.2609, -81.5163], // Glynn County
-    };
-    
-    const coords = lookup[String(zip)] || [32.5, -83.5];
-    return coords;
-}
-

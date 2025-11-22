@@ -4,9 +4,6 @@
 let hospitalData = [];
 let filteredHospitalData = [];
 
-// Single source for data file
-const DATA_URL = "./data/current/GeorgiaWatch_HospitalScores.json";
-
 // ===============================
 // Load JSON Data
 // ===============================
@@ -28,20 +25,6 @@ fetch(DATA_URL)
     .catch(err => console.error("Error loading JSON:", err));
 
 // ===============================
-// Load GA ZIP Coordinate Lookup
-// ===============================
-let zipCoords = {};
-
-fetch("./data/util/ga_zip_coords.json")
-  .then(res => res.json())
-  .then(data => {
-      zipCoords = data;
-      console.log("GA ZIP lookup loaded:", Object.keys(zipCoords).length, "ZIPs");
-  })
-  .catch(err => console.error("Error loading ZIP lookup:", err));
-
-
-// ===============================
 // Mobile Navigation & Filter Functions
 // ===============================
 function initMobileUI() {
@@ -49,37 +32,6 @@ function initMobileUI() {
     initMobileEventListeners();
     // Initialize mobile navigation
     initMobileNavigation();
-}
-
-function initMobileNavigation() {
-    const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
-    const mobileNavClose = document.querySelector('.mobile-nav-close');
-    const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
-    
-    if (mobileNavToggle && mobileNavOverlay) {
-        mobileNavToggle.addEventListener('click', toggleMobileNavigation);
-        if (mobileNavClose) {
-            mobileNavClose.addEventListener('click', toggleMobileNavigation);
-        }
-        mobileNavOverlay.addEventListener('click', function(e) {
-            if (e.target === this) toggleMobileNavigation();
-        });
-    }
-}
-
-function toggleMobileNavigation() {
-    const body = document.body;
-    const overlay = document.querySelector('.mobile-nav-overlay');
-    const panel = document.querySelector('.mobile-nav-panel');
-    
-    if (!overlay || !panel) return;
-    
-    body.classList.toggle('mobile-nav-open');
-    overlay.style.display = body.classList.contains('mobile-nav-open') ? 'block' : 'none';
-    
-    setTimeout(() => {
-        panel.classList.toggle('active');
-    }, 10);
 }
 
 function initMobileEventListeners() {
@@ -641,21 +593,6 @@ function applyAllFilters() {
 }
 
 // ===============================
-// Distance Calculation
-// ===============================
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 3959; // Earth's radius in miles
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-}
-
-// ===============================
 // Sorting Function
 // ===============================
 function sortAndRender(data) {
@@ -939,20 +876,6 @@ function updateMapMarkers(data) {
         console.log('Map size invalidated');
     }, 100);
 }
-
-
-// ===============================
-// ZIP-Based Coordinate Approximation
-// ===============================
-function getZipCoords(zip) {
-    if (!zipCoords || !zipCoords[zip]) {
-        console.warn("No coordinates found for ZIP:", zip);
-        return null;
-    }
-    const { lat, lon } = zipCoords[zip];
-    return [lat, lon];
-}
-
 
 // ===============================
 // Star Rating Utilities

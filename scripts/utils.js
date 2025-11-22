@@ -70,12 +70,17 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
  */
 function toggleMobileNavigation() {
     const body = document.body;
-    const isOpen = body.classList.contains("nav-open");
+    const overlay = document.querySelector('.mobile-nav-overlay');
+    const panel   = document.querySelector('.mobile-nav-panel');
 
-    if (isOpen) {
-        body.classList.remove("nav-open");
-    } else {
-        body.classList.add("nav-open");
+    // toggle scroll-lock class
+    const isOpen = body.classList.toggle('mobile-nav-open');
+
+    if (overlay) {
+        overlay.style.display = isOpen ? 'block' : 'none';
+    }
+    if (panel) {
+        panel.classList.toggle('active', isOpen);
     }
 }
 

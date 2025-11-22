@@ -947,3 +947,8 @@ function showErrorPopup(message) {
         setTimeout(() => popup.remove(), 400);
     }, 4000);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    initMobileUI();
+});
+

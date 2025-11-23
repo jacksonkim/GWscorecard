@@ -539,55 +539,107 @@ document.getElementById('applyLocationBtn').addEventListener('click', () => {
 // ===============================
 function applyAllFilters() {
     let filtered = [...hospitalData];
-	
-	
 
-    // Apply hospital type filters (map to Care_Level)
+    // 1) View mode: systems vs. individuals
+    // If "Hospital Systems" view is active, only show hospitals that are in a system.
+    const isSystemsView =
+        typeof viewSystemsBtn !== 'undefined' &&
+        viewSystemsBtn &&
+        viewSystemsBtn.classList.contains('active');
+
+    if (isSystemsView) {
+        filtered = filtered.filter(hospital => hospital.In_System === 1);
+    }
+
+    // 2) Hospital type filters (map to Care_Level)
     const selectedHospitalType = getSelectedHospitalType();
     if (selectedHospitalType === 'Critical Access') {
-        // Approximated as primary/small hospitals in this schema
+        // Approximated as Primary / small hospitals in this schema
         filtered = filtered.filter(hospital => hospital.Care_Level === 'Primary');
     } else if (selectedHospitalType === 'Acute Care') {
         filtered = filtered.filter(hospital => hospital.Care_Level === 'Acute Care');
     }
 
-    // Apply checkbox filters
-    const checked = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
-    
+    // 3) Checkbox filters (urban/rural, ownership, metrics)
+    const checked = [...document.querySelectorAll('input[type="checkbox"]:checked')]
+        .map(cb => cb.value);
+
     if (checked.length > 0) {
+        // Pre-calc combos where BOTH options should behave like "no filter"
+        const hasNonprofit = checked.includes('Non-profit');
+        const hasForProfit = checked.includes('For Profit');
+        const hasUrban = checked.includes('Urban');
+        const hasRural = checked.includes('Rural');
+
         filtered = filtered.filter(hospital => {
             return checked.every(val => {
-                switch(val) {
+                switch (val) {
+                    // ----- Location (Urban / Rural) -----
                     case 'Urban':
+                        // If both Urban + Rural are checked, don't filter on Urban/Rural at all
+                        if (hasUrban && hasRural) return true;
                         return hospital.Urban_Rural === 'Urban';
+
                     case 'Rural':
+                        if (hasUrban && hasRural) return true;
                         return hospital.Urban_Rural === 'Rural';
+
+                    // ----- Ownership (Non-profit / For Profit) -----
                     case 'Non-profit':
-                        return hospital.Ownership_Type === 'Non-profit' || hospital.Ownership_Type === 'Nonprofit';
+                        // If BOTH Non-profit + For Profit are checked, show all ownerships
+                        if (hasNonprofit && hasForProfit) return true;
+                        return hospital.Ownership_Type === 'Non-profit' ||
+                               hospital.Ownership_Type === 'Nonprofit';
+
                     case 'For Profit':
-                        return hospital.Ownership_Type === 'For Profit' || hospital.Ownership_Type === 'For-profit';
-                    // The remaining categories (Church Affiliated, Academic Medical Center, Safety Net)
-                    // are not explicit in this schema, so we fall back to a text search.
+                        // If BOTH Non-profit + For Profit are checked, show all ownerships
+                        if (hasNonprofit && hasForProfit) return true;
+                        // Schema currently doesn’t have For Profit, but keep this logic for future data
+                        return hospital.Ownership_Type === 'For Profit' ||
+                               hospital.Ownership_Type === 'For-profit';
+
+                    // ----- Special tags (placeholders for future schema fields) -----
                     case 'Church Affiliated':
                     case 'Academic Medical Center':
                     case 'Safety Net':
-                        return JSON.stringify(hospital).toLowerCase().includes(val.toLowerCase());
+                        // No explicit fields in the current dataset; treat as no-op so they don’t kill results
+                        return true;
+
+                    // ----- Metric “Refine by” filters (use numeric category ratings) -----
+                    case 'Financial Transparency and Institutional Health':
+                        return typeof hospital.FTIH_Category_Rating === 'number' &&
+                               hospital.FTIH_Category_Rating >= 4;
+
+                    case 'Community Benefit Spending':
+                        return typeof hospital.CBS_Category_Rating === 'number' &&
+                               hospital.CBS_Category_Rating >= 4;
+
+                    case 'Healthcare Affordability and Billing':
+                        return typeof hospital.HAB_Category_Rating === 'number' &&
+                               hospital.HAB_Category_Rating >= 4;
+
+                    case 'Healthcare Access and Social Responsibility':
+                        return typeof hospital.HASR_Category_Rating === 'number' &&
+                               hospital.HASR_Category_Rating >= 4;
+
+                    // Unknown filter value – don’t exclude the hospital
                     default:
-                        return JSON.stringify(hospital).toLowerCase().includes(val.toLowerCase());
+                        return true;
                 }
             });
         });
     }
-	
-	filtered = filterByZipAndRadius(filtered);
 
-	filteredHospitalData = filtered;
+    // 4) ZIP + radius filter
+    filtered = filterByZipAndRadius(filtered);
 
-    // Apply sorting and render
+    // 5) Store and render
+    filteredHospitalData = filtered;
     sortAndRender(filteredHospitalData);
     updateMapMarkers(filteredHospitalData);
     updateMobileMapMarkers(filteredHospitalData);
 }
+
 
 // ===============================
 // Sorting Function
